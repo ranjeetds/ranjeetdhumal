@@ -62,7 +62,7 @@ export const sections = [
     label: 'Studio',
     title: 'Learning Studio',
     description:
-      'Lessons with an experiment attached. Read the mechanism, change a parameter, and continue. A module that is not built is marked as such.',
+      'Open an experiment and change it. The explanation is on the same page as the figure.',
     group: 'primary',
   },
   {

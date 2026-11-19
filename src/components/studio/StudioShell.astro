@@ -1,18 +1,12 @@
 ---
 /**
- * A focused studio workspace: one module, one figure, Learn or Explore.
- * The library is not listed here. The drawer holds the current domain sequence,
- * or the path the reader arrived from.
+ * The studio bench. The figure is on the page when it opens, and the explanation
+ * is on the same page. Switching experiments is one control, not a directory.
  */
 import 'katex/dist/katex.min.css';
 import GradientDescentStudio from '@/components/studio/GradientDescentStudio';
 import Viz from '@/components/visualizations/Viz.astro';
-import {
-  getStudioDomain,
-  resolveStep,
-  studioPaths,
-  type StudioModule,
-} from '@/data/studio';
+import { getStudioDomain, liveStudioModules, resolveStep, type StudioModule } from '@/data/studio';
 import type { StudioLesson } from '@/lib/content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 
@@ -22,11 +16,8 @@ interface Props {
 }
 
 const { module, lesson } = Astro.props;
+const instruments = liveStudioModules();
 const domain = getStudioDomain(lesson.data.domain);
-const sequence = (domain?.sequence ?? []).map((id) => resolveStep(id));
-const index = sequence.findIndex((step) => step.id === module.id);
-const previous = index > 0 ? sequence[index - 1] : undefined;
-const nextStep = sequence[index + 1];
 
 const relations = [
   { label: 'Prerequisite', id: lesson.data.prerequisites[0] },
@@ -35,101 +26,32 @@ const relations = [
 ]
   .filter((item): item is { label: string; id: string } => typeof item.id === 'string')
   .map((item) => ({ ...item, step: resolveStep(item.id) }));
-
-const pathIndex = studioPaths.map((path) => ({
-  id: path.id,
-  steps: path.steps.map((id) => {
-    const step = resolveStep(id);
-    return { id: step.id, title: step.title, status: step.status };
-  }),
-}));
 ---
 
 <BaseLayout title={`${lesson.data.title} — Learning Studio`} description={lesson.data.description}>
-  <noscript>
-    <style>
-      [data-panel='learn'] {
-        display: block !important;
-      }
-    </style>
-  </noscript>
   <article class="mx-auto min-w-0 max-w-page" data-studio-module data-module={module.id}>
-    <header class="sticky top-16 z-30 border-b border-line bg-canvas/90 px-gutter py-3 backdrop-blur-md">
-      <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <nav aria-label="Studio location" class="mono-label flex flex-wrap items-center gap-x-2 text-ink-faint">
-          <a href="/studio" class="hover:text-ink">Studio</a>
-          <span aria-hidden="true">/</span>
-          {
-            domain && (
-              <a href={`/studio/domain/${domain.id}`} class="hover:text-ink">
-                {domain.title}
-              </a>
-            )
-          }
-          <span aria-hidden="true">/</span>
-          <span class="text-ink">{lesson.data.title}</span>
-        </nav>
-        <div role="group" aria-label="Learning mode" class="ml-auto flex gap-1">
-          <button
-            type="button"
-            data-set-mode="explore"
-            aria-pressed="true"
-            class="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
-          >
-            Explore
-          </button>
-          <button
-            type="button"
-            data-set-mode="learn"
-            aria-pressed="false"
-            class="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
-          >
-            Learn
-          </button>
-        </div>
-      </div>
-      <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
-        {
-          previous?.href && (
-            <a data-step="prev" href={previous.href} class="text-sm text-ink-muted hover:text-ink">
-              Previous: {previous.title}
-            </a>
-          )
-        }
-        {
-          !previous?.href && (
-            <a data-step="prev" href="/studio" hidden class="text-sm text-ink-muted hover:text-ink">
-              Previous
-            </a>
-          )
-        }
-        {
-          nextStep?.href && (
-            <a data-step="next" href={nextStep.href} class="text-sm text-ink-muted hover:text-ink">
-              Next: {nextStep.title}
-            </a>
-          )
-        }
-        {
-          !nextStep?.href && (
-            <a data-step="next" href="/studio" hidden class="text-sm text-ink-muted hover:text-ink">
-              Next
-            </a>
-          )
-        }
-        <p class="mono-label ml-auto text-ink-faint" data-progress aria-live="polite">Nothing marked yet</p>
-        <div class="h-px w-24 bg-line" aria-hidden="true">
-          <div data-progress-bar class="h-px bg-ink" style="width: 0%"></div>
-        </div>
-      </div>
-    </header>
-
-    <div class="px-gutter pt-8">
+    <header class="px-gutter pt-6">
       <p class="mono-label text-ink-faint">
-        {lesson.data.difficulty} · {lesson.data.estimatedTime} min
+        {domain ? domain.title : 'Studio'}
+        <span class="mx-2" aria-hidden="true">/</span>
+        {lesson.data.difficulty}
       </p>
       <h1 class="mt-2 font-serif text-headline text-ink">{lesson.data.title}</h1>
-    </div>
+      <p class="mt-3 max-w-prose text-sm leading-relaxed text-ink">{lesson.data.summary}</p>
+      <nav aria-label="Experiments" class="mt-5 flex flex-wrap gap-2">
+        {
+          instruments.map((instrument) => (
+            <a
+              href={`/studio/${instrument.id}`}
+              aria-current={instrument.id === module.id ? 'page' : undefined}
+              class="mono-label rounded-sm border border-line px-3 py-2 text-ink-muted hover:border-line-strong hover:text-ink aria-[current=page]:border-line-strong aria-[current=page]:bg-raised aria-[current=page]:text-ink"
+            >
+              {instrument.title}
+            </a>
+          ))
+        }
+      </nav>
+    </header>
 
     <div class="mt-6 border-y border-line">
       {
@@ -156,113 +78,73 @@ const pathIndex = studioPaths.map((path) => ({
     </div>
 
     <div class="mx-auto max-w-prose px-gutter py-8">
-      <details class="border border-line p-4">
-        <summary data-drawer-summary class="cursor-pointer text-sm text-ink">In this {domain ? 'domain' : 'studio'}</summary>
-        <ul data-drawer-list class="mt-3 space-y-1">
-          {
-            sequence.map((step) => (
-              <li>
-                {step.href ? (
-                  <a
-                    href={step.href}
-                    aria-current={step.id === module.id ? 'page' : undefined}
-                    class="block py-1 text-sm text-ink-muted hover:text-ink aria-[current=page]:text-ink"
-                  >
-                    {step.title}
-                  </a>
-                ) : (
-                  <span class="block py-1 text-sm text-ink-faint">
-                    {step.title}
-                    <span class="mono-label ml-2">Not built</span>
-                  </span>
-                )}
-              </li>
-            ))
-          }
-        </ul>
+      {
+        lesson.data.experiments.length > 0 && (
+          <div>
+            <h2 class="font-serif text-title text-ink">On this figure</h2>
+            <ul class="mt-3 space-y-2 text-sm leading-relaxed text-ink-muted">
+              {lesson.data.experiments.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      <div class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <button type="button" data-chapter-prev class="text-sm text-ink-muted hover:text-ink">
+          Previous part
+        </button>
+        <button type="button" data-chapter-next class="text-sm text-ink-muted hover:text-ink">
+          Next part
+        </button>
+        <p class="mono-label text-ink-faint" data-progress aria-live="polite">Nothing marked yet</p>
+        <div class="h-px w-24 bg-line" aria-hidden="true">
+          <div data-progress-bar class="h-px bg-ink" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <details class="mt-4 border border-line p-4">
+        <summary class="cursor-pointer text-sm text-ink">Parts of this lesson</summary>
+        <ol data-toc class="mt-3"></ol>
       </details>
 
-      <div class="mt-8 min-w-0">
-        <div data-panel="explore">
-          <p class="text-sm leading-relaxed text-ink">{lesson.data.summary}</p>
-          {
-            lesson.data.experiments.length > 0 && (
-              <div class="mt-6">
-                <h2 class="font-serif text-title text-ink">Suggested runs</h2>
-                <ul class="mt-3 space-y-2 text-sm leading-relaxed text-ink-muted">
-                  {lesson.data.experiments.map((item) => (
-                    <li>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            )
-          }
-          <p class="mt-6">
-            <button
-              type="button"
-              data-set-mode="learn"
-              class="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink"
-            >
-              Read the lesson
-            </button>
-          </p>
-        </div>
-
-        <div data-panel="learn" hidden>
-          <div class="flex flex-wrap gap-4">
-            <button type="button" data-chapter-prev class="text-sm text-ink-muted hover:text-ink">
-              Previous part
-            </button>
-            <button type="button" data-chapter-next class="text-sm text-ink-muted hover:text-ink">
-              Next part
-            </button>
-          </div>
-          <details class="mt-4 border border-line p-4">
-            <summary class="cursor-pointer text-sm text-ink">Parts of this lesson</summary>
-            <ol data-toc class="mt-3"></ol>
-          </details>
-          <div class="prose mt-2">
-            <slot />
-          </div>
-          <p class="mt-10">
-            <button
-              type="button"
-              data-clear-progress
-              class="mono-label text-ink-faint hover:text-ink"
-            >
-              Clear learning progress on this browser
-            </button>
-          </p>
-          <p data-cleared hidden class="mt-2 text-sm text-ink-muted" role="status"></p>
-        </div>
-
-        {
-          relations.length > 0 && (
-            <div class="mt-10 border-t border-line pt-6">
-              <h2 class="font-serif text-title text-ink">Where this leads</h2>
-              <ul class="mt-4 divide-y divide-line border-y border-line">
-                {relations.map((relation) => (
-                  <li class="grid gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:items-baseline">
-                    <span class="mono-label text-ink-faint">{relation.label}</span>
-                    {relation.step.href ? (
-                      <a href={relation.step.href} class="text-ink hover:text-accent">
-                        {relation.step.title}
-                      </a>
-                    ) : (
-                      <p class="text-ink">
-                        {relation.step.title}
-                        <span class="mono-label ml-2 text-ink-faint">Not built</span>
-                      </p>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )
-        }
+      <div class="prose mt-2">
+        <slot />
       </div>
+
+      {
+        relations.length > 0 && (
+          <div class="mt-10 border-t border-line pt-6">
+            <h2 class="font-serif text-title text-ink">Where this leads</h2>
+            <ul class="mt-4 divide-y divide-line border-y border-line">
+              {relations.map((relation) => (
+                <li class="grid gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:items-baseline">
+                  <span class="mono-label text-ink-faint">{relation.label}</span>
+                  {relation.step.href ? (
+                    <a href={relation.step.href} class="text-ink hover:text-accent">
+                      {relation.step.title}
+                    </a>
+                  ) : (
+                    <p class="text-ink">
+                      {relation.step.title}
+                      <span class="mono-label ml-2 text-ink-faint">Not built</span>
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      <p class="mt-10">
+        <button type="button" data-clear-progress class="mono-label text-ink-faint hover:text-ink">
+          Clear learning progress on this browser
+        </button>
+      </p>
+      <p data-cleared hidden class="mt-2 text-sm text-ink-muted" role="status"></p>
     </div>
-    <script type="application/json" data-path-index set:html={JSON.stringify(pathIndex).replaceAll('<', '\\u003c')} />
   </article>
 </BaseLayout>
 
