@@ -220,12 +220,19 @@ export const topics = [
   {
     id: 'mathematics',
     title: 'Mathematics for AI',
-    description: 'Linear algebra, calculus, probability, and optimization, kept visual.',
+    description: 'Statistics, linear algebra, calculus, probability, and optimization, kept visual.',
     introduction: [
       'The mathematics in this notebook is the mathematics the code is already doing. A layer is a linear map followed by a bend. Training follows a gradient. A probability is the thing a softmax claims to be. None of this requires treating the subject as a separate course to survive before you are allowed to train a model. It does require being able to point at a symbol and say what object it is.',
-      'Each area earns its place by unlocking a picture. Linear algebra is the picture of a space being rotated, stretched, and flattened. Calculus is the picture of a small step on a surface. Probability is the picture of updating a belief when evidence arrives. Optimization is the picture of walking downhill under constraints. The notes and figures exist to make those pictures precise enough that the notation in a paper becomes a reference, not an obstacle.',
+      'Each area earns its place by unlocking a picture. Statistics is the picture of a sample and of the mean that summarizes it. Linear algebra is the picture of a space being rotated, stretched, and flattened. Calculus is the picture of a small step on a surface. Probability is the picture of updating a belief when evidence arrives. Optimization is the picture of walking downhill under constraints. The notes and figures exist to make those pictures precise enough that the notation in a paper becomes a reference, not an obstacle.',
     ],
     entries: [
+      {
+        title: 'A sample and its mean',
+        paragraphs: [
+          'A dataset is a sample. The population is the larger set the sample was drawn from, including the cases you have not seen and will be judged on. The mean is the average of the values you do have. It is a fact about those rows. It becomes a fact about the population only as the sample gets large and the way it was drawn does not systematically miss a region.',
+          'Shape is what the mean throws away. A pile on the left with a long tail on the right has a mean sitting in a place few of the values occupy. Reporting that mean and nothing else describes a point the data do not live at. The first figure in the path is this picture, on a designed population, so the sample can be redrawn and the mean watched as it moves.',
+        ],
+      },
       {
         title: 'Linear maps',
         paragraphs: [

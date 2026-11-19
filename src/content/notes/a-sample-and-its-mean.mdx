@@ -1,0 +1,34 @@
+---
+title: A sample and its mean
+description: A dataset is a sample. The mean summarizes the rows you have, and it throws the shape away.
+topic: mathematics
+maturity: budding
+publishedAt: 2026-11-19
+tags: [statistics, mean, sampling]
+---
+
+A dataset is not the world. It is a sample: a finite set of rows drawn from a larger set you do not have, including the cases a model will later be judged on. The mean is the average of the values in the rows you do have. It is one number. It is a true statement about those rows, and it is silent about everything the rows were drawn from unless the sample is large and the drawing did not systematically miss a region.
+
+That distinction is the first one in this notebook, because every later number is an average over a sample. A loss is a mean of mistakes. A reported accuracy is a mean of hits. If the sample is small, or lopsided, the average is still correct and still not about the population.
+
+## What the mean keeps
+
+Add the values and divide by how many there are. The result sits at the balance point of the values. Move one point far to the right and the balance point follows it, even if almost every other point stayed where it was. The mean has no way to say "that point is unusual." Unusual is a claim about shape, and the mean has already thrown the shape away.
+
+Spread is the other number worth keeping beside it. It is how far the values sit from their own mean, as a distance. A small spread means the rows agree with each other. It does not mean they agree with the population. Eight nearly identical rows can be a tight sample from the wrong part of the world.
+
+## What the picture is doing
+
+The figure uses a designed population of 240 numbers, piled on the left with a tail to the right. It is not a measurement of anything. The grey bars are everyone. The coloured bars are one draw, taken without putting rows back, so a row cannot appear twice. The dashed line is the mean of everyone. The solid line is the mean of this draw.
+
+Two controls, and they do different jobs. **Draw again** starts a new shuffle. At a sample of 8 the solid line jumps. At 120 it stays near the dashed line, and the coloured shape starts to look like the grey one. **Raising n on the same draw** does not reshuffle. The points you already have stay, and new ones are added. The mean moves because of the added points. That is the useful experiment: note the mean at 8, then go to 120 without drawing again, and see which way it was wrong.
+
+The tail is why the dashed line does not sit on the tallest grey bar. A few large values pull the balance point to the right of the pile. Someone who is told only the mean will imagine the data living at a place where few of the values are.
+
+<Viz id="sample-mean" />
+
+## Where a learning problem begins
+
+The next chapter takes a sample as given and asks what to predict from it. That question chooses the inputs, the family of functions, and the loss. The loss will be an average over the rows in the sample. Nothing in the averaging step checks whether those rows were a fair draw. A search that makes the loss small has solved the sample. Whether it has solved the population is a separate claim, and it is the claim a held-out set is for.
+
+The path that puts this chapter first is [From Data to Intelligence](/learning-paths#from-data-to-intelligence). The same picture is the opening of [Mathematics for AI](/learning-paths#mathematics-for-ai), before a layer is treated as a map.

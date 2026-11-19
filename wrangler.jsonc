@@ -4,6 +4,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "ranjeetdhumal-com",
   "compatibility_date": "2026-11-01",
+  "workers_dev": true,
   "assets": {
     "directory": "./dist",
     // Serves `knowledge.html` at `/knowledge` and redirects `/knowledge/` to it,
@@ -11,5 +12,10 @@
     "html_handling": "auto-trailing-slash",
     // Unknown paths return `dist/404.html` with a 404 status.
     "not_found_handling": "404-page"
-  }
+  },
+  // The zone is on this account. Deploy creates the DNS records and certificates.
+  "routes": [
+    { "pattern": "ranjeetdhumal.com", "custom_domain": true },
+    { "pattern": "www.ranjeetdhumal.com", "custom_domain": true }
+  ]
 }

@@ -8,6 +8,7 @@ import { type LiveVisualizationId, engineLabels, getVisualization } from './regi
 import AttentionPatterns from './svg/AttentionPatterns';
 import GradientDescent from './svg/GradientDescent';
 import NextToken from './svg/NextToken';
+import SampleMean from './svg/SampleMean';
 import VizFrame from './VizFrame.astro';
 
 interface Props {
@@ -28,6 +29,7 @@ const visualization = getVisualization(id);
   class={className}
 >
   {/* Hydrate only once scrolled into view; the server-rendered figure is already complete. */}
+  {id === 'sample-mean' && <SampleMean client:visible />}
   {id === 'gradient-descent' && <GradientDescent client:visible />}
   {id === 'attention-patterns' && <AttentionPatterns client:visible />}
   {id === 'next-token' && <NextToken client:visible />}

@@ -6,17 +6,39 @@ draft: false
 level: foundational
 topics: [mathematics, machine-learning]
 overview: >
-  The order follows a forward and backward pass, not a textbook table of
-  contents. A layer is a linear map, so linear algebra comes first. Training
-  follows a slope, so derivatives come next, and they use the maps from the
-  first module. A model that emits probabilities is making a claim the third
-  module gives you the language to check. Optimization comes last because it
+  The order follows the objects a training run actually touches. A dataset is a
+  sample, so the mean and the shape it hides come first. A layer is a linear map,
+  so linear algebra comes next. Training
+  follows a slope, so derivatives come after the maps, and they use them.
+  A model that emits probabilities is making a claim the probability module
+  gives you the language to check. Optimization comes last because it
   is what you are doing with all of the above, under constraints you may not
   have noticed you set. Each module is a picture precise enough that a symbol
   in a paper refers to an object you have already seen.
 outcome: Follow the notation in a paper or a codebase, and connect each symbol to a picture rather than treat it as decoration.
 order: 4
 modules:
+  - title: A sample and its mean
+    outcome: >
+      You can tell a sample from the population it was drawn from, and you can
+      say what the mean reports and what it leaves out.
+    concepts:
+      - A sample is not the population
+      - The mean
+      - Shape and a tail
+    why: >
+      Every number a training run prints is computed on the rows in front of it.
+      Those rows are a sample. A mean of a small or lopsided sample is a fact
+      about that sample. The shape, including a tail that pulls the mean away
+      from the pile, is not in the average.
+    next: >
+      The values in that sample are vectors once a model takes more than one
+      number per example. The next module is the map a layer applies to them.
+    article: /knowledge/a-sample-and-its-mean
+    figure: sample-mean
+    experiment: >
+      Draw eight points and read the mean. Stay on that draw, raise the sample
+      to 120, and watch the mean move toward the population.
   - title: Vectors and linear maps
     outcome: >
       You can describe a matrix as a transformation of space, and you can say

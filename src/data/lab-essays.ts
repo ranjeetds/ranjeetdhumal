@@ -17,6 +17,15 @@ export interface LabEssay {
 }
 
 export const labEssays: Record<VisualizationId, LabEssay> = {
+  'sample-mean': {
+    scene:
+      'Two histograms on one axis. The grey bars are a fixed population of 240 numbers, piled on the left with a long tail to the right. The coloured bars are one sample drawn from that population without replacement. A dashed line marks the mean of everyone. A solid line marks the mean of this draw. The readout gives both means and the spread of the sample.',
+    interaction:
+      'Choose n = 8, 30, or 120. A larger size on the same draw keeps the points already drawn and adds to them, so the mean moves because of the new points, not because the old ones were replaced. Draw again to start a fresh shuffle. At n = 8 the solid line jumps from draw to draw. At n = 120 it sits close to the dashed line, and the coloured shape starts to resemble the grey one.',
+    insight:
+      'The mean is a fact about the rows you have. A small or lopsided draw can put that fact well away from the population, and the shape — here, a tail that pulls the mean to the right of the pile — is invisible if all you keep is the average. Every loss later in the notebook is an average over a sample. It inherits this limit.',
+    concepts: ['A sample is not the population', 'The mean', 'A tail the mean does not show'],
+  },
   'gradient-descent': {
     scene:
       'A contour map of a loss with two basins. One is deeper. A trajectory starts at a chosen point and walks, with momentum, leaving a trace. The current step and the current loss are readable beside the figure. Up to four traces remain, older ones fading, so a comparison is still on the screen when a new run begins.',

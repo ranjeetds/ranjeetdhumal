@@ -7,6 +7,7 @@ level: foundational
 primary: true
 topics: [machine-learning, deep-learning, generative-ai, agentic-ai]
 notes:
+  - a-sample-and-its-mean
   - how-neural-networks-learn
   - training-dynamics
   - embeddings-and-representation
@@ -15,7 +16,9 @@ notes:
   - evaluation-and-alignment
   - agentic-systems
 overview: >
-  A modern AI system is a short list of mechanisms wearing a product. Something is
+  A modern AI system is a short list of mechanisms wearing a product, and the product
+  is trained on a sample. The path begins with that sample: its mean, its spread, and
+  the shape the mean does not show. Then something is
   predicted from something observed. A function with adjustable parts makes the
   prediction. A search moves those parts to make a loss smaller. The function learns
   to represent its inputs as vectors. Attention moves information between positions
@@ -24,9 +27,32 @@ overview: >
   care about. An agent is the same model placed in a loop that can change a state.
   This path walks that list in order. The other paths on this page are branches:
   take one when a chapter is moving too fast, then come back.
-outcome: Follow a modern system from the data it is trained on to the action it is allowed to take, and say which mechanism is doing the work at each step.
+outcome: Follow a modern system from the sample it is trained on to the action it is allowed to take, and say which mechanism is doing the work at each step.
 order: 0
 modules:
+  - title: A sample and its mean
+    outcome: >
+      You can tell a sample from the population it was drawn from, and you can
+      say what the mean reports and what it leaves out.
+    concepts:
+      - A sample is not the population
+      - The mean
+      - Shape and a tail
+    why: >
+      Every later number in this notebook is computed on a sample. A loss is an
+      average over the rows you have. If those rows are a small or lopsided
+      draw, the average is a fact about the draw. Treating it as a fact about
+      the world is the first way a result lies.
+    next: >
+      The next chapter takes the sample as given and asks what you are trying
+      to predict from it. That question has three parts: the inputs, the family
+      of functions, and the loss.
+    article: /knowledge/a-sample-and-its-mean
+    figure: sample-mean
+    experiment: >
+      Draw a sample of 8 and note the mean. Stay on the same draw and raise the
+      sample to 120. The first eight points are still in the picture. Watch
+      which way the mean moves.
   - title: A learning problem
     outcome: >
       You can state a task as inputs, a family of functions, and a loss, and you

@@ -13,7 +13,7 @@ export const site = {
   title: 'Ranjeet Dhumal — AI research notebook',
   tagline: 'Seeing how machines learn.',
   description:
-    'A guided path through how modern AI systems work, from a loss and a dataset to representations, transformers, language models and agents.',
+    'A guided path through how modern AI systems work, from a sample and its mean to representations, transformers, language models and agents.',
   /**
    * POST target for the contact form. Empty uses a mailto action and the visitor's
    * mail client. Set a Formspree or Worker URL here when one exists. Nothing is connected.
@@ -67,7 +67,7 @@ export const sections = [
     label: 'Paths',
     title: 'Learning Paths',
     description:
-      'One story, From Data to Intelligence, from a dataset to an agent. Shorter paths branch off when a chapter needs more ground.',
+      'One story, From Data to Intelligence, from a sample to an agent. Shorter paths branch off when a chapter needs more ground.',
     group: 'primary',
   },
   {

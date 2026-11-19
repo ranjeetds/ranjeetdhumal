@@ -34,6 +34,22 @@ export interface Visualization {
 
 export const visualizations = [
   {
+    id: 'sample-mean',
+    title: 'A sample and its mean',
+    summary: 'A skewed population, one draw from it, and the mean that draw reports.',
+    caption:
+      'A designed population, not a real dataset. Grey bars are everyone. Coloured bars are this draw. Raise n on the same draw, then draw again at n = 8.',
+    objective: 'See that a mean is a fact about a sample, and that a small sample’s mean moves.',
+    interactions: [
+      'Choose a sample size',
+      'Draw again',
+      'Compare the sample mean with the population mean',
+    ],
+    engine: 'svg',
+    topic: 'mathematics',
+    status: 'live',
+  },
+  {
     id: 'gradient-descent',
     title: 'Gradient descent on a loss surface',
     summary: 'Watch an optimizer with momentum roll downhill — and see where it gets stuck.',

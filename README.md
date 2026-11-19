@@ -56,17 +56,18 @@ npm run dev      # http://localhost:4321
 ### The learning path
 
 The story a newcomer is meant to follow is **From Data to Intelligence**
-(`src/content/paths/from-data-to-intelligence.md`, `primary: true`). Eight chapters, in
+(`src/content/paths/from-data-to-intelligence.md`, `primary: true`). Nine chapters, in
 dependency order:
 
-1. A learning problem
-2. How a network computes
-3. How training moves
-4. Representations
-5. Attention
-6. A language model
-7. Evaluation and alignment
-8. An agent
+1. A sample and its mean
+2. A learning problem
+3. How a network computes
+4. How training moves
+5. Representations
+6. Attention
+7. A language model
+8. Evaluation and alignment
+9. An agent
 
 Each chapter in that file has an outcome, the concepts it depends on, why they matter, and
 what the next chapter assumes. Optional fields hang the rest of the site off the chapter:
@@ -271,8 +272,10 @@ gh secret set CLOUDFLARE_API_TOKEN
 gh secret set CLOUDFLARE_ACCOUNT_ID
 ```
 
-After the first successful deploy, attach `ranjeetdhumal.com` as a custom domain on the
-Worker. The workers.dev hostname is live before that domain is connected.
+`ranjeetdhumal.com` and `www.ranjeetdhumal.com` are custom domains on the Worker.
+The zone uses Cloudflare nameservers. Delete any imported Namecheap URL-forward
+records for the apex and `www` before deploying; a custom domain cannot replace
+a record it does not own. A deploy then creates the DNS records and certificates.
 
 ## Before launch
 
