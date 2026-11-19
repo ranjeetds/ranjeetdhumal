@@ -5,6 +5,14 @@ topic: deep-learning
 maturity: budding
 publishedAt: 2026-11-19
 tags: [embeddings, representations]
+prerequisites:
+  - A layer as a map from vectors to vectors.
+objectives:
+  - Explain an embedding as a direction later layers can use.
+  - Say what a flat plot of those vectors is not.
+furtherReading:
+  - title: Attention Mechanisms and Transformers
+    href: /knowledge/attention-and-transformers
 ---
 
 After the first layer of a network, the input is no longer the thing you typed or the pixels you stored. It is a vector. The rest of the network only ever sees vectors. Representation learning is the claim that training will arrange those vectors so that directions in the space correspond to something the loss cared about.

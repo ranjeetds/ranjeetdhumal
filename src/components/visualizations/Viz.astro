@@ -9,6 +9,7 @@ import AttentionPatterns from './svg/AttentionPatterns';
 import GradientDescent from './svg/GradientDescent';
 import NextToken from './svg/NextToken';
 import SampleMean from './svg/SampleMean';
+import Tokenization from './svg/Tokenization';
 import VizFrame from './VizFrame.astro';
 
 interface Props {
@@ -33,5 +34,6 @@ const visualization = getVisualization(id);
   {id === 'gradient-descent' && <GradientDescent client:visible />}
   {id === 'attention-patterns' && <AttentionPatterns client:visible />}
   {id === 'next-token' && <NextToken client:visible />}
+  {id === 'tokenization' && <Tokenization client:visible />}
   {visualization.caption && <Fragment slot="caption">{visualization.caption}</Fragment>}
 </VizFrame>

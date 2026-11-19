@@ -30,7 +30,7 @@ const kindLabel = {
 <ul class="border-t border-line">
   {
     rendered.map(({ entry, Content }) => (
-      <li class="border-b border-line py-10">
+      <li id={entry.id} class="scroll-mt-28 border-b border-line py-10">
         <p class="mono-label text-ink-faint">
           {entry.data.stage === 'posted' ? formatDate(entry.data.publishedAt) : 'Planned'}
           <span class="mx-2 text-line-strong" aria-hidden="true">/</span>

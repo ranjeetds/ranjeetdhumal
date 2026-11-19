@@ -1,0 +1,22 @@
+---
+/**
+ * Domain entry points. Each card links to a written overview, not to an empty course.
+ */
+import Section from '@/components/ui/Section.astro';
+import { domains } from '@/data/domains';
+---
+
+<Section id="domains" index="01" label="Start" title="What do you want to learn?">
+  <ul class="grid gap-px border border-line bg-line sm:grid-cols-2 xl:grid-cols-3">
+    {
+      domains.map((domain) => (
+        <li class="bg-canvas">
+          <a href={`/explore/${domain.id}`} class="group block h-full p-5 transition-colors duration-200 hover:bg-surface">
+            <h3 class="font-serif text-xl text-ink group-hover:text-accent">{domain.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-ink-muted">{domain.description}</p>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

@@ -13,7 +13,7 @@ export const site = {
   title: 'Ranjeet Dhumal — AI research notebook',
   tagline: 'Seeing how machines learn.',
   description:
-    'A guided path through how modern AI systems work, from a sample and its mean to representations, transformers, language models and agents.',
+    'A public notebook for learning how intelligent systems work: lessons, figures, paths, videos, code, and research, from a sample and its mean to agents.',
   /**
    * POST target for the contact form. Empty uses a mailto action and the visitor's
    * mail client. Set a Formspree or Worker URL here when one exists. Nothing is connected.
@@ -48,18 +48,31 @@ export interface SiteSection {
   title: string;
   /** One or two sentences; doubles as the page lede and meta description. */
   description: string;
-  group: 'primary' | 'secondary';
+  /**
+   * `primary` is the learning navigation. `secondary` is the author.
+   * `reference` stays on the site and out of the header, so older hubs keep their URLs.
+   */
+  group: 'primary' | 'secondary' | 'reference';
 }
 
 export const sections = [
+  {
+    id: 'explore',
+    href: '/explore',
+    label: 'Explore',
+    title: 'Explore',
+    description:
+      'Twelve domains, from Python and mathematics to agents and current research. A domain explains what it is for. A lesson exists only when it is linked.',
+    group: 'primary',
+  },
   {
     id: 'knowledge',
     href: '/knowledge',
     label: 'Knowledge',
     title: 'Knowledge Hub',
     description:
-      'Eight fields. Each one explains why it matters, then the ideas it is responsible for. Notes are linked from the field they belong to.',
-    group: 'primary',
+      'Eight fields, written as essays. Each one explains why it matters, then the ideas it is responsible for. Notes are linked from the field they belong to.',
+    group: 'reference',
   },
   {
     id: 'learning-paths',
@@ -67,13 +80,13 @@ export const sections = [
     label: 'Paths',
     title: 'Learning Paths',
     description:
-      'One story, From Data to Intelligence, from a sample to an agent. Shorter paths branch off when a chapter needs more ground.',
+      'Several journeys. From Data to Intelligence is the one to follow first. The others are branches, opened only where the essays exist.',
     group: 'primary',
   },
   {
     id: 'visual-lab',
     href: '/visual-lab',
-    label: 'Visual Lab',
+    label: 'Lab',
     title: 'Interactive Visual Lab',
     description:
       'Interactive figures you can take apart. Small, focused experiments that each make one idea visible.',
@@ -89,21 +102,21 @@ export const sections = [
     group: 'primary',
   },
   {
+    id: 'projects',
+    href: '/projects',
+    label: 'Projects',
+    title: 'Code & Projects',
+    description:
+      'Public repositories, each with the problem, the approach in the code, and what that code demonstrates. Employer work is on the résumé.',
+    group: 'primary',
+  },
+  {
     id: 'research',
     href: '/research',
     label: 'Research',
     title: 'Research',
     description:
       'Paper notes, experiments, and open questions. Posted work links to its source; planned entries are the queue, not findings.',
-    group: 'primary',
-  },
-  {
-    id: 'projects',
-    href: '/projects',
-    label: 'Projects',
-    title: 'Projects',
-    description:
-      'Public repositories, each with the problem, the approach in the code, and what that code demonstrates. Employer work is on the résumé.',
     group: 'primary',
   },
   {

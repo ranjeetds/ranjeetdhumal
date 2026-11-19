@@ -82,9 +82,9 @@ export const labEssays: Record<VisualizationId, LabEssay> = {
   },
   tokenization: {
     scene:
-      'A text field, the token pieces underneath it, and the integer id of each piece. A second tokenizer can be shown on the same string, aligned so a word that one of them splits and the other keeps is visible as a difference in the number of pieces. Whitespace and punctuation are drawn, not trimmed.',
+      'A text field and the pieces underneath it, each with an id. The default string is “The cat sat.” Words mode is showing: a run of letters stays together, and the space is its own piece. The vocabulary that assigns the ids is small and written by hand.',
     interaction:
-      'Type, including a trailing space, a rare word, and a number. The pieces update as you type. Switch tokenizers and watch a single word become three pieces or one. The ids are there so two pieces that look similar can still be different objects. Selecting a piece shows where it starts and ends in the original string.',
+      'Type, including a trailing space and the word “unbelievable”. Switch to Pieces. The same string is cut by longest match against that vocabulary, so the rare word falls into fragments while “cat” and “sat” survive. Select a piece. The readout gives its character span and its id. The id is an index in this vocabulary, not a model’s.',
     insight:
       'The model\'s alphabet is the vocabulary, and the vocabulary was fit to a corpus for length, not for linguistic sense. A behaviour that depends on a word as a unit is a behaviour the model may not have access to. The figure is for the moment a prompt does something strange. Look at the pieces before inventing a theory about the model\'s reasoning.',
     concepts: ['Vocabulary', 'A token is a string piece', 'Different tokenizers, different problems'],

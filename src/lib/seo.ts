@@ -35,6 +35,11 @@ export function websiteSchema(): JsonLd {
     url: site.url,
     inLanguage: site.locale,
     publisher: { '@id': personId },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${site.url}/search?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
   };
 }
 

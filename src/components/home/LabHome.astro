@@ -1,0 +1,35 @@
+---
+/**
+ * One live figure on the homepage, with links to the others that are actually built.
+ * Planned figures stay on the lab page, labelled as specified.
+ */
+import Section from '@/components/ui/Section.astro';
+import Viz from '@/components/visualizations/Viz.astro';
+import { visualizations } from '@/components/visualizations/registry';
+
+const live = visualizations.filter((figure) => figure.status === 'live' && figure.id !== 'sample-mean');
+---
+
+<Section
+  id="lab"
+  index="03"
+  label="Lab"
+  title="Change the picture."
+  lede="A mean is a fact about the rows you have. Draw again and watch it move. The other built figures are linked under it."
+>
+  <Viz id="sample-mean" number="02" />
+  <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+    {
+      live.map((figure) => (
+        <li>
+          <a href={`/visual-lab#${figure.id}`} class="link-underline text-ink hover:text-accent">
+            {figure.title}
+          </a>
+        </li>
+      ))
+    }
+    <li>
+      <a href="/visual-lab" class="link-underline text-ink-muted hover:text-ink">All figures</a>
+    </li>
+  </ul>
+</Section>

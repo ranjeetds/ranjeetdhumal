@@ -8,7 +8,7 @@ import Icon from '@/components/ui/Icon.astro';
 import Status from '@/components/ui/Status.astro';
 import { getSection } from '@/config/site';
 import { getTopic } from '@/data/topics';
-import { type Note, formatDate, noteHref } from '@/lib/content';
+import { type Note, formatDate, getPublishedNotes, getPublishedPaths, noteHref } from '@/lib/content';
 import { articleSchema, breadcrumbSchema } from '@/lib/seo';
 
 interface Props {
@@ -16,10 +16,22 @@ interface Props {
 }
 
 const { note } = Astro.props;
-const { title, description, publishedAt, updatedAt, maturity, tags } = note.data;
+const { title, description, publishedAt, updatedAt, maturity, tags, prerequisites, objectives, furtherReading } =
+  note.data;
 const topic = note.data.topic && getTopic(note.data.topic);
 const hub = getSection('knowledge');
 const path = noteHref(note);
+const notes = await getPublishedNotes();
+const primary = (await getPublishedPaths()).find((candidate) => candidate.data.primary);
+const sequence = (primary?.data.notes ?? []).map((reference) => reference.id);
+const place = sequence.indexOf(note.id);
+const previousId = place > 0 ? sequence[place - 1] : undefined;
+const nextId = place >= 0 ? sequence[place + 1] : undefined;
+const previous = previousId ? notes.find((candidate) => candidate.id === previousId) : undefined;
+const next = nextId ? notes.find((candidate) => candidate.id === nextId) : undefined;
+const related = notes
+  .filter((candidate) => candidate.id !== note.id && candidate.data.topic === note.data.topic)
+  .slice(0, 3);
 ---
 
 <BaseLayout
@@ -87,6 +99,14 @@ const path = noteHref(note);
               )
             }
             {
+              prerequisites.length > 0 && (
+                <div>
+                  <dt class="mono-label text-ink-faint">Prerequisites</dt>
+                  <dd class="mt-1.5 text-ink-muted">{prerequisites.join(' ')}</dd>
+                </div>
+              )
+            }
+            {
               tags.length > 0 && (
                 <div>
                   <dt class="mono-label text-ink-faint">Tags</dt>
@@ -95,12 +115,121 @@ const path = noteHref(note);
               )
             }
           </dl>
+          <nav id="note-toc" aria-label="On this page" class="mt-8 hidden lg:block" hidden></nav>
         </aside>
 
-        <div class="prose min-w-0 lg:col-span-9">
-          <slot />
+        <div class="min-w-0 lg:col-span-9">
+          {
+            objectives.length > 0 && (
+              <div class="mb-10 border border-line p-5">
+                <p class="mono-label text-ink-faint">After this lesson</p>
+                <ul class="mt-3 space-y-2 text-ink-muted">
+                  {objectives.map((objective) => (
+                    <li>{objective}</li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+          <div class="prose">
+            <slot />
+          </div>
+          {
+            furtherReading.length > 0 && (
+              <div class="mt-12">
+                <h2 class="font-serif text-title text-ink">Further reading</h2>
+                <ul class="mt-4 space-y-2">
+                  {furtherReading.map((item) => (
+                    <li>
+                      <a href={item.href} class="link-underline text-ink hover:text-accent">
+                        {item.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+          {
+            (previous || next) && (
+              <nav aria-label="Lesson order" class="mt-12 grid gap-4 border-t border-line pt-8 sm:grid-cols-2">
+                {previous ? (
+                  <a href={noteHref(previous)} class="block">
+                    <span class="mono-label text-ink-faint">Previous</span>
+                    <span class="mt-2 block font-serif text-title text-ink">{previous.data.title}</span>
+                  </a>
+                ) : (
+                  <span></span>
+                )}
+                {next && (
+                  <a href={noteHref(next)} class="block sm:text-right">
+                    <span class="mono-label text-ink-faint">Next</span>
+                    <span class="mt-2 block font-serif text-title text-ink">{next.data.title}</span>
+                  </a>
+                )}
+              </nav>
+            )
+          }
+          {
+            related.length > 0 && (
+              <div class="mt-12">
+                <h2 class="font-serif text-title text-ink">Related lessons</h2>
+                <ul class="mt-4 space-y-3">
+                  {related.map((item) => (
+                    <li>
+                      <a href={noteHref(item)} class="link-underline text-ink hover:text-accent">
+                        {item.data.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
         </div>
       </div>
     </div>
   </article>
+  <div id="reading-progress" class="pointer-events-none fixed inset-x-0 top-16 z-30 h-px origin-left scale-x-0 bg-accent"></div>
 </BaseLayout>
+
+<script>
+  const progress = document.querySelector<HTMLElement>('#reading-progress');
+  const article = document.querySelector('article .prose');
+  const toc = document.querySelector<HTMLElement>('#note-toc');
+
+  const onScroll = () => {
+    if (!progress || !article) return;
+    const rect = article.getBoundingClientRect();
+    const total = rect.height - window.innerHeight;
+    const seen = Math.min(1, Math.max(0, -rect.top / (total || 1)));
+    progress.style.transform = `scaleX(${seen})`;
+  };
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  if (article && toc) {
+    const headings = [...article.querySelectorAll<HTMLHeadingElement>('h2')];
+    if (headings.length > 1) {
+      const list = document.createElement('ol');
+      list.className = 'mt-3 space-y-2 text-sm';
+      const label = document.createElement('p');
+      label.className = 'mono-label text-ink-faint';
+      label.textContent = 'On this page';
+      for (const heading of headings) {
+        if (!heading.id) {
+          heading.id = heading.textContent?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ?? '';
+        }
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = `#${heading.id}`;
+        link.className = 'text-ink-muted hover:text-ink';
+        link.textContent = heading.textContent;
+        item.append(link);
+        list.append(item);
+      }
+      toc.append(label, list);
+      toc.hidden = false;
+    }
+  }
+</script>

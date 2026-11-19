@@ -22,7 +22,7 @@ const section = getSection(Astro.props.section);
 >
   <PageHeader
     index={sectionIndex(section.id)}
-    eyebrow={section.group === 'primary' ? 'Notebook' : 'Author'}
+    eyebrow={section.group === 'secondary' ? 'Author' : 'Notebook'}
     title={section.title}
     lede={section.description}
   >

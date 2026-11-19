@@ -53,6 +53,15 @@ npm run dev      # http://localhost:4321
 4. **Figures work before they hydrate.** A figure's server render is a complete, meaningful
    static image. JavaScript adds interaction on top.
 
+### Publishing a lesson
+
+Add `src/content/notes/<name>.mdx`. Files starting with `_` are ignored. Set `title`,
+`description`, `publishedAt`, and a `topic` from `src/data/topics.ts`. Optional frontmatter
+`prerequisites`, `objectives`, and `furtherReading` appear on the lesson when present.
+`draft: true` hides the file from production. A domain on `/explore` lists the lesson when
+its `topic` matches the domain, or when the domain names the note id in `lessons`. Pushing
+`main` deploys. Do not add a page component for an ordinary lesson.
+
 ### The learning path
 
 The story a newcomer is meant to follow is **From Data to Intelligence**

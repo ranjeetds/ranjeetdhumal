@@ -5,6 +5,16 @@ topic: generative-ai
 maturity: budding
 publishedAt: 2026-11-19
 tags: [language-models, tokens]
+prerequisites:
+  - Attention as a way of moving information between positions.
+objectives:
+  - Say that the model’s output is a distribution over tokens.
+  - Say what temperature changes, and what it does not.
+furtherReading:
+  - title: Next-token distribution
+    href: /visual-lab#next-token
+  - title: Intro to large language models
+    href: /videos#intro-to-large-language-models
 ---
 
 A large language model, in the sense that matters for using one, is a function from a sequence of tokens to a distribution over the next token. Call it once, sample, append, call it again. A paragraph is that loop. The size of the network and the quantity of text it was trained on change the distribution. They do not change the kind of object the model returns.
@@ -13,7 +23,9 @@ The object is not a sentence, and it is not a belief. It is a list of probabilit
 
 ## Tokens, then a distribution
 
-The model does not see words. It sees ids from a vocabulary that was built to keep sequences short, not to respect morphology. A rare word may be three tokens. A trailing space may be its own. Two strings that look identical to you can be different sequences, and the distribution is a function of the sequence. When a prompt does something strange, look at the pieces before inventing a theory of the model’s reasoning. The tokenization figure in the lab is specified for that look. It is not built yet.
+The model does not see words. It sees ids from a vocabulary that was built to keep sequences short, not to respect morphology. A rare word may be three tokens. A trailing space may be its own. Two strings that look identical to you can be different sequences, and the distribution is a function of the sequence. When a prompt does something strange, look at the pieces before inventing a theory of the model’s reasoning. The figure below is a designed vocabulary, not a model’s. Words keep “unbelievable” whole. Pieces do not.
+
+<Viz id="tokenization" />
 
 Given the pieces, the transformer stack from the previous chapter produces a vector at the last position, and a linear map turns that vector into a score per token. A softmax makes the scores a distribution. That distribution is the output. The figure below is a toy with six words and hand-written scores, so the shape can be moved without pretending a model was trained.
 

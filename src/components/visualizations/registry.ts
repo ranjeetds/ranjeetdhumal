@@ -157,15 +157,17 @@ export const visualizations = [
     id: 'tokenization',
     title: 'Tokenization',
     summary: 'A sentence cut into tokens, which are not the words you think you typed.',
-    objective: 'See the units a model actually receives, including the splits that surprise you.',
+    caption:
+      'Two designed cuts of the same string, not a production tokenizer. Words keep a run of letters together. Pieces take the longest match from a small vocabulary, so a rare word falls apart. The number under a piece is its id in that vocabulary.',
+    objective: 'See that a model receives pieces, and that a different vocabulary is a different problem.',
     interactions: [
-      'Type a sentence, including punctuation and a word the tokenizer will split',
-      'Compare two tokenizers on the same text',
-      'Show the token ids beside the pieces',
+      'Type a sentence, including a trailing space and a rare word',
+      'Switch between words and pieces',
+      'Select a piece and read its character span and id',
     ],
     engine: 'svg',
     topic: 'generative-ai',
-    status: 'planned',
+    status: 'live',
   },
   {
     id: 'agent-loop',

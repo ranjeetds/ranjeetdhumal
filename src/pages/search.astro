@@ -1,0 +1,164 @@
+---
+import PageHeader from '@/components/ui/PageHeader.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const query = Astro.url.searchParams.get('q') ?? '';
+---
+
+<BaseLayout title="Search" description="Search lessons, domains, paths, figures, videos, projects, and research.">
+  <PageHeader
+    eyebrow="Search"
+    title="Search the notebook."
+    lede="Lessons, domains, paths, figures, videos, projects, and research. A planned film or a queued paper is labelled as such."
+  >
+    <form action="/search" method="get" role="search" class="rise mt-8 max-w-xl" style="--i:3">
+      <label for="q" class="mono-label text-ink-faint">Query</label>
+      <div class="mt-2 flex gap-2">
+        <input
+          id="q"
+          name="q"
+          type="search"
+          value={query}
+          placeholder="Mean, attention, agent"
+          class="h-11 min-w-0 flex-1 border border-line-strong bg-canvas px-3 text-ink outline-none focus:border-ink"
+        />
+        <button type="submit" class="h-11 bg-ink px-4 text-sm font-medium text-canvas hover:bg-accent hover:text-accent-ink">
+          Search
+        </button>
+      </div>
+    </form>
+  </PageHeader>
+
+  <div class="mx-auto max-w-page px-gutter pb-section">
+    <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by kind">
+      {
+        ['all', 'lesson', 'domain', 'path', 'figure', 'video', 'project', 'research'].map((kind) => (
+          <button
+            type="button"
+            data-kind={kind}
+            aria-pressed={kind === 'all' ? 'true' : 'false'}
+            class="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
+          >
+            {kind}
+          </button>
+        ))
+      }
+    </div>
+    <p id="search-status" class="mono-label mt-6 text-ink-faint" aria-live="polite"></p>
+    <ul id="search-results" class="mt-4 divide-y divide-line border-y border-line"></ul>
+  </div>
+</BaseLayout>
+
+<script>
+  interface RecordItem {
+    title: string;
+    href: string;
+    description: string;
+    kind: string;
+    available: boolean;
+  }
+
+  const input = document.querySelector<HTMLInputElement>('#q');
+  const list = document.querySelector<HTMLUListElement>('#search-results');
+  const status = document.querySelector<HTMLParagraphElement>('#search-status');
+  const filters = [...document.querySelectorAll<HTMLButtonElement>('[data-kind]')];
+  let records: RecordItem[] = [];
+  let kind = 'all';
+  let active = 0;
+
+  const render = () => {
+    if (!input || !list || !status) return;
+    const terms = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+    const matched = records.filter((record) => {
+      if (kind !== 'all' && record.kind !== kind) return false;
+      const haystack = `${record.title} ${record.description} ${record.kind}`.toLowerCase();
+      return terms.every((term) => haystack.includes(term));
+    });
+    active = 0;
+    list.replaceChildren();
+    status.textContent =
+      terms.length === 0 && kind === 'all'
+        ? `${records.length} entries. Type to narrow them.`
+        : `${matched.length} ${matched.length === 1 ? 'match' : 'matches'}.`;
+
+    for (const [index, record] of matched.entries()) {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = record.href;
+      link.className = 'block py-5 outline-none focus:bg-surface';
+      link.dataset.index = String(index);
+      const title = document.createElement('span');
+      title.className = 'block font-serif text-title text-ink';
+      title.textContent = record.title;
+      const meta = document.createElement('span');
+      meta.className = 'mono-label mt-2 block text-ink-faint';
+      meta.textContent = record.available ? record.kind : `${record.kind} · not available yet`;
+      const description = document.createElement('span');
+      description.className = 'mt-2 block max-w-2xl text-sm leading-relaxed text-ink-muted';
+      description.textContent = record.description;
+      link.append(title, meta, description);
+      item.append(link);
+      list.append(item);
+    }
+    markActive();
+  };
+
+  const markActive = () => {
+    const links = [...(list?.querySelectorAll<HTMLAnchorElement>('a') ?? [])];
+    for (const [index, link] of links.entries()) {
+      if (index === active) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+      link.classList.toggle('bg-surface', index === active);
+    }
+  };
+
+  filters.forEach((button) => {
+    button.addEventListener('click', () => {
+      kind = button.dataset.kind ?? 'all';
+      for (const candidate of filters) {
+        candidate.setAttribute('aria-pressed', candidate === button ? 'true' : 'false');
+      }
+      render();
+    });
+  });
+
+  input?.addEventListener('input', render);
+  input?.addEventListener('keydown', (event) => {
+    const links = [...(list?.querySelectorAll<HTMLAnchorElement>('a') ?? [])];
+    if (links.length === 0) return;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      active = (active + 1) % links.length;
+      markActive();
+      links[active]?.focus();
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      active = (active - 1 + links.length) % links.length;
+      markActive();
+      links[active]?.focus();
+    }
+  });
+
+  const fromUrl = new URLSearchParams(window.location.search).get('q');
+  if (input && fromUrl) input.value = fromUrl;
+
+  const isRecord = (value: unknown): value is RecordItem => {
+    if (typeof value !== 'object' || value === null) return false;
+    const title = Reflect.get(value, 'title');
+    const href = Reflect.get(value, 'href');
+    const description = Reflect.get(value, 'description');
+    const kind = Reflect.get(value, 'kind');
+    const available = Reflect.get(value, 'available');
+    return (
+      typeof title === 'string' &&
+      typeof href === 'string' &&
+      typeof description === 'string' &&
+      typeof kind === 'string' &&
+      typeof available === 'boolean'
+    );
+  };
+
+  const payload: unknown = await (await fetch('/search.json')).json();
+  records = Array.isArray(payload) ? payload.filter(isRecord) : [];
+  render();
+</script>

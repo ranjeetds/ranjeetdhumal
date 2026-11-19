@@ -21,24 +21,37 @@ import { site } from '@/config/site';
       </p>
 
       <h1 id="hero-title" class="rise mt-6 font-serif text-display text-ink" style="--i:1">
-        How modern AI systems actually work.
+        Learn how intelligence works.
       </h1>
 
       <div class="rise mt-7 max-w-xl space-y-4 text-lede text-ink-muted" style="--i:2">
         <p>
-          Under a product, the machinery is short. A loss. A function with adjustable parts.
-          A search that walks downhill. A representation. A way of moving information between
-          positions. A distribution over the next token. A loop that is allowed to act.
-        </p>
-        <p>
-          This notebook walks that list in one order, from a sample of data to an agent.
-          The figure beside this is the walk. Where it starts decides the valley it finds.
+          A public notebook of lessons, figures, and code. Start from a sample and a mean,
+          then follow the mechanisms a modern system is actually made of: a loss, a search,
+          a representation, attention, a distribution over the next token, and a loop that
+          is allowed to act.
         </p>
       </div>
 
-      <div class="rise mt-9 flex flex-wrap gap-3" style="--i:3">
-        <Button href="/learning-paths#from-data-to-intelligence" arrow>Begin the path</Button>
-        <Button href="/visual-lab" variant="secondary">Open the visual lab</Button>
+      <form action="/search" method="get" role="search" class="rise mt-8 max-w-md" style="--i:3">
+        <label for="home-search" class="sr-only">Search the notebook</label>
+        <div class="flex gap-2">
+          <input
+            id="home-search"
+            name="q"
+            type="search"
+            placeholder="Search lessons, figures, paths"
+            class="h-11 min-w-0 flex-1 border border-line-strong bg-canvas px-3 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-ink"
+          />
+          <button type="submit" class="h-11 bg-ink px-4 text-sm font-medium text-canvas hover:bg-accent hover:text-accent-ink">
+            Search
+          </button>
+        </div>
+      </form>
+
+      <div class="rise mt-6 flex flex-wrap gap-3" style="--i:4">
+        <Button href="/explore" arrow>Explore knowledge</Button>
+        <Button href="/visual-lab" variant="secondary">Enter the visual lab</Button>
       </div>
     </div>
 

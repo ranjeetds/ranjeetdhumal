@@ -5,6 +5,16 @@ topic: mathematics
 maturity: budding
 publishedAt: 2026-11-19
 tags: [optimization, training]
+prerequisites:
+  - A network as a function and a loss as a number.
+objectives:
+  - Explain a gradient as a local slope.
+  - Say why two correct runs can settle in different places.
+furtherReading:
+  - title: The loss surface
+    href: /visual-lab#gradient-descent
+  - title: Building micrograd
+    href: /videos#building-micrograd
 ---
 
 Once a network is a function and a loss is a number, training is a walk. At the current weights, compute the direction in which the loss increases most steeply. Step the other way, by a distance you chose. Repeat. Everything called an optimizer is a variation on that walk: a memory of previous steps, a different distance, a rescaling of the slope so that some directions are not allowed to dominate.

@@ -36,6 +36,14 @@ const notes = defineCollection({
     updatedAt: z.coerce.date().optional(),
     /** Obsidian aliases; reserved for wikilink resolution. */
     aliases: z.array(z.string()).default([]),
+    /** What the reader should already be able to do. Optional. */
+    prerequisites: z.array(z.string()).default([]),
+    /** What the reader can do after the lesson. Optional. */
+    objectives: z.array(z.string()).default([]),
+    /** Links that are not the lesson itself. */
+    furtherReading: z
+      .array(z.object({ title: z.string(), href: z.string() }))
+      .default([]),
   }),
 });
 

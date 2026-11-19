@@ -1,0 +1,159 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Icon from '@/components/ui/Icon.astro';
+import PageHeader from '@/components/ui/PageHeader.astro';
+import Section from '@/components/ui/Section.astro';
+import { domains, type Domain } from '@/data/domains';
+import { getTopic } from '@/data/topics';
+import { visualizations } from '@/components/visualizations/registry';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getPublishedNotes, getPublishedProjects, getPublishedVideos, noteHref } from '@/lib/content';
+import { breadcrumbSchema } from '@/lib/seo';
+
+export const getStaticPaths = (() =>
+  domains.map((domain) => ({
+    params: { domain: domain.id },
+    props: { domain },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  domain: Domain;
+}
+
+const { domain } = Astro.props;
+const notes = (await getPublishedNotes()).filter(
+  (note) => note.data.topic === domain.topicId || domain.lessons?.includes(note.id),
+);
+const projects = (await getPublishedProjects()).filter(
+  (project) => domain.projectTag !== undefined && project.data.tags.includes(domain.projectTag),
+);
+const noteIds = new Set(notes.map((note) => note.id));
+const referenceId = (value: unknown) => {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value !== null) {
+    const id = Reflect.get(value, 'id');
+    if (typeof id === 'string') return id;
+  }
+  return undefined;
+};
+const videos = (await getPublishedVideos()).filter((video) => {
+  const id = referenceId(video.data.note);
+  return id !== undefined && noteIds.has(id);
+});
+const figures = visualizations.filter((figure) => figure.topic === domain.topicId);
+const field = domain.topicId ? getTopic(domain.topicId) : undefined;
+const index = String(domains.findIndex((candidate) => candidate.id === domain.id) + 1).padStart(2, '0');
+---
+
+<BaseLayout
+  title={domain.title}
+  description={domain.description}
+  structuredData={[
+    breadcrumbSchema([
+      { name: 'Explore', path: '/explore' },
+      { name: domain.title, path: `/explore/${domain.id}` },
+    ]),
+  ]}
+>
+  <PageHeader index={index} eyebrow="Explore" title={domain.title} lede={domain.description}>
+    <p class="rise mt-6 max-w-2xl text-sm text-ink-faint" style="--i:3">{domain.audience}</p>
+  </PageHeader>
+
+  <Section id="overview" label="Overview" title="What this domain is for.">
+    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
+      {domain.overview.map((paragraph) => <p>{paragraph}</p>)}
+      <p>
+        <a href="/explore" class="inline-flex items-center gap-2 text-sm text-ink hover:text-accent">
+          <Icon name="arrow-right" class="size-3.5 rotate-180" />
+          All domains
+        </a>
+      </p>
+    </div>
+  </Section>
+
+  <Section id="map" label="Map" title="The ideas this domain is responsible for.">
+    <p class="max-w-2xl text-ink-muted">
+      These are places on the map. A title here is not a lesson. Lessons are linked in the next section, and only when the essay exists.
+    </p>
+    <div class="mt-10 grid gap-12 md:grid-cols-2">
+      {
+        domain.groups.map((group) => (
+          <div>
+            <h3 class="font-serif text-title text-ink">{group.title}</h3>
+            <ul class="mt-5 space-y-5">
+              {group.topics.map((topic) => (
+                <li>
+                  <p class="text-ink">{topic.title}</p>
+                  <p class="mt-1 text-sm leading-relaxed text-ink-muted">{topic.summary}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section id="lessons" label="Lessons" title="Written so far.">
+    {
+      notes.length > 0 ? (
+        <ul class="border-t border-line">
+          {notes.map((note) => (
+            <li class="border-b border-line">
+              <a href={noteHref(note)} class="block py-5 hover:bg-surface">
+                <span class="block font-serif text-title text-ink">{note.data.title}</span>
+                <span class="mt-1.5 block max-w-2xl text-sm leading-relaxed text-ink-muted">{note.data.description}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="max-w-2xl text-ink-muted">No lesson is published in this domain yet. The map above is the outline, not a promise of pages.</p>
+      )
+    }
+    {
+      field && (
+        <p class="mt-8 max-w-2xl text-sm text-ink-muted">
+          The longer field essay is on the <a href={`/knowledge#${field.id}`} class="link-underline text-ink hover:text-accent">Knowledge Hub</a>.
+        </p>
+      )
+    }
+  </Section>
+
+  {
+    (figures.length > 0 || videos.length > 0 || projects.length > 0) && (
+      <Section id="alongside" label="Alongside" title="Figures, films, and code tied to this domain.">
+        <ul class="max-w-2xl divide-y divide-line border-y border-line">
+          {figures.map((figure) => (
+            <li class="py-4">
+              <a href={`/visual-lab#${figure.id}`} class="link-underline text-ink hover:text-accent">
+                {figure.title}
+              </a>
+              <p class="mt-1 text-sm text-ink-muted">
+                {figure.status === 'live' ? 'Figure, built.' : 'Figure, specified and not built.'} {figure.summary}
+              </p>
+            </li>
+          ))}
+          {videos.map((video) => (
+            <li class="py-4">
+              <a href={`/videos#${video.id}`} class="link-underline text-ink hover:text-accent">
+                {video.data.title}
+              </a>
+              <p class="mt-1 text-sm text-ink-muted">
+                {video.data.url ? 'Video.' : 'Planned film, not recorded.'} {video.data.description}
+              </p>
+            </li>
+          ))}
+          {projects.map((project) => (
+            <li class="py-4">
+              <a href={`/projects#${project.id}`} class="link-underline text-ink hover:text-accent">
+                {project.data.title}
+              </a>
+              <p class="mt-1 text-sm text-ink-muted">Repository. {project.data.description}</p>
+            </li>
+          ))}
+        </ul>
+      </Section>
+    )
+  }
+</BaseLayout>
