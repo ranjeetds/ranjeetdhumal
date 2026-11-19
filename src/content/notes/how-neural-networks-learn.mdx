@@ -1,0 +1,40 @@
+---
+title: How Neural Networks Learn
+description: A network is a stack of weighted sums and a bend. Learning is the search for the weights that make a loss small.
+topic: deep-learning
+maturity: budding
+publishedAt: 2026-11-19
+tags: [neural-networks, learning]
+---
+
+A neural network is a function with a large number of adjustable numbers. Learning is not a separate substance poured into it. Learning is the procedure that changes those numbers so the function’s mistakes, measured by a loss, get smaller on the examples you have.
+
+That sentence is the whole subject. The rest is what the function is allowed to look like, and how the search is allowed to move.
+
+## A layer is a map
+
+Take a list of numbers. Multiply each one by a weight, add the products, add a bias. That is an affine map: a weighted sum. Do it once for every unit in the next layer and you have a matrix multiplying a vector. Nothing about this step is intelligent. It is linear algebra with a name.
+
+Stack several of those maps with nothing between them and the stack collapses. The composition of linear maps is one linear map. A deep network with no nonlinearity is a single weighted sum wearing several names. The bend between layers is what makes depth mean something. A ReLU, a sigmoid, a GELU: each one is a function applied to every number on its own, and each one is there so the next linear map sees a space the previous map could not have made by itself.
+
+The picture worth keeping is composition. Layer one builds features that are combinations of the input. The nonlinearity decides which of those combinations survive. Layer two combines the survivors. A network that can separate two classes wrapped around each other is a network that was allowed to bend.
+
+## What “learn” is doing
+
+The weights start as a guess, usually a small random one. For an example, the network produces a prediction. The loss says how wrong that prediction was, as one number. The gradient of that number, with respect to every weight, says which direction to nudge each weight to make the loss go up. Training steps the other way.
+
+Nothing in that procedure looks at the meaning of the data. It looks at the slope of one function at one point. If the loss treats a rare class as cheap to miss, the search will happily miss it. If the loss can be made small by memorising the training rows, the search will memorise them when the family of functions is flexible enough. “The network learned” is a report about a loss on a set of examples. It is not a report about understanding, unless the loss and the set were built to mean that.
+
+The surface below is the same idea with two weights you can see. The walk does not know there is a deeper valley. It knows the slope where it stands.
+
+<Viz id="gradient-descent" />
+
+## A failure that looks like success
+
+A network can drive training loss to nearly zero and still be useless on the next batch. That is not a mystery of depth. It is a function that was flexible enough to fit the sample, and a search that was allowed to. The remedies pull in opposite directions. A smaller family, a penalty on the weights, or more data that the function has not seen. Regularising a model that was too rigid makes it worse. The diagnosis comes before the remedy: is the function too weak to represent the pattern, or strong enough to remember the rows?
+
+## Where this goes
+
+The next distinction is the search itself: step size, momentum, and the fact that a correct walk can still settle in the wrong valley. That is [Training Dynamics and Optimization](/knowledge/training-dynamics). The path that holds both chapters in order is [From Data to Intelligence](/learning-paths#from-data-to-intelligence).
+
+Grant Sanderson’s [But what is a neural network?](/videos#but-what-is-a-neural-network) draws the collapse of a linear stack more slowly than this page does. Watch for the moment the bend is introduced, and treat the neurons as a diagram of the maps.

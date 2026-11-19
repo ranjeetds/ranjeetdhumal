@@ -1,0 +1,26 @@
+---
+/**
+ * Dark/light switch. Behaviour lives in Header.astro's script, which binds every
+ * `[data-theme-toggle]` on the page, so this can be rendered more than once.
+ */
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  aria-label="Switch to light theme"
+  class:list={[
+    'grid size-10 place-items-center rounded-sm text-ink-muted transition-colors duration-200 hover:bg-raised hover:text-ink',
+    className,
+  ]}
+>
+  <Icon name="sun" class="hidden size-[1.125rem] dark:block" />
+  <Icon name="moon" class="size-[1.125rem] dark:hidden" />
+</button>

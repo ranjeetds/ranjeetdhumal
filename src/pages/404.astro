@@ -1,0 +1,31 @@
+---
+import Button from '@/components/ui/Button.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found" description="This page does not exist." noindex>
+  <section class="relative isolate overflow-hidden">
+    <div
+      aria-hidden="true"
+      class="absolute inset-0 -z-10 bg-dotgrid opacity-50 [mask-image:radial-gradient(ellipse_60%_100%_at_85%_0%,black,transparent)]"
+    >
+    </div>
+    <div class="mx-auto max-w-page px-gutter py-24 lg:py-36">
+      <p class="rise mono-label flex items-center gap-3 text-ink-faint" style="--i:0">
+        <span class="text-accent">404</span>
+        <span class="h-px w-6 bg-line-strong" aria-hidden="true"></span>
+        <span>Not found</span>
+      </p>
+      <h1 class="rise mt-6 max-w-3xl font-serif text-display text-ink" style="--i:1">
+        This page is off the map.
+      </h1>
+      <p class="rise mt-7 max-w-xl text-lede text-ink-muted" style="--i:2">
+        The address may have changed, or the note may not be published yet.
+      </p>
+      <div class="rise mt-9 flex flex-wrap gap-3" style="--i:3">
+        <Button href="/" arrow>Back to the start</Button>
+        <Button href="/knowledge" variant="secondary">Knowledge hub</Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

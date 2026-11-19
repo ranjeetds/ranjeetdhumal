@@ -1,0 +1,30 @@
+---
+import PathList from '@/components/content/PathList.astro';
+import Section from '@/components/ui/Section.astro';
+import PageLayout from '@/layouts/PageLayout.astro';
+import { getPublishedPaths } from '@/lib/content';
+
+const paths = await getPublishedPaths();
+---
+
+<PageLayout section="learning-paths">
+  <Section id="anatomy" label="Anatomy" title="A path is a sequence of dependencies.">
+    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
+      <p>
+        The path to follow is From Data to Intelligence. It is one story: a learning problem, a
+        network, the walk that trains it, the representations that walk produces, attention, a
+        language model, the question of whether the score means what it says, and an agent. The
+        paths under it are branches. Take one when a chapter is moving too fast, then come back.
+      </p>
+      <p>
+        Each chapter states an outcome, the ideas that outcome depends on, why those ideas are
+        the ones that matter, and what the next chapter will assume. Where an essay, a figure, or
+        a lecture exists, the chapter links to it.
+      </p>
+    </div>
+  </Section>
+
+  <Section id="paths" label="Paths" title="The path, and the branches.">
+    <PathList paths={paths} />
+  </Section>
+</PageLayout>

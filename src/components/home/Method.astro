@@ -1,0 +1,91 @@
+---
+import CodeListing from '@/components/ui/CodeListing.astro';
+import Section from '@/components/ui/Section.astro';
+import { OPTIMIZER } from '@/lib/viz/loss-surface';
+
+const formats = [
+  {
+    name: 'Interactive figures',
+    description:
+      'Change a parameter and watch the model respond. Every core idea gets a figure you can manipulate.',
+  },
+  {
+    name: 'Annotated code',
+    description:
+      'Short, complete Python that mirrors each figure — nothing hidden behind a library call.',
+  },
+  {
+    name: 'Learning paths',
+    description:
+      'Ordered sequences that take you from prerequisite to practice without the guesswork.',
+  },
+  {
+    name: 'Research notes',
+    description:
+      'Compact readings of papers and ideas, with the context needed to judge them.',
+  },
+];
+
+// Rendered from the same constants that drive the hero figure, so the two cannot drift.
+const listing = `import numpy as np
+
+def descend(grad, theta, lr=${OPTIMIZER.learningRate}, beta=${OPTIMIZER.momentum}, steps=${OPTIMIZER.maxSteps}):
+    """Gradient descent with momentum."""
+    velocity = np.zeros_like(theta)
+    path = [theta]
+    for _ in range(steps):
+        velocity = beta * velocity - lr * grad(theta)
+        theta = theta + velocity
+        path.append(theta)
+    return np.array(path)`;
+---
+
+<Section
+  id="method"
+  index="02"
+  label="Method"
+  title="Show it, then name it, then use it."
+>
+  <div class="mb-12 max-w-2xl space-y-4 leading-relaxed text-ink-muted">
+    <p>
+      A definition delivers the vocabulary without the object. The object is a surface, a boundary,
+      a product of derivatives, a pattern of attention. Those can be drawn, and once drawn they can
+      be changed. The change is the difference between recognizing a term and knowing what it
+      refers to. A figure earns its place only when moving it moves a belief. Animation that merely
+      plays is a video.
+    </p>
+    <p>
+      Order is part of the teaching. A path is not a list of topics that share a tag. Each module
+      says what should be understood, which ideas that understanding depends on, why those ideas
+      are the ones that matter, and what the next module needs from this one. Without the handoff,
+      the later page is a new subject instead of a consequence.
+    </p>
+    <p>
+      The same restraint applies to the research log. A posted entry points at a source. A planned
+      entry states a question and does not pretend to have answered it. The four formats below are
+      the instruments. None of them is a long article standing in for the picture.
+    </p>
+  </div>
+  <div class="grid gap-x-10 gap-y-12 xl:grid-cols-12">
+    <dl class="border-t border-line xl:col-span-5">
+      {
+        formats.map((format) => (
+          <div class="border-b border-line py-5">
+            <dt class="font-medium text-ink">{format.name}</dt>
+            <dd class="mt-1.5 text-[0.9375rem] leading-relaxed text-ink-muted">
+              {format.description}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <div class="min-w-0 xl:col-span-7">
+      <CodeListing code={listing} lang="python" title="descend.py" number="01" />
+      <p class="mt-4 text-sm leading-relaxed text-ink-faint">
+        The figure at the top of this page, as code: the same update rule and the same
+        hyper-parameters.
+      </p>
+    </div>
+  </div>
+</Section>

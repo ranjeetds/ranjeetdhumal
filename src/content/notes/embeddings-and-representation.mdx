@@ -1,0 +1,36 @@
+---
+title: Embeddings and Representation Learning
+description: A network stores directions, not symbols. Similarity is an angle in that space, and a picture of the space is a choice of projection.
+topic: deep-learning
+maturity: budding
+publishedAt: 2026-11-19
+tags: [embeddings, representations]
+---
+
+After the first layer of a network, the input is no longer the thing you typed or the pixels you stored. It is a vector. The rest of the network only ever sees vectors. Representation learning is the claim that training will arrange those vectors so that directions in the space correspond to something the loss cared about.
+
+The claim is easy to overdraw. A direction corresponds to whatever made the loss smaller. That might be a concept you can name. It might be a shortcut in the dataset. The geometry does not come labelled.
+
+## A vector is a list of coordinates
+
+An embedding of a token is a row in a table, one vector per token in the vocabulary, chosen so that the rest of the model can use it. At the start the table is random. Training moves the rows. Tokens that help predict each other tend to end up pointing in related directions, because that arrangement made the loss smaller. “Related” is doing a lot of work. Related for the loss is not the same as related in a dictionary.
+
+You compare two vectors by their dot product, or by the cosine of the angle between them. A large positive cosine means they point the same way. Distance in the raw coordinates means something else, and it changes if you rescale an axis. Most of the time, when someone says two embeddings are “close”, they mean the angle.
+
+The same geometry is what a later attention head uses. A query and a key are vectors. Their dot product is a score. The scores become weights. If you do not believe that a direction can carry the thing the model needs, attention is a ritual. It is a weighted average of vectors, and the weights come from angles.
+
+## What a plot is hiding
+
+People draw embeddings by projecting hundreds of dimensions down to two or three and looking at clusters. A projection is a choice of which directions to keep. Two tokens can sit on top of each other in the drawing and be far apart in the space, and the reverse. A cluster that disappears when you change the projection was a property of the drawing. A cluster that survives is a better candidate for something in the vectors.
+
+The visual lab’s embedding figure is specified around exactly that test: rotate, then switch the projection, and only describe what remains. It is not built yet. Until it is, the discipline still applies to anyone else’s plot.
+
+## Features the loss invented
+
+A representation can be useful and still be the wrong object. A model trained to classify images may put “photographed indoors” in a direction that predicts the label, because the dataset took all of one class in a kitchen. The direction is real. It is a feature of the collection, and the network will use it, and a new photograph taken outside will fall on the wrong side of it. Representation learning does not ask whether the direction is the one you would have written down. It asks whether the direction reduced the loss.
+
+This is why a probe, a small classifier trained on frozen vectors, is evidence about the vectors and not about the model’s reasons. If a direction predicts a property, the property is linearly readable there. The model may or may not be using that direction when it acts.
+
+## Where this goes
+
+Attention is the operation that mixes these vectors across a sequence, so that a position can be updated by the others. That is [Attention Mechanisms and Transformers](/knowledge/attention-and-transformers). The path places this chapter immediately before that one, in [From Data to Intelligence](/learning-paths#from-data-to-intelligence).

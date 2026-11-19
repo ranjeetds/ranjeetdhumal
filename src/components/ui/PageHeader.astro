@@ -1,0 +1,36 @@
+---
+/** The opening block of every inner page: index, title and lede over a fading dot grid. */
+interface Props {
+  title: string;
+  lede: string;
+  /** Mono eyebrow, e.g. "Section". */
+  eyebrow?: string;
+  /** Ordinal shown before the eyebrow, e.g. "03". */
+  index?: string;
+}
+
+const { title, lede, eyebrow, index } = Astro.props;
+---
+
+<header class="relative isolate overflow-hidden">
+  <div
+    aria-hidden="true"
+    class="absolute inset-0 -z-10 bg-dotgrid opacity-50 [mask-image:radial-gradient(ellipse_60%_100%_at_85%_0%,black,transparent)]"
+  >
+  </div>
+
+  <div class="mx-auto max-w-page px-gutter pt-16 pb-14 sm:pt-20 sm:pb-16 lg:pt-28 lg:pb-20">
+    {
+      (eyebrow || index) && (
+        <p class="rise mono-label flex items-center gap-3 text-ink-faint" style="--i:0">
+          {index && <span class="text-accent">{index}</span>}
+          {index && eyebrow && <span class="h-px w-6 bg-line-strong" aria-hidden="true" />}
+          {eyebrow && <span>{eyebrow}</span>}
+        </p>
+      )
+    }
+    <h1 class="rise mt-6 max-w-4xl font-serif text-display text-ink" style="--i:1">{title}</h1>
+    <p class="rise mt-7 max-w-2xl text-lede text-ink-muted" style="--i:2">{lede}</p>
+    <slot />
+  </div>
+</header>

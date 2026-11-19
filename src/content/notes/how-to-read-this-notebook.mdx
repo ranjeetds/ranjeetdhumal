@@ -1,0 +1,33 @@
+---
+title: How to read this notebook
+description: Notes here are short, visual and revised in the open. A two-minute guide to the conventions.
+maturity: evergreen
+publishedAt: 2026-11-18
+tags: [meta]
+---
+
+This notebook is a path through how modern systems work, with essays on the mechanisms and figures where a picture can be changed. A note carries a maturity marker, so you know how much weight it can bear.
+
+## Notes grow
+
+Every note carries a maturity marker, so you know how much weight it can bear:
+
+- **Seedling** — a first sketch. Expect gaps.
+- **Budding** — the argument holds together; details are still moving.
+- **Evergreen** — stable enough to build on.
+
+## Figures are live
+
+Where a picture explains more than a paragraph, there is a figure you can manipulate. Click the surface below to drop an optimizer anywhere and watch where it settles.
+
+<Viz id="gradient-descent" />
+
+## Code is complete
+
+Listings run as written, with no hidden setup:
+
+```python
+def step(theta, velocity, grad, lr=0.045, beta=0.88):
+    velocity = beta * velocity - lr * grad(theta)
+    return theta + velocity, velocity
+```

@@ -1,0 +1,24 @@
+---
+/** Honest placeholder for a collection that has no published entries yet. */
+interface Props {
+  title: string;
+  label?: string;
+}
+
+const { title, label = 'In preparation' } = Astro.props;
+---
+
+<div class="rounded-md border border-dashed border-line-strong px-6 py-10 sm:px-10 sm:py-12">
+  <p class="mono-label flex items-center gap-2.5 text-ink-faint">
+    <span class="size-1.5 rounded-full border border-ink-faint" aria-hidden="true"></span>
+    {label}
+  </p>
+  <p class="mt-4 max-w-xl font-serif text-title text-ink">{title}</p>
+  {
+    Astro.slots.has('default') && (
+      <div class="mt-3 max-w-xl text-ink-muted">
+        <slot />
+      </div>
+    )
+  }
+</div>

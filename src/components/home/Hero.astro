@@ -1,0 +1,49 @@
+---
+import Button from '@/components/ui/Button.astro';
+import Viz from '@/components/visualizations/Viz.astro';
+import { site } from '@/config/site';
+---
+
+<section aria-labelledby="hero-title" class="relative isolate overflow-hidden">
+  <div
+    aria-hidden="true"
+    class="absolute inset-0 -z-10 bg-dotgrid opacity-50 [mask-image:radial-gradient(ellipse_75%_70%_at_75%_25%,black,transparent)]"
+  >
+  </div>
+
+  <div
+    class="mx-auto grid max-w-page items-center gap-x-10 gap-y-14 px-gutter pt-14 pb-20 sm:pt-20 lg:grid-cols-12 lg:pt-24 lg:pb-28"
+  >
+    <div class="lg:col-span-5">
+      <p class="rise mono-label flex items-center gap-2.5 text-ink-faint" style="--i:0">
+        <span class="size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+        {site.tagline}
+      </p>
+
+      <h1 id="hero-title" class="rise mt-6 font-serif text-display text-ink" style="--i:1">
+        How modern AI systems actually work.
+      </h1>
+
+      <div class="rise mt-7 max-w-xl space-y-4 text-lede text-ink-muted" style="--i:2">
+        <p>
+          Under a product, the machinery is short. A loss. A function with adjustable parts.
+          A search that walks downhill. A representation. A way of moving information between
+          positions. A distribution over the next token. A loop that is allowed to act.
+        </p>
+        <p>
+          This notebook walks that list in one order, from a table of examples to an agent.
+          The figure beside this is the walk. Where it starts decides the valley it finds.
+        </p>
+      </div>
+
+      <div class="rise mt-9 flex flex-wrap gap-3" style="--i:3">
+        <Button href="/learning-paths#from-data-to-intelligence" arrow>Begin the path</Button>
+        <Button href="/visual-lab" variant="secondary">Open the visual lab</Button>
+      </div>
+    </div>
+
+    <div class="rise lg:col-span-7" style="--i:4">
+      <Viz id="gradient-descent" number="01" />
+    </div>
+  </div>
+</section>

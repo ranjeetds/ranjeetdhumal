@@ -1,0 +1,20 @@
+---
+/**
+ * The mark: level sets closing in on a minimum — the same picture as the homepage figure.
+ * Rings inherit the text colour; the minimum is always the accent.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class:list={['size-6 shrink-0', className]}>
+  <g stroke="currentColor" stroke-width="1.25" transform="rotate(-20 12 12)">
+    <ellipse cx="12" cy="12" rx="10.4" ry="8.4" opacity="0.35"></ellipse>
+    <ellipse cx="12.9" cy="12.3" rx="6.6" ry="5" opacity="0.65"></ellipse>
+    <ellipse cx="13.7" cy="12.6" rx="3" ry="2.1"></ellipse>
+  </g>
+  <circle cx="13.5" cy="12" r="1.35" class="fill-accent"></circle>
+</svg>

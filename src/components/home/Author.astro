@@ -1,0 +1,22 @@
+---
+import Button from '@/components/ui/Button.astro';
+import Section from '@/components/ui/Section.astro';
+import { site } from '@/config/site';
+---
+
+<Section id="author" index="03" label="Author">
+  <div class="max-w-3xl">
+    <p class="font-serif text-headline text-ink">
+      A working notebook, maintained in the open by {site.name}.
+    </p>
+    <p class="mt-6 max-w-2xl text-lede text-ink-muted">
+      {site.role} at {site.employer}, in {site.location}, and a physicist by training. Notes are
+      published as they mature and revised as understanding improves. Nothing here is final, and
+      that is the point.
+    </p>
+    <div class="mt-9 flex flex-wrap gap-3">
+      <Button href="/about" variant="secondary" arrow>About this notebook</Button>
+      <Button href="/resume" variant="secondary">Résumé</Button>
+    </div>
+  </div>
+</Section>

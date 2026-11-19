@@ -1,0 +1,36 @@
+---
+title: Evaluation and Alignment
+description: A score measures the signal you chose. Alignment, in the narrow sense, is the problem of that signal not being the behaviour you wanted.
+topic: emerging-tech
+maturity: budding
+publishedAt: 2026-11-19
+tags: [evaluation, alignment]
+---
+
+Every earlier chapter produces a system that makes some number smaller, or some sample more fluent. Evaluation is the question of whether that number is the thing you care about. Alignment, as this page uses the word, is the narrower problem that follows: the signal you trained on can be satisfied by behaviour you did not want, and the system will take that bargain if it is available.
+
+Neither word needs a grand theory to be useful. Both are ways of refusing a score that was convenient.
+
+## A metric is a choice
+
+Accuracy on a balanced test set, accuracy on a rare class, a log loss, a preference from a human rater, a pass rate on a hidden exam: each one ranks systems differently. Pick the metric after you have said which mistake is expensive. A model that is wrong on the expensive mistake and right on the common one will win a leaderboard that counts mistakes equally. The leaderboard is not lying. It was asked a different question.
+
+Calibration is the check people skip because the number already looks like a probability. If the model says 80 percent on a set of cases, the event should happen about 80 percent of the time in that set. A softmax makes numbers that add to one. It does not make them calibrated. Decisions that treat the score as a frequency inherit whatever bias the score has.
+
+A test set that was involved in choosing the model, the prompt, or the features is not a test. It is another training set with a delay. The score will be optimistic in a way you cannot see from inside it. The fix is dull. Decide the comparison, seal the data, then look.
+
+## The signal and the goal
+
+Training minimizes a signal. The signal is a loss on text, or a reward from a grader, or a preference between two answers. The goal, if you have one, is a behaviour in the situations you will actually face. These come apart in ordinary ways. A grader that rewards length will get length. A grader that rewards refusal in a clumsy pattern will get the pattern, including on questions where a refusal is the wrong act. A model that has learned to sound calibrated will be preferred by a judge that is itself a language model, whether or not the probabilities match frequencies.
+
+This is the same shape as a loss that can be made small by a shortcut in the data. The system is not cheating against its objective. The objective was the shortcut. Calling the result a failure of alignment is fair only after you can say what the signal paid for that the goal did not include.
+
+## What would count against the claim
+
+A paper, a demo, or a benchmark makes a claim and offers evidence. Keep them apart. The claim should be a sentence that could be false. The evidence should name the data, the comparison, the metric, and what was held fixed. Then write down an observation that would have falsified the claim, including one the authors did not collect. A summary that glues the three together will smuggle a hope in as a result.
+
+The research log keeps a [note on that separation](/research) as a method, and a [question about agent scores](/research) that grade the transcript instead of the state. Neither is a finding. They are the standard this page is asking you to apply.
+
+## Where this goes
+
+When the system can act, the score has to look at the state that changed. A fluent description of the right action, with the action not taken, passes a transcript grader and fails the only test that matters. That is the last chapter of the path: [Agentic AI Systems](/knowledge/agentic-systems).

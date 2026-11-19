@@ -1,0 +1,32 @@
+---
+/**
+ * Layout for the top-level section pages. Give it a section id and it supplies the title,
+ * lede, index, metadata and breadcrumb structured data from `src/config/site.ts`.
+ */
+import BaseLayout from './BaseLayout.astro';
+import PageHeader from '@/components/ui/PageHeader.astro';
+import { type SectionId, getSection, sectionIndex } from '@/config/site';
+import { breadcrumbSchema } from '@/lib/seo';
+
+interface Props {
+  section: SectionId;
+}
+
+const section = getSection(Astro.props.section);
+---
+
+<BaseLayout
+  title={section.title}
+  description={section.description}
+  structuredData={[breadcrumbSchema([{ name: section.title, path: section.href }])]}
+>
+  <PageHeader
+    index={sectionIndex(section.id)}
+    eyebrow={section.group === 'primary' ? 'Notebook' : 'Author'}
+    title={section.title}
+    lede={section.description}
+  >
+    <slot name="header" />
+  </PageHeader>
+  <slot />
+</BaseLayout>

@@ -1,0 +1,37 @@
+---
+/** Link styled as a button. Use for navigation calls to action. */
+import type { HTMLAttributes } from 'astro/types';
+import Icon from './Icon.astro';
+
+interface Props extends HTMLAttributes<'a'> {
+  variant?: 'primary' | 'secondary';
+  /** Appends an arrow that nudges forward on hover. */
+  arrow?: boolean;
+}
+
+const { variant = 'primary', arrow = false, class: className, ...attrs } = Astro.props;
+
+const variants = {
+  primary: 'bg-ink text-canvas hover:bg-accent hover:text-accent-ink',
+  secondary: 'border border-line-strong text-ink hover:border-ink hover:bg-surface',
+};
+---
+
+<a
+  class:list={[
+    'group inline-flex h-11 items-center gap-2.5 rounded-sm px-5 text-sm font-medium transition-colors duration-200',
+    variants[variant],
+    className,
+  ]}
+  {...attrs}
+>
+  <slot />
+  {
+    arrow && (
+      <Icon
+        name="arrow-right"
+        class="transition-transform duration-300 ease-swift group-hover:translate-x-1"
+      />
+    )
+  }
+</a>

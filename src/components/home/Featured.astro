@@ -1,0 +1,77 @@
+---
+/**
+ * Four ways in: three paths and the one live figure. Titles come from the path
+ * collection and the visualization registry, so the cards cannot drift from the pages.
+ */
+import Section from '@/components/ui/Section.astro';
+import { getVisualization } from '@/components/visualizations/registry';
+import { getPublishedPaths } from '@/lib/content';
+
+const paths = await getPublishedPaths();
+const featuredIds = [
+  'foundations-of-machine-learning',
+  'neural-networks-to-transformers',
+  'agentic-ai-systems',
+] as const;
+
+const essays = {
+  'foundations-of-machine-learning':
+    'A learning problem is four choices: what is observed, what is predicted, which functions are allowed, and which mistakes count. This path stays with models you can draw, because the habits are formed there. A linear boundary shows what a flat cut cannot do. The gap between training and test shows why a perfect fit is not the goal. A tree fails differently, by cutting the space until each row has a cell. The last module is the one that makes any of those scores mean something: a metric chosen for the cost of a mistake, and a test set the fitting procedure never saw.',
+  'neural-networks-to-transformers':
+    'A network is a graph of operations, and a transformer is one particular graph. The path does not start at attention. It starts at a unit you can compute by hand, then the chain rule on that graph, then convolution as the first architecture that encodes a belief about the data. Attention arrives as a different belief: a position may look anywhere, and the weights of that look are computed. The stream carries the representation, and the block writes a correction onto it. The last module is why a deep stack of those corrections can be trained at all.',
+  'agentic-ai-systems':
+    'An agent is not a model with a longer prompt. It is a loop the program owns: an observation, a proposed action, an action that is actually taken, and a result that becomes the next observation. Tools are schemas the code can refuse. Memory is state written from tool results, not the growing transcript. A plan is provisional and goes stale. The test looks at the state. A sentence that describes the right action, while the action was not taken, is a failure, and the path is built so that failure is the thing you can see.',
+  'gradient-descent':
+    'The figure is a loss with two basins and a descent with momentum. Nothing in the update rule looks at the other basin. Start in the upper left and again in the lower right, and the same step size and the same momentum settle in different places. The deeper valley can exist and still be missed by a run that did everything the algorithm asks. That is the fact the optimization talk on this site is about. The listing in the next section is the same update, with the same constants.',
+} as const;
+
+const cards: { href: string; label: string; title: string; body: string }[] = featuredIds.map(
+  (id) => {
+  const path = paths.find((candidate) => candidate.id === id);
+  if (!path) throw new Error(`Featured path is missing: ${id}`);
+  return {
+    href: `/learning-paths#${path.id}`,
+    label: 'Path',
+    title: path.data.title,
+    body: essays[id],
+  };
+});
+
+const figure = getVisualization('gradient-descent');
+
+cards.push({
+  href: '/visual-lab#gradient-descent',
+  label: 'Visual lab',
+  title: figure.title,
+  body: essays['gradient-descent'],
+});
+---
+
+<Section
+  id="featured"
+  index="02"
+  label="Start"
+  title="Four places to begin."
+  lede="Three paths, in the order a newcomer can use them, and the figure that is already built. Each one says what the work actually is."
+>
+  <ul class="border-t border-line">
+    {
+      cards.map((card) => (
+        <li class="border-b border-line">
+          <a
+            href={card.href}
+            class="group block max-w-2xl py-8 transition-colors duration-300"
+          >
+            <span class="mono-label text-ink-faint transition-colors duration-300 group-hover:text-accent">
+              {card.label}
+            </span>
+            <span class="mt-3 block font-serif text-title text-ink group-hover:text-accent">
+              {card.title}
+            </span>
+            <span class="mt-3 block leading-relaxed text-ink-muted">{card.body}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

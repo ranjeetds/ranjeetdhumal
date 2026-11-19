@@ -1,0 +1,40 @@
+---
+/**
+ * The document shell used by every page: <head>, skip link, header, <main>, footer.
+ * Compose it through PageLayout or NoteLayout unless a page needs full control (homepage, 404).
+ */
+import '@fontsource-variable/instrument-sans/wght.css';
+import '@fontsource-variable/instrument-sans/wght-italic.css';
+import '@fontsource-variable/newsreader/opsz.css';
+import '@fontsource-variable/newsreader/wght-italic.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import '@/styles/global.css';
+
+import type { ComponentProps } from 'astro/types';
+import BaseHead from '@/components/layout/BaseHead.astro';
+import Footer from '@/components/layout/Footer.astro';
+import Header from '@/components/layout/Header.astro';
+import { site } from '@/config/site';
+
+type Props = ComponentProps<typeof BaseHead>;
+---
+
+<!doctype html>
+<html lang={site.locale} class="dark">
+  <head>
+    <BaseHead {...Astro.props} />
+  </head>
+  <body class="bg-canvas text-ink">
+    <a
+      href="#main"
+      class="sr-only z-50 rounded-sm bg-ink px-4 py-2 text-sm font-medium text-canvas focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    >
+      Skip to content
+    </a>
+    <Header />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

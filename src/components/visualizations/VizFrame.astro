@@ -1,0 +1,36 @@
+---
+/**
+ * The chrome around every figure: a numbered title bar, the figure itself and a caption.
+ * Purely presentational and server-rendered — the interactive part goes in the default slot.
+ */
+interface Props {
+  title: string;
+  /** Figure number within the page, e.g. "01". */
+  number?: string;
+  /** Rendering technology shown at the right of the title bar, e.g. "D3.js". */
+  engine?: string;
+  class?: string;
+}
+
+const { title, number, engine, class: className } = Astro.props;
+---
+
+<figure class:list={['not-prose overflow-hidden rounded-md border border-line bg-surface', className]}>
+  <div class="flex items-center justify-between gap-4 border-b border-line px-4 py-2.5">
+    <p class="mono-label flex min-w-0 items-center gap-2.5 text-ink-faint">
+      <span class="shrink-0 text-accent">{number ? `Fig. ${number}` : 'Figure'}</span>
+      <span class="truncate">{title}</span>
+    </p>
+    {engine && <p class="mono-label hidden shrink-0 text-ink-faint sm:block">{engine}</p>}
+  </div>
+
+  <slot />
+
+  {
+    Astro.slots.has('caption') && (
+      <figcaption class="border-t border-line px-4 py-3 text-sm leading-relaxed text-ink-muted">
+        <slot name="caption" />
+      </figcaption>
+    )
+  }
+</figure>

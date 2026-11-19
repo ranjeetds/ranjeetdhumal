@@ -1,0 +1,150 @@
+---
+/**
+ * Sticky site header: wordmark, primary navigation, secondary links and the theme toggle.
+ * Below the `lg` breakpoint the links collapse into MobileMenu.
+ */
+import MobileMenu from './MobileMenu.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Logo from '@/components/ui/Logo.astro';
+import { isActivePath, primaryNav, secondaryNav, site } from '@/config/site';
+
+const { pathname } = Astro.url;
+
+// The active link draws an accent rule exactly on top of the header's bottom hairline;
+// hovering any other link previews the same rule.
+const primaryLink = [
+  'relative flex h-16 items-center px-3 text-sm text-ink-muted transition-colors duration-200',
+  'hover:text-ink aria-[current=page]:text-ink',
+  'after:absolute after:inset-x-3 after:-bottom-px after:h-px after:origin-left after:scale-x-0 after:bg-accent',
+  'after:transition-transform after:duration-300 after:ease-swift',
+  'hover:after:scale-x-100 aria-[current=page]:after:scale-x-100',
+];
+---
+
+<header
+  class="sticky top-0 z-40 border-b border-line bg-canvas/85 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/70"
+>
+  <div class="mx-auto flex h-16 max-w-page items-center justify-between gap-6 px-gutter">
+    <a
+      href="/"
+      aria-label={`${site.name} — home`}
+      class="flex items-center gap-2.5 font-medium tracking-tight text-ink"
+    >
+      <Logo />
+      <span>{site.name}</span>
+    </a>
+
+    <nav aria-label="Main" class="hidden lg:block">
+      <ul class="flex items-center">
+        {
+          primaryNav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isActivePath(pathname, item.href) ? 'page' : undefined}
+                class:list={primaryLink}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-1">
+      <ul class="mr-2 hidden items-center gap-5 lg:flex">
+        {
+          secondaryNav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isActivePath(pathname, item.href) ? 'page' : undefined}
+                class="text-sm text-ink-faint transition-colors duration-200 hover:text-ink aria-[current=page]:text-ink"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <ThemeToggle />
+
+      <button
+        type="button"
+        data-menu-open
+        aria-label="Open navigation"
+        aria-haspopup="dialog"
+        aria-controls="site-menu"
+        aria-expanded="false"
+        class="-mr-2.5 grid size-10 place-items-center rounded-sm text-ink-muted transition-colors duration-200 hover:bg-raised hover:text-ink lg:hidden"
+      >
+        <Icon name="menu" class="size-5" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<MobileMenu />
+
+<script>
+  // The only script that runs on every page: theme switching and the mobile menu.
+
+  const root = document.documentElement;
+  const themeMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  const themeToggles = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+
+  function syncTheme() {
+    const dark = root.classList.contains('dark');
+    const color = dark ? themeMeta?.dataset.dark : themeMeta?.dataset.light;
+    if (themeMeta && color) themeMeta.content = color;
+    for (const toggle of themeToggles) {
+      toggle.setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} theme`);
+    }
+  }
+
+  function toggleTheme() {
+    const dark = !root.classList.contains('dark');
+    try {
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    } catch {
+      /* storage unavailable: the choice lasts for this page only */
+    }
+
+    const apply = () => {
+      root.classList.toggle('dark', dark);
+      syncTheme();
+    };
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (document.startViewTransition && !reduceMotion) document.startViewTransition(apply);
+    else apply();
+  }
+
+  for (const toggle of themeToggles) toggle.addEventListener('click', toggleTheme);
+  syncTheme();
+
+  const menu = document.querySelector<HTMLDialogElement>('#site-menu');
+  const opener = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+
+  if (menu && opener) {
+    opener.addEventListener('click', () => {
+      menu.showModal();
+      opener.setAttribute('aria-expanded', 'true');
+    });
+    menu.addEventListener('close', () => opener.setAttribute('aria-expanded', 'false'));
+    for (const closer of menu.querySelectorAll('[data-menu-close]')) {
+      closer.addEventListener('click', () => menu.close());
+    }
+
+    // Never leave the menu open where the desktop navigation is showing, or when the
+    // browser restores this page from the back/forward cache.
+    window.matchMedia('(min-width: 64rem)').addEventListener('change', (event) => {
+      if (event.matches) menu.close();
+    });
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) menu.close();
+    });
+  }
+</script>

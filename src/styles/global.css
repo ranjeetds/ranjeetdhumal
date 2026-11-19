@@ -1,0 +1,345 @@
+/*
+ * Design system — single source of truth for tokens.
+ *
+ * Tailwind v4 is configured here in CSS (there is no tailwind.config.js).
+ *   1. Raw tokens   → CSS custom properties that change with the colour scheme.
+ *   2. @theme       → maps tokens onto Tailwind utilities (bg-canvas, text-ink, font-serif…).
+ *   3. Base styles  → element defaults.
+ *   4. Utilities    → small named patterns used across components.
+ *
+ * Components must use the semantic utilities; never hard-code a colour.
+ */
+
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/* Class-driven dark mode: `dark:` applies when <html class="dark">. The site is dark-first,
+   so the class is present in the server-rendered markup and removed for the light theme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------ 1. Raw tokens */
+
+:root {
+  /* Light — "paper and ink" */
+  color-scheme: light;
+  --canvas: oklch(0.985 0.004 85);
+  --surface: oklch(0.999 0.002 85);
+  --raised: oklch(0.958 0.006 85);
+  --line: oklch(0.895 0.007 85);
+  --line-strong: oklch(0.78 0.01 85);
+  --ink: oklch(0.21 0.016 262);
+  --ink-muted: oklch(0.41 0.016 262);
+  --ink-faint: oklch(0.53 0.014 262);
+  --accent: oklch(0.52 0.135 55);
+  --accent-ink: oklch(0.99 0.01 85);
+  --signal: oklch(0.5 0.09 215);
+}
+
+.dark {
+  /* Dark — "the lab at night" (default) */
+  color-scheme: dark;
+  --canvas: oklch(0.16 0.012 262);
+  --surface: oklch(0.195 0.013 262);
+  --raised: oklch(0.235 0.014 262);
+  --line: oklch(0.285 0.014 262);
+  --line-strong: oklch(0.4 0.016 262);
+  --ink: oklch(0.955 0.008 85);
+  --ink-muted: oklch(0.77 0.012 262);
+  --ink-faint: oklch(0.62 0.014 262);
+  --accent: oklch(0.83 0.135 78);
+  --accent-ink: oklch(0.2 0.03 70);
+  --signal: oklch(0.8 0.1 200);
+}
+
+/* ------------------------------------------------------------------ 2. Theme */
+
+@theme {
+  /* Remove Tailwind's default palette so only the tokens below can be used. */
+  --color-*: initial;
+  --color-white: #fff;
+  --color-black: #000;
+
+  --font-sans:
+    'Instrument Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Newsreader Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Fluid type scale. Display sizes are set in the serif; everything else in the sans. */
+  --text-display: clamp(2.75rem, 1.55rem + 5.2vw, 5.5rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.035em;
+  --text-headline: clamp(2rem, 1.45rem + 2.4vw, 3.25rem);
+  --text-headline--line-height: 1.06;
+  --text-headline--letter-spacing: -0.028em;
+  --text-title: clamp(1.375rem, 1.2rem + 0.75vw, 1.75rem);
+  --text-title--line-height: 1.2;
+  --text-title--letter-spacing: -0.018em;
+  --text-lede: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  --text-lede--line-height: 1.6;
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1rem;
+  --text-label--letter-spacing: 0.12em;
+
+  /* Layout rhythm: `px-gutter`, `py-section`, `max-w-page`, `max-w-prose`. */
+  --spacing-gutter: clamp(1.25rem, 0.5rem + 3.2vw, 3rem);
+  --spacing-section: clamp(4.5rem, 3rem + 6vw, 8rem);
+  --container-page: 80rem;
+  --container-prose: 44rem;
+
+  /* Corners stay nearly square; the aesthetic is drawn with hairlines, not cards. */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 8px;
+
+  --ease-swift: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-rise: rise 0.8s var(--ease-swift) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* `inline` so utilities resolve to the scheme-aware raw tokens at use-site. */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-signal: var(--signal);
+}
+
+/* ------------------------------------------------------------------ 3. Base */
+
+@layer base {
+  html {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Keep anchored headings clear of the sticky header. */
+    scroll-padding-top: 6rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  figcaption {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--accent) 32%, transparent);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* Native <dialog> resets that Tailwind's preflight leaves alone. */
+  dialog {
+    max-width: none;
+    max-height: none;
+  }
+}
+
+/* Cross-document view transitions: a quiet cross-fade between pages with zero JavaScript.
+   Browsers without support simply navigate normally. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 220ms;
+    animation-timing-function: var(--ease-swift);
+  }
+}
+
+/* Honour reduced-motion everywhere, including third-party and future styles. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------------ 4. Utilities */
+
+/* Small-caps monospace label: eyebrows, figure numbers, metadata. */
+@utility mono-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--text-label--letter-spacing);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* Graph-paper dot grid. Pair with a mask to fade it out. */
+@utility bg-dotgrid {
+  background-image: radial-gradient(circle at 1px 1px, var(--line-strong) 1px, transparent 0);
+  background-size: 1.5rem 1.5rem;
+}
+
+/* Text link with an underline that draws in from the left. */
+@utility link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.35s var(--ease-swift);
+
+  &:hover,
+  &:focus-visible {
+    background-size: 100% 1px;
+  }
+}
+
+/* Staggered entrance for above-the-fold content: set `--i` to the element's order.
+   `--rise-step` (inherited) tunes the gap between consecutive elements. */
+@utility rise {
+  animation: var(--animate-rise);
+  animation-delay: calc(var(--i, 0) * var(--rise-step, 90ms));
+}
+
+/* Scroll-linked reveal. Progressive enhancement: without scroll-driven animation support
+   (or with reduced motion) the element is simply visible. No JavaScript involved. */
+@utility reveal {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      animation: reveal linear both;
+      animation-timeline: view();
+      /* A fixed distance, so tall and short blocks settle after the same amount of scroll. */
+      animation-range: entry 0% entry 12rem;
+    }
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------ Code blocks */
+/* Unlayered on purpose so these win over Tailwind's layered output.
+   Shiki emits both themes as CSS variables (see `markdown.shikiConfig`). */
+
+.astro-code {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 1.125rem 1.25rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  tab-size: 4;
+}
+
+.astro-code,
+.astro-code span {
+  color: var(--shiki-light);
+}
+
+.dark .astro-code,
+.dark .astro-code span {
+  color: var(--shiki-dark);
+}
+
+/* ------------------------------------------------------------------ Long-form prose */
+/* Maps @tailwindcss/typography onto the design tokens. Use as `class="prose"`. */
+
+.prose {
+  --tw-prose-body: var(--ink-muted);
+  --tw-prose-headings: var(--ink);
+  --tw-prose-lead: var(--ink-muted);
+  --tw-prose-links: var(--ink);
+  --tw-prose-bold: var(--ink);
+  --tw-prose-counters: var(--ink-faint);
+  --tw-prose-bullets: var(--line-strong);
+  --tw-prose-hr: var(--line);
+  --tw-prose-quotes: var(--ink);
+  --tw-prose-quote-borders: var(--accent);
+  --tw-prose-captions: var(--ink-faint);
+  --tw-prose-kbd: var(--ink);
+  --tw-prose-code: var(--ink);
+  --tw-prose-pre-code: var(--ink);
+  --tw-prose-pre-bg: var(--surface);
+  --tw-prose-th-borders: var(--line-strong);
+  --tw-prose-td-borders: var(--line);
+  max-width: var(--container-prose);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.prose :where(h1, h2, h3, h4):not(:where(.not-prose, .not-prose *)) {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.018em;
+}
+
+.prose :where(a):not(:where(.not-prose, .not-prose *)) {
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.prose :where(:not(pre) > code):not(:where(.not-prose, .not-prose *)) {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  font-weight: 500;
+  background-color: var(--raised);
+  border-radius: var(--radius-xs);
+  padding: 0.125em 0.35em;
+}
+
+.prose :where(:not(pre) > code):not(:where(.not-prose, .not-prose *))::before,
+.prose :where(:not(pre) > code):not(:where(.not-prose, .not-prose *))::after {
+  content: none;
+}

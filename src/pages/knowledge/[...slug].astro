@@ -1,0 +1,22 @@
+---
+import { render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import Viz from '@/components/visualizations/Viz.astro';
+import NoteLayout from '@/layouts/NoteLayout.astro';
+import { getPublishedNotes } from '@/lib/content';
+
+export const getStaticPaths = (async () => {
+  const notes = await getPublishedNotes();
+  return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
+}) satisfies GetStaticPaths;
+
+const { note } = Astro.props;
+const { Content } = await render(note);
+
+// Components available in every note without an import statement.
+const components = { Viz };
+---
+
+<NoteLayout note={note}>
+  <Content components={components} />
+</NoteLayout>

@@ -1,0 +1,52 @@
+---
+/**
+ * Four doors into the notebook. Copy is local because these are routes, not the
+ * section descriptions in site.ts, which are the page ledes.
+ */
+import Section from '@/components/ui/Section.astro';
+
+const doors = [
+  {
+    href: '/knowledge',
+    name: 'A map of the subject',
+    description:
+      'Eight fields, each with an explanation of why it matters and of the ideas inside it. A note is linked once it is written.',
+  },
+  {
+    href: '/learning-paths',
+    name: 'Paths with an order',
+    description: 'Sequences from a prerequisite to a thing you can do. Each path says what the last module is for.',
+  },
+  {
+    href: '/visual-lab',
+    name: 'Figures you can change',
+    description: 'One idea per figure. The live ones respond; the rest are specified so they can be built.',
+  },
+  {
+    href: '/research',
+    name: 'Claims, checked',
+    description: 'Paper notes and experiments. Planned entries are questions. Posted entries link to the source.',
+  },
+];
+---
+
+<Section id="find" index="01" label="Contents" title="What you will find here.">
+  <ul class="grid border-t border-l border-line sm:grid-cols-2">
+    {
+      doors.map((door, i) => (
+        <li class="border-r border-b border-line">
+          <a
+            href={door.href}
+            class="group flex h-full flex-col p-6 transition-colors duration-300 hover:bg-surface sm:p-7"
+          >
+            <span class="mono-label text-ink-faint transition-colors duration-300 group-hover:text-accent">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <span class="mt-8 font-serif text-title text-ink">{door.name}</span>
+            <span class="mt-2.5 text-[0.9375rem] leading-relaxed text-ink-muted">{door.description}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

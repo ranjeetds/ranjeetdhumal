@@ -1,0 +1,106 @@
+---
+/**
+ * Layout for a single Knowledge Hub note: header, a metadata rail and the prose column.
+ * The article is marked `data-pagefind-body` so search (when added) indexes only notes' text.
+ */
+import BaseLayout from './BaseLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Status from '@/components/ui/Status.astro';
+import { getSection } from '@/config/site';
+import { getTopic } from '@/data/topics';
+import { type Note, formatDate, noteHref } from '@/lib/content';
+import { articleSchema, breadcrumbSchema } from '@/lib/seo';
+
+interface Props {
+  note: Note;
+}
+
+const { note } = Astro.props;
+const { title, description, publishedAt, updatedAt, maturity, tags } = note.data;
+const topic = note.data.topic && getTopic(note.data.topic);
+const hub = getSection('knowledge');
+const path = noteHref(note);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  structuredData={[
+    articleSchema({ title, description, path, publishedAt, updatedAt }),
+    breadcrumbSchema([
+      { name: hub.title, path: hub.href },
+      { name: title, path },
+    ]),
+  ]}
+>
+  <article data-pagefind-body>
+    <header class="mx-auto max-w-page px-gutter pt-12 pb-12 sm:pt-16 lg:pt-20 lg:pb-16">
+      <a
+        href={hub.href}
+        class="rise mono-label inline-flex items-center gap-2 text-ink-faint transition-colors duration-200 hover:text-ink"
+        style="--i:0"
+      >
+        <Icon name="arrow-right" class="size-3.5 rotate-180" />
+        {hub.title}
+      </a>
+      <h1 class="rise mt-8 max-w-4xl font-serif text-display text-ink" style="--i:1">{title}</h1>
+      <p class="rise mt-6 max-w-2xl text-lede text-ink-muted" style="--i:2">{description}</p>
+    </header>
+
+    <div class="border-t border-line">
+      <div class="mx-auto grid max-w-page gap-x-8 gap-y-10 px-gutter py-12 lg:grid-cols-12 lg:py-16">
+        <aside aria-label="About this note" class="lg:col-span-3" data-pagefind-ignore>
+          <dl class="grid grid-cols-2 gap-x-6 gap-y-5 text-sm lg:sticky lg:top-24 lg:grid-cols-1">
+            <div>
+              <dt class="mono-label text-ink-faint">Maturity</dt>
+              <dd class="mt-1.5">
+                <Status tone={maturity === 'evergreen' ? 'live' : 'planned'}>{maturity}</Status>
+              </dd>
+            </div>
+            <div>
+              <dt class="mono-label text-ink-faint">Published</dt>
+              <dd class="mt-1.5 text-ink-muted">
+                <time datetime={publishedAt.toISOString()}>{formatDate(publishedAt)}</time>
+              </dd>
+            </div>
+            {
+              updatedAt && (
+                <div>
+                  <dt class="mono-label text-ink-faint">Updated</dt>
+                  <dd class="mt-1.5 text-ink-muted">
+                    <time datetime={updatedAt.toISOString()}>{formatDate(updatedAt)}</time>
+                  </dd>
+                </div>
+              )
+            }
+            {
+              topic && (
+                <div>
+                  <dt class="mono-label text-ink-faint">Field</dt>
+                  <dd class="mt-1.5">
+                    <a href={`${hub.href}#${topic.id}`} class="link-underline text-ink-muted hover:text-ink">
+                      {topic.title}
+                    </a>
+                  </dd>
+                </div>
+              )
+            }
+            {
+              tags.length > 0 && (
+                <div>
+                  <dt class="mono-label text-ink-faint">Tags</dt>
+                  <dd class="mt-1.5 text-ink-muted">{tags.join(', ')}</dd>
+                </div>
+              )
+            }
+          </dl>
+        </aside>
+
+        <div class="prose min-w-0 lg:col-span-9">
+          <slot />
+        </div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,21 @@
+---
+/** Mono status marker: a filled accent dot for live things, a hollow one for planned. */
+interface Props {
+  tone?: 'live' | 'planned';
+  class?: string;
+}
+
+const { tone = 'planned', class: className } = Astro.props;
+---
+
+<span class:list={['mono-label inline-flex items-center gap-2 text-ink-faint', className]}>
+  <span
+    aria-hidden="true"
+    class:list={[
+      'size-1.5 rounded-full',
+      tone === 'live' ? 'bg-accent' : 'border border-ink-faint',
+    ]}
+  >
+  </span>
+  <slot />
+</span>

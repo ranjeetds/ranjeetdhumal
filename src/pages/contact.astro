@@ -1,0 +1,98 @@
+---
+import Button from '@/components/ui/Button.astro';
+import Section from '@/components/ui/Section.astro';
+import { site } from '@/config/site';
+import PageLayout from '@/layouts/PageLayout.astro';
+
+const endpoint = site.contactFormAction;
+const usesMailto = endpoint.length === 0;
+const action = usesMailto ? `mailto:${site.email}` : endpoint;
+---
+
+<PageLayout section="contact">
+  <Section id="write" label="Write" title="After the path, if you want to talk.">
+    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
+      <p>
+        The useful notes are about a chapter, a figure, or a claim on the research log. Say which
+        one, and what you think it gets wrong. The address below is the one on the public résumé.
+      </p>
+      <p>
+        {
+          usesMailto
+            ? 'No hosted form is connected. Sending opens your mail client, with the message in the body. A Formspree or Worker URL can replace that later, in the site config, without changing this page.'
+            : 'The form posts to the endpoint configured for this site.'
+        }
+      </p>
+    </div>
+
+    <form
+      class="mt-10 max-w-xl space-y-5"
+      action={action}
+      method="post"
+      enctype={usesMailto ? 'text/plain' : 'application/x-www-form-urlencoded'}
+    >
+      <div>
+        <label for="name" class="mono-label text-ink-faint">Name</label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          autocomplete="name"
+          required
+          class="mt-2 w-full border border-line bg-surface px-3 py-2.5 text-ink outline-none transition-colors duration-200 focus:border-line-strong"
+        />
+      </div>
+      <div>
+        <label for="email" class="mono-label text-ink-faint">Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          required
+          class="mt-2 w-full border border-line bg-surface px-3 py-2.5 text-ink outline-none transition-colors duration-200 focus:border-line-strong"
+        />
+      </div>
+      <div>
+        <label for="message" class="mono-label text-ink-faint">Message</label>
+        <textarea
+          id="message"
+          name="body"
+          required
+          rows="6"
+          class="mt-2 w-full border border-line bg-surface px-3 py-2.5 text-ink outline-none transition-colors duration-200 focus:border-line-strong"
+        ></textarea>
+      </div>
+      <button
+        type="submit"
+        class="inline-flex h-11 items-center rounded-sm bg-ink px-5 text-sm font-medium text-canvas transition-colors duration-200 hover:bg-accent hover:text-accent-ink"
+      >
+        {usesMailto ? 'Open in your mail client' : 'Send'}
+      </button>
+    </form>
+  </Section>
+
+  <Section id="elsewhere" label="Elsewhere" title="The same person, without a form.">
+    <ul class="max-w-xl border-t border-line">
+      <li class="grid gap-2 border-b border-line py-4 sm:grid-cols-[8rem_1fr]">
+        <span class="mono-label pt-1 text-ink-faint">Email</span>
+        <a href={`mailto:${site.email}`} class="link-underline text-ink hover:text-accent">{site.email}</a>
+      </li>
+      {
+        site.socials.map((social) => (
+          <li class="grid gap-2 border-b border-line py-4 sm:grid-cols-[8rem_1fr]">
+            <span class="mono-label pt-1 text-ink-faint">{social.label}</span>
+            <a href={social.href} class="link-underline text-ink hover:text-accent" rel="me noopener noreferrer" target="_blank">
+              {social.href.replace(/^https:\/\//, '')}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="mt-8">
+      <Button href="/learning-paths#from-data-to-intelligence" variant="secondary" arrow>
+        Back to the path
+      </Button>
+    </div>
+  </Section>
+</PageLayout>

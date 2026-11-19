@@ -1,0 +1,64 @@
+---
+/**
+ * The research log. Posted entries link to a source. Planned entries are the queue:
+ * a title, the question, and an abstract of the idea — not a finding.
+ */
+import { render } from 'astro:content';
+import { type ResearchEntry, formatDate } from '@/lib/content';
+
+interface Props {
+  entries: ResearchEntry[];
+}
+
+const { entries } = Astro.props;
+
+const rendered = await Promise.all(
+  entries.map(async (entry) => {
+    const { Content } = await render(entry);
+    return { entry, Content };
+  }),
+);
+
+const kindLabel = {
+  note: 'Note',
+  experiment: 'Experiment',
+  'paper-note': 'Paper',
+  'open-question': 'Direction',
+} as const;
+---
+
+<ul class="border-t border-line">
+  {
+    rendered.map(({ entry, Content }) => (
+      <li class="border-b border-line py-10">
+        <p class="mono-label text-ink-faint">
+          {entry.data.stage === 'posted' ? formatDate(entry.data.publishedAt) : 'Planned'}
+          <span class="mx-2 text-line-strong" aria-hidden="true">/</span>
+          {kindLabel[entry.data.kind]}
+        </p>
+        <h3 class="mt-3 max-w-2xl font-serif text-title text-ink">
+          {
+            entry.data.source ? (
+              <a
+                href={entry.data.source}
+                class="link-underline hover:text-accent"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {entry.data.title}
+              </a>
+            ) : (
+              entry.data.title
+            )
+          }
+        </h3>
+        {entry.data.authors.length > 0 && (
+          <p class="mt-2 text-sm text-ink-faint">{entry.data.authors.join(', ')}</p>
+        )}
+        <div class="prose mt-4">
+          <Content />
+        </div>
+      </li>
+    ))
+  }
+</ul>

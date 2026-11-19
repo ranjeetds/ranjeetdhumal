@@ -1,0 +1,40 @@
+---
+title: Attention Mechanisms and Transformers
+description: A head is a weighted average of values. A transformer block writes that average, and a position-wise change, back onto a stream of vectors.
+topic: generative-ai
+maturity: budding
+publishedAt: 2026-11-19
+tags: [attention, transformers]
+---
+
+Attention is a way for one position in a sequence to read the others. It is not a memory of the world, and it is not a theory of grammar. Given a set of vectors, each position builds a query. Every position offers a key and a value. The query is compared with the keys. The comparisons become weights that sum to one. The output is the weighted average of the values.
+
+That is the whole mechanism. The rest is what you do with the average, and which positions are allowed to be read.
+
+## One row is a distribution
+
+The scores are dot products, scaled so they do not grow with the dimension. A softmax turns a row of scores into weights. After the softmax, the row sums to one and none of it is negative. It is a distribution over positions. “The model attended to the subject” means that distribution put most of its mass there, for that query, in that head.
+
+Heads differ because their queries, keys, and values are different linear maps of the same stream. One head can put the verb’s mass on the noun that acted. Another can put each position’s mass on its neighbours. Averaging the heads into one picture destroys the only structure the mechanism has. You read a head, or you read none.
+
+The figure uses two patterns that were designed, not trained, so the row is visible before a real model is attached. Select the verb. Switch heads. The sentence does not change. The distribution does.
+
+<Viz id="attention-patterns" />
+
+## The mask
+
+A causal mask sets the scores for future positions to a value the softmax will treat as zero, then the remaining weights are renormalized. The row still sums to one. What changed is the support: a position may not read a token that has not been “written” yet. That is the constraint a language model needs if it is trained to predict the next token. It is not a claim that the past is more important. It is a ban on a direction of travel.
+
+Turn the mask off in the figure and the same head is allowed to look forward. The pattern changes because the distribution was recomputed, not because information was deleted from the sentence.
+
+## A block is an update, not a replacement
+
+Around the attention sits the rest of a transformer block. The attention output is added back onto the incoming vectors, on a residual path, rather than replacing them. A position-wise network then changes each vector on its own, and that change is added back too. The stream carries what earlier blocks wrote. The block writes a correction.
+
+This split is the one to keep. Only attention can move information from position A to position B inside the block. The position-wise network cannot see the other positions. If something about one token has to affect another, it happens in attention, or it happened in an earlier block. The feed-forward layer is where a single position is transformed once it has gathered what it needs.
+
+A stack of blocks is a stack of those corrections. By the last block, the vector at the final position has to carry whatever the next-token prediction needs, because that prediction is a function of that vector.
+
+## Where this goes
+
+Point the stack at a vocabulary and train it to put probability on the token that actually came next. That is a language model, and it is the next chapter: [Large Language Models](/knowledge/large-language-models). Sanderson’s lecture [Attention in transformers, step by step](/videos#attention-in-transformers) spends longer on the examples, including why the same word needs a different vector in a different sentence. The block he draws is the one this page just separated into a mix and a correction.

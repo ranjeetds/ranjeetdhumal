@@ -1,0 +1,51 @@
+---
+/**
+ * A ruled page section: a hairline on top, a sticky mono label in the left rail and the
+ * heading plus content on the right. Every content block on the site sits in one of these.
+ */
+interface Props {
+  /** Used as the section's anchor and to label it for assistive technology. */
+  id: string;
+  /** Short rail label, e.g. "Fields". */
+  label: string;
+  /** Optional ordinal shown before the label, e.g. "01". */
+  index?: string;
+  title?: string;
+  lede?: string;
+  class?: string;
+}
+
+const { id, label, index, title, lede, class: className } = Astro.props;
+const titleId = `${id}-title`;
+---
+
+<section
+  id={id}
+  aria-labelledby={title ? titleId : undefined}
+  aria-label={title ? undefined : label}
+  class:list={['border-t border-line', className]}
+>
+  <div class="mx-auto grid max-w-page gap-x-8 gap-y-8 px-gutter py-section lg:grid-cols-12">
+    <div class="lg:col-span-3">
+      <p class="mono-label flex items-center gap-3 text-ink-faint lg:sticky lg:top-24">
+        {index && <span class="text-accent">{index}</span>}
+        <span class="h-px w-6 bg-line-strong" aria-hidden="true"></span>
+        <span>{label}</span>
+      </p>
+    </div>
+
+    <div class="min-w-0 lg:col-span-9">
+      {
+        title && (
+          <h2 id={titleId} class="max-w-3xl font-serif text-headline text-ink">
+            {title}
+          </h2>
+        )
+      }
+      {lede && <p class="mt-5 max-w-2xl text-lede text-ink-muted">{lede}</p>}
+      <div class:list={['reveal', (title || lede) && 'mt-12']}>
+        <slot />
+      </div>
+    </div>
+  </div>
+</section>

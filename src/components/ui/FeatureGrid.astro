@@ -1,0 +1,38 @@
+---
+/**
+ * A hairline grid of short labelled statements (stages, formats, principles…).
+ * Pick `columns` so the item count fills the grid: 3 items → 3, 4 items → 2 or 4.
+ * Renders <h3>s, so use it inside a Section that has a title.
+ */
+interface Item {
+  name: string;
+  description: string;
+  /** Mono label above the name. Defaults to the item's ordinal. */
+  label?: string;
+}
+
+interface Props {
+  items: Item[];
+  columns?: 2 | 3 | 4;
+}
+
+const { items, columns = 3 } = Astro.props;
+
+const grid = {
+  2: 'sm:grid-cols-2',
+  3: 'md:grid-cols-3',
+  4: 'sm:grid-cols-2 xl:grid-cols-4',
+};
+---
+
+<ul class:list={['grid border-t border-l border-line', grid[columns]]}>
+  {
+    items.map((item, i) => (
+      <li class="border-r border-b border-line p-6 sm:p-7">
+        <p class="mono-label text-ink-faint">{item.label ?? String(i + 1).padStart(2, '0')}</p>
+        <h3 class="mt-8 font-serif text-title text-ink">{item.name}</h3>
+        <p class="mt-2.5 text-[0.9375rem] leading-relaxed text-ink-muted">{item.description}</p>
+      </li>
+    ))
+  }
+</ul>

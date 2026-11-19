@@ -1,0 +1,42 @@
+---
+/**
+ * A titled, syntax-highlighted code listing for use outside Markdown. Highlighting runs
+ * at build time (Shiki), so no JavaScript is shipped for it.
+ */
+import { Code } from 'astro:components';
+import type { ComponentProps } from 'astro/types';
+
+interface Props {
+  code: string;
+  lang: ComponentProps<typeof Code>['lang'];
+  /** File name or short title shown in the listing's header. */
+  title: string;
+  /** Listing number within the page, e.g. "01". */
+  number?: string;
+}
+
+const { code, lang, title, number } = Astro.props;
+---
+
+<figure class="overflow-hidden rounded-md border border-line bg-surface">
+  <figcaption class="mono-label flex items-center gap-2.5 border-b border-line px-4 py-2.5 text-ink-faint">
+    <span class="text-accent">{number ? `Listing ${number}` : 'Listing'}</span>
+    <span class="truncate">{title}</span>
+  </figcaption>
+  {/* Themes must match `markdown.shikiConfig` in astro.config.mjs. */}
+  <Code
+    code={code}
+    lang={lang}
+    themes={{ light: 'vitesse-light', dark: 'vitesse-dark' }}
+    defaultColor={false}
+    class="code-listing"
+  />
+</figure>
+
+<style>
+  /* The figure already draws the frame. */
+  figure :global(.code-listing) {
+    border: 0;
+    border-radius: 0;
+  }
+</style>

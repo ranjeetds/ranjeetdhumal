@@ -1,0 +1,107 @@
+---
+/**
+ * Full-screen navigation for small viewports, built on a native modal <dialog>:
+ * focus trapping, Escape-to-close and an inert page behind it come from the platform.
+ * Opened and closed by Header.astro's script.
+ */
+import ThemeToggle from './ThemeToggle.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Logo from '@/components/ui/Logo.astro';
+import { isActivePath, primaryNav, secondaryNav, sectionIndex, site } from '@/config/site';
+
+const { pathname } = Astro.url;
+---
+
+<dialog id="site-menu" aria-label="Site navigation" class="site-menu m-0 h-dvh w-full bg-canvas text-ink">
+  <div class="flex h-full flex-col">
+    <div class="flex h-16 shrink-0 items-center justify-between border-b border-line px-gutter">
+      <a href="/" class="flex items-center gap-2.5 font-medium tracking-tight">
+        <Logo />
+        {site.name}
+      </a>
+      <button
+        type="button"
+        data-menu-close
+        autofocus
+        aria-label="Close navigation"
+        class="-mr-2.5 grid size-10 place-items-center rounded-sm text-ink-muted hover:bg-raised hover:text-ink"
+      >
+        <Icon name="close" class="size-5" />
+      </button>
+    </div>
+
+    {/* Titles only, so the whole menu fits on one phone screen without scrolling. */}
+    <nav aria-label="Menu" class="flex-1 overflow-y-auto px-gutter pt-2 pb-8 [--rise-step:40ms]">
+      <ul>
+        {
+          primaryNav.map((item, i) => (
+            <li class="rise border-b border-line" style={`--i:${i}`}>
+              <a
+                href={item.href}
+                aria-current={isActivePath(pathname, item.href) ? 'page' : undefined}
+                class="group flex items-baseline gap-5 py-4"
+              >
+                <span class="mono-label w-5 text-ink-faint group-aria-[current=page]:text-accent">
+                  {sectionIndex(item.id)}
+                </span>
+                <span class="font-serif text-[1.75rem] leading-tight tracking-tight">
+                  {item.title}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <ul class="rise mt-5 flex gap-6 pl-10" style={`--i:${primaryNav.length}`}>
+        {
+          secondaryNav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isActivePath(pathname, item.href) ? 'page' : undefined}
+                class="inline-flex py-2 text-ink-muted hover:text-ink aria-[current=page]:text-ink"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex shrink-0 items-center justify-between border-t border-line px-gutter py-3">
+      <p class="mono-label text-ink-faint">{site.tagline}</p>
+      <ThemeToggle class="-mr-2.5" />
+    </div>
+  </div>
+</dialog>
+
+<style>
+  /* Fade the dialog in and out. `allow-discrete` lets `display` and the top layer
+     take part in the transition; older browsers simply show and hide it. */
+  .site-menu {
+    opacity: 0;
+    transition:
+      opacity 0.2s ease-out,
+      overlay 0.2s allow-discrete,
+      display 0.2s allow-discrete;
+  }
+
+  .site-menu[open] {
+    opacity: 1;
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
+  .site-menu::backdrop {
+    background-color: var(--canvas);
+  }
+
+  /* Stop the page behind the menu from scrolling. */
+  :global(html:has(.site-menu[open])) {
+    overflow: hidden;
+  }
+</style>

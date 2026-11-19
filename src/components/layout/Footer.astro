@@ -1,0 +1,59 @@
+---
+import Logo from '@/components/ui/Logo.astro';
+import { primaryNav, secondaryNav, site } from '@/config/site';
+
+const year = new Date().getFullYear();
+
+const groups = [
+  { heading: 'Explore', links: primaryNav.map((item) => ({ label: item.title, href: item.href })) },
+  { heading: 'Author', links: secondaryNav.map((item) => ({ label: item.label, href: item.href })) },
+  { heading: 'Elsewhere', links: site.socials.map((social) => ({ ...social, external: true })) },
+].filter((group) => group.links.length > 0);
+---
+
+<footer class="mt-auto border-t border-line">
+  <div class="mx-auto grid max-w-page gap-x-8 gap-y-12 px-gutter py-14 lg:grid-cols-12 lg:py-20">
+    <div class="lg:col-span-5">
+      <a href="/" class="inline-flex items-center gap-2.5 font-medium tracking-tight text-ink">
+        <Logo />
+        {site.name}
+      </a>
+      <p class="mt-6 max-w-sm font-serif text-title text-ink">{site.tagline}</p>
+      <p class="mt-3 max-w-sm text-sm leading-relaxed text-ink-faint">
+        An open notebook on artificial intelligence, written to be explored rather than skimmed.
+      </p>
+    </div>
+
+    <nav aria-label="Footer" class="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-6 lg:col-start-7">
+      {
+        groups.map((group) => (
+          <div>
+            <h2 class="mono-label text-ink-faint">{group.heading}</h2>
+            <ul class="mt-4 space-y-2.5">
+              {group.links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="link-underline text-sm text-ink-muted transition-colors duration-200 hover:text-ink"
+                    {...('external' in link && { rel: 'me noopener', target: '_blank' })}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </nav>
+  </div>
+
+  <div class="border-t border-line">
+    <div
+      class="mono-label mx-auto flex max-w-page flex-col gap-2 px-gutter py-5 text-ink-faint sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>© {year} {site.name}</p>
+      <p>Set in Newsreader &amp; Instrument Sans</p>
+    </div>
+  </div>
+</footer>

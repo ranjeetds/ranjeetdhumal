@@ -1,0 +1,38 @@
+---
+title: Training Dynamics and Optimization
+description: Training is a walk downhill on a loss. The walk is local, the surface can have more than one valley, and a lower loss is not by itself a better model.
+topic: mathematics
+maturity: budding
+publishedAt: 2026-11-19
+tags: [optimization, training]
+---
+
+Once a network is a function and a loss is a number, training is a walk. At the current weights, compute the direction in which the loss increases most steeply. Step the other way, by a distance you chose. Repeat. Everything called an optimizer is a variation on that walk: a memory of previous steps, a different distance, a rescaling of the slope so that some directions are not allowed to dominate.
+
+The variation does not grant the walk a view of the whole surface.
+
+## The gradient is local
+
+A derivative is a fact about a function at a point, not a ranking of causes. The gradient points to the steepest nearby increase. It can point into a wall. It can be large because a single example was strange. It can be nearly zero because the function is flat there, which is a different failure from a function that is simply wrong. People read saliency maps and “feature importance” off gradients as if the slope were a confession. It is a slope.
+
+Backpropagation is how the slope is computed when the function is a graph. Each node needs its own local derivative and the derivative arriving from upstream. Their product is the gradient along that path. Automatic differentiation hides the arithmetic. It does not decide whether the loss was the right number to differentiate.
+
+## The surface is not a bowl
+
+On a convex problem, a careful walk reaches the bottom from anywhere. A neural network loss is not convex. There can be two valleys, and a ridge between them, and the walk from one side of the ridge will never see the other valley. Momentum helps the walk keep going through a shallow patch and makes it overshoot. It does not look over the ridge.
+
+The figure is that situation with the dimensions cut down to two, so the choice is visible. Start in one place and then in another. The update rule does not change.
+
+<Viz id="gradient-descent" />
+
+Step size is the other choice that looks like a detail. Too large, and the walk oscillates or leaves the valley it was in. Too small, and it stops in a flat region that was not the bottom, or it takes so long that you stop it. A learning-rate schedule is an admission that the right step is not the same at the start of the walk and at the end.
+
+## Constraints you did not write in the loss
+
+The loss is not the whole problem. A penalty on the size of the weights, a normalization layer, a finite step, and the place the weights started are all constraints on which functions the walk can reach. Two runs with the same loss and the same data can finish as different functions because they walked different constrained paths. Comparing them by training loss alone throws away the constraint.
+
+Early stopping is one of those constraints. The function you would have reached later is not the function you have. Sometimes that is the point: the later function would have fit noise. Sometimes you have simply not arrived.
+
+## Where this goes
+
+What the walk changes, inside the network, is the direction of the vectors flowing through it. Those directions are the representation the next chapters use. Read [Embeddings and Representation Learning](/knowledge/embeddings-and-representation) for that, and Karpathy’s [micrograd lecture](/videos#building-micrograd) if you want the chain rule pushed through one expression by hand before a library does it. The protocol for measuring this particular surface, without pretending the measurement has been run, is on the [research log](/research).

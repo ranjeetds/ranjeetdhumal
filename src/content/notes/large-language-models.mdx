@@ -1,0 +1,36 @@
+---
+title: Large Language Models
+description: A language model is a next-token distribution, conditioned on the tokens so far. A sentence in a product is a sample from that distribution, repeated.
+topic: generative-ai
+maturity: budding
+publishedAt: 2026-11-19
+tags: [language-models, tokens]
+---
+
+A large language model, in the sense that matters for using one, is a function from a sequence of tokens to a distribution over the next token. Call it once, sample, append, call it again. A paragraph is that loop. The size of the network and the quantity of text it was trained on change the distribution. They do not change the kind of object the model returns.
+
+The object is not a sentence, and it is not a belief. It is a list of probabilities, one per token in the vocabulary, conditioned on what came before.
+
+## Tokens, then a distribution
+
+The model does not see words. It sees ids from a vocabulary that was built to keep sequences short, not to respect morphology. A rare word may be three tokens. A trailing space may be its own. Two strings that look identical to you can be different sequences, and the distribution is a function of the sequence. When a prompt does something strange, look at the pieces before inventing a theory of the model’s reasoning. The tokenization figure in the lab is specified for that look. It is not built yet.
+
+Given the pieces, the transformer stack from the previous chapter produces a vector at the last position, and a linear map turns that vector into a score per token. A softmax makes the scores a distribution. That distribution is the output. The figure below is a toy with six words and hand-written scores, so the shape can be moved without pretending a model was trained.
+
+<Viz id="next-token" />
+
+## Temperature is not intelligence
+
+Sampling draws a token with probability proportional to those weights, sometimes after dividing the scores by a temperature. Low temperature makes the largest score dominate. High temperature flattens the distribution, so dull tokens stay plausible. Temperature does not add knowledge and it does not remove it. It changes how willing the draw is to be unlikely. A product that always shows you the most likely token is a product that took the tallest bar. A product that feels various is one that sometimes takes a shorter bar. Both are readings of the same distribution.
+
+Greedy decoding, beam search, and a random sample are different policies on top of one model. Comparing them as if they were different models confuses the policy with the distribution.
+
+## Context is the only new information at inference
+
+At inference the weights are fixed. The way to change what the model assigns probability to, without training, is to change the sequence it is shown. A retrieved paragraph works, when it works, because it is now part of that sequence and attention can read it. The model did not search your documents. Your system searched, then asked the model to continue. If the chunk is the wrong chunk, the distribution moves for the wrong reason, and blaming “the model” skips the retrieval.
+
+Fine-tuning is the other lever, and it is a change to the weights. It is the right move when the behaviour should happen even with no documents attached, and you have examples of it. It does not install a database. A fact that changes next week does not belong in the weights if you can put it in the context.
+
+## Where this goes
+
+A fluent sample can be false, and a probability of 0.9 can be wrong 40 percent of the time if the model is miscalibrated. The next chapter is that gap: [Evaluation and Alignment](/knowledge/evaluation-and-alignment). Karpathy’s [Intro to Large Language Models](/videos#intro-to-large-language-models) separates the forward distribution from the training that produced the weights. [Let's build GPT](/videos#lets-build-gpt) is the block, written out, if the previous chapter still feels like a diagram.

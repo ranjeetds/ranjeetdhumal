@@ -1,0 +1,34 @@
+---
+title: Agentic AI Systems
+description: An agent is a model inside a loop that can change a state. The model proposes. The program permits, acts, and records what happened.
+topic: agentic-ai
+maturity: budding
+publishedAt: 2026-11-19
+tags: [agents, tools]
+---
+
+An agent, in the current sense, is a language model placed in a loop that is allowed to do something. The model sees an observation and proposes an action. Some other code decides whether that action is permitted, performs it, and puts the result where the next observation can include it. Remove the loop and you have a chatbot. The loop is the system.
+
+The model is one function inside that system. It is not the system.
+
+## Four stages, and only one of them is the model
+
+Draw a cycle. First the observation: the text and the state your program chose to show. Second the proposal: a tool name and arguments, or a decision to stop. Third the act: your code runs the tool, or refuses. Fourth the result: what will be appended before the next proposal. The model occupies the second stage. The other three are yours, which means their failures are yours.
+
+Most production failures are a bad observation. The fact the model needed had scrolled out, or was never written down, or was contradicted by a later message that your program treated as truth. A longer prompt is one way to pack the observation. It is not memory. Memory is state your code wrote, from something that happened, and that a later message cannot silently rewrite.
+
+## Tools are a boundary
+
+A tool is a function with a schema. The schema is the contract the model can be held to: these fields, these types, and a refusal when the request falls outside them. The refusal has to happen in your code. A sentence in the prompt that says “be careful” is not a boundary, because the model can propose the careful sentence and the destructive call in the same step.
+
+Two tools that overlap are a quieter failure. The model’s choice between them is then invisible, and a test that checks “a tool was called” will pass either way. Name the action you are willing to allow, and make the schema unable to express the action you are not.
+
+## The test looks at the state
+
+A benchmark that grades the final message rewards a description of the right action. An agent that deletes a file and then apologises will pass one of those and fail the check you actually wanted: the file is still there, the tool was called once, an error stopped the loop instead of being narrated over. The checks are small on purpose. They are assertions about state.
+
+The lab’s agent figure is specified as that cycle, paused, with a control that hides the state and shows only the commentary so you can feel how little the commentary tells you. It is not built yet. The standard does not depend on the figure. If you cannot point at the record of what changed, you do not know what the agent did.
+
+## Where this stops
+
+A larger system is this loop with more state, not a different idea. Planning is a piece of state you wrote down and might have to throw away when the result contradicts it. The [agentic path](/learning-paths#agentic-ai-systems) takes the same cycle more slowly: tools, memory, plans, and tests. This chapter is the end of [From Data to Intelligence](/learning-paths#from-data-to-intelligence), which started from a loss and a table of examples and arrived here without changing the kind of question. What is being optimized, what is allowed to change, and how you would notice if the wrong thing changed.

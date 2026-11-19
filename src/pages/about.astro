@@ -1,0 +1,104 @@
+---
+import Button from '@/components/ui/Button.astro';
+import Section from '@/components/ui/Section.astro';
+import { site } from '@/config/site';
+import PageLayout from '@/layouts/PageLayout.astro';
+
+const colophon = [
+  { term: 'Framework', detail: 'Astro, built to static HTML' },
+  { term: 'Content', detail: 'Markdown and MDX' },
+  { term: 'Figures', detail: 'SVG and React, with D3 and Three.js to come' },
+  { term: 'Typefaces', detail: 'Newsreader, Instrument Sans and JetBrains Mono' },
+  { term: 'Hosting', detail: 'Cloudflare' },
+];
+---
+
+<PageLayout section="about">
+  <Section
+    id="premise"
+    label="Premise"
+    title="Most explanations of AI ask you to take the picture on trust."
+  >
+    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
+      <p>
+        The ideas behind modern AI are visual and mechanical: surfaces being descended, vectors
+        being rotated, attention moving across a sentence. The way through them is one path,
+        <a href="/learning-paths#from-data-to-intelligence" class="link-underline text-ink hover:text-accent">From Data to Intelligence</a>,
+        from a loss and a dataset to an agent. Text alone is a poor medium for that walk, so the
+        path points at a figure whenever the figure exists.
+      </p>
+      <p>
+        This notebook explains those ideas the way they are easiest to understand — with figures
+        you can manipulate, code you can run, and paths that put things in a sensible order.
+      </p>
+    </div>
+  </Section>
+
+  <Section id="teaching" label="Teaching" title="How a page is supposed to teach.">
+    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
+      <p>
+        Visual first. If an idea has a shape, the shape is the explanation and the paragraph is
+        the caption. A loss, a boundary, a gradient, and a pattern of attention are objects. The
+        lab exists so those objects can be changed, and so the change is the lesson. A definition
+        that arrives before the picture asks the reader to trust a word.
+      </p>
+      <p>
+        Structured, in the strong sense. A path is a sequence of dependencies. Each module says
+        what you should be able to do at the end of it, which ideas that ability depends on, why
+        those ideas are the ones that matter, and what the next module will assume. The order is
+        the teaching. A list of related topics is not.
+      </p>
+      <p>
+        Interactive where interaction carries a belief, and research-oriented everywhere else. A
+        control that does not change what you think is decoration. A research entry either points
+        at a source or states a question it has not answered. Notes are published when they are
+        ready to be argued with, marked with their maturity, and revised in place. Code accompanies
+        a claim that can be run, and it is the same code the figure uses.
+      </p>
+    </div>
+  </Section>
+
+  <Section id="author" label="Author" title={site.name}>
+    <div class="grid items-start gap-10 lg:grid-cols-[11rem_1fr]">
+      <div class="flex aspect-[4/5] w-40 items-end border border-line bg-surface p-4 lg:w-full">
+        <p class="mono-label text-ink-faint">[PERSONAL CONTENT NEEDED] Portrait</p>
+      </div>
+      <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
+      <p>
+        {site.name} is a {site.role} at {site.employer} in {site.location}. He works on document
+        understanding for Basecone, a product used in the Netherlands and Belgium: splitting,
+        reading and checking the invoices and receipts that pass through it.
+      </p>
+      <p>
+        He trained as a physicist. A BSc at Fergusson College was followed by an MSc in quantum
+        mechanics at Savitribai Phule Pune University, and by research in computational physics at
+        the university’s Center for Modeling and Simulation. The work since has been applied
+        machine learning — industrial sound at Asquared IoT, telematics at KPIT, language and
+        platform models at Exadatum and Fractal, and client systems at Accenture.
+      </p>
+      <p>
+        He has taught physics to grades 11 and 12, and has served as visiting faculty and as a
+        member of the Board of Studies at MIT-WPU for its Big Data and AI programmes. This
+        notebook is where those ideas are written down so they can be seen, not only used.
+      </p>
+      </div>
+    </div>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <Button href="/resume" variant="secondary" arrow>Résumé</Button>
+      <Button href={`mailto:${site.email}`} variant="secondary">{site.email}</Button>
+    </div>
+  </Section>
+
+  <Section id="colophon" label="Colophon" title="How this site is made.">
+    <dl class="max-w-2xl border-t border-line">
+      {
+        colophon.map((item) => (
+          <div class="grid gap-x-8 gap-y-1 border-b border-line py-4 sm:grid-cols-[9rem_1fr]">
+            <dt class="mono-label pt-1 text-ink-faint">{item.term}</dt>
+            <dd class="text-ink-muted">{item.detail}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </Section>
+</PageLayout>
