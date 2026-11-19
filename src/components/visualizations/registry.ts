@@ -80,20 +80,6 @@ export const visualizations = [
     status: 'planned',
   },
   {
-    id: 'backpropagation',
-    title: 'Backpropagation, step by step',
-    summary: 'Follow gradients as they flow backwards through a small network.',
-    objective: 'Trace one scalar loss back to one weight, and see the chain rule as a path.',
-    interactions: [
-      'Step forward, then backward, one node at a time',
-      'Change an input and watch only the affected gradients move',
-      'Toggle a numeric readout on each edge',
-    ],
-    engine: 'svg',
-    topic: 'deep-learning',
-    status: 'planned',
-  },
-  {
     id: 'attention-patterns',
     title: 'Attention patterns',
     summary: 'Token-to-token attention weights as a heatmap you can read.',
@@ -167,6 +153,86 @@ export const visualizations = [
     ],
     engine: 'svg',
     topic: 'generative-ai',
+    status: 'live',
+  },
+  {
+    id: 'dot-product',
+    title: 'Dot product',
+    summary: 'Two arrows in the plane, the product of their components, and the angle between them.',
+    caption:
+      'Drag the four components. The product is a1·b1 + a2·b2. The angle is missing when either arrow has length zero.',
+    objective: 'See a dot product as both a number and an angle, before attention uses it as a score.',
+    interactions: [
+      'Move each component of the two vectors',
+      'Line the arrows up, set them at a right angle, and point them opposite ways',
+      'Zero one vector and read that the angle is undefined',
+    ],
+    engine: 'svg',
+    topic: 'mathematics',
+    status: 'live',
+  },
+  {
+    id: 'loss-functions',
+    title: 'Loss functions',
+    summary: 'Squared error and binary cross-entropy for one prediction.',
+    caption:
+      'One prediction and one target. Squared error is a parabola with its bottom at the target. Cross-entropy uses a 0 or 1 label and climbs as the prediction moves away from that label.',
+    objective: 'See what a loss is before a training loop tries to make it smaller.',
+    interactions: [
+      'Switch between squared error and cross-entropy',
+      'Move the prediction',
+      'Move the squared-error target, or switch the cross-entropy label',
+    ],
+    engine: 'svg',
+    topic: 'machine-learning',
+    status: 'live',
+  },
+  {
+    id: 'neuron',
+    title: 'A neuron',
+    summary: 'A weighted sum of two inputs, a bias, and one activation.',
+    caption:
+      'The output is the activation of w1·x1 + w2·x2 + bias. Nothing here is trained. The sliders are the parameters.',
+    objective: 'Read a neuron as arithmetic plus a bend, not as a picture of a brain cell.',
+    interactions: [
+      'Move the inputs, the weights, and the bias',
+      'Drive the weighted sum below zero and watch ReLU output 0',
+      'Switch the activation and keep the same sum',
+    ],
+    engine: 'svg',
+    topic: 'deep-learning',
+    status: 'live',
+  },
+  {
+    id: 'activations',
+    title: 'Activations',
+    summary: 'Sigmoid, tanh, and ReLU, with the tangent at a chosen input.',
+    caption:
+      'The curve is the activation. The short line is its tangent. ReLU’s slope at exactly zero is undefined; the figure draws 0 there.',
+    objective: 'See the bend a neuron applies, and the slope backpropagation will multiply by.',
+    interactions: [
+      'Switch among sigmoid, tanh, and ReLU',
+      'Move the input and read the output and the slope',
+      'Sit ReLU on zero and read the caption about the kink',
+    ],
+    engine: 'svg',
+    topic: 'deep-learning',
+    status: 'live',
+  },
+  {
+    id: 'backpropagation',
+    title: 'Backpropagation',
+    summary: 'Forward values and exact gradients on a one-unit network, then one gradient step.',
+    caption:
+      'One input, a ReLU, a linear output, and a squared error. The table is the chain rule. One step subtracts 0.2 times each parameter gradient. The ReLU gate is 0 at a negative pre-activation, and also at exactly zero.',
+    objective: 'See a gradient arrive at each weight, and see it stop when the ReLU is closed.',
+    interactions: [
+      'Read the forward numbers and the gradients',
+      'Close the ReLU and watch the first-layer gradients become zero',
+      'Take one step, then reset',
+    ],
+    engine: 'svg',
+    topic: 'deep-learning',
     status: 'live',
   },
   {

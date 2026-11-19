@@ -1,0 +1,105 @@
+---
+title: Backpropagation
+description: Forward values and exact gradients on one ReLU and one linear output, then a single gradient step.
+summary: One input, a weight and a bias, a ReLU, another weight and bias, and a squared error against a target. The table is the forward pass and the chain rule. The ReLU gate is 1 when the pre-activation is positive and 0 otherwise, including at exactly zero. One step subtracts 0.2 times each parameter gradient. The input and the target do not move.
+domain: deep-learning
+difficulty: Intermediate
+estimatedTime: 20
+visualization: backpropagation
+status: published
+prerequisites:
+  - activations
+related:
+  - neuron
+next: attention-patterns
+experiments:
+  - Read the default table. The gate is 1, so the first-layer gradients are not zero.
+  - Lower b1 until the pre-activation goes negative. The gate becomes 0 and both dL/d w1 and dL/d b1 become 0.
+  - Reset, then press One step. The four parameters move. The input and the target stay.
+  - Close the gate and press One step. w1 and b1 stay put. w2 and b2 can still move.
+tags:
+  - backpropagation
+  - chain rule
+  - relu
+  - gradient
+---
+
+<Chapter id="intuition" title="The loss has to travel back" objective="Say what the table is for.">
+
+[Gradient descent](/studio/gradient-descent) steps along a slope. In that figure the slope is handed to you, because the surface is a formula of two numbers. In a network the loss depends on the output, the output depends on a hidden unit, and the hidden unit depends on a weight. The slope with respect to that weight is not a separate formula someone types. It is the chain rule, applied once per step.
+
+This network is small enough that every intermediate fits in a table. One input <Equation tex="x" display={false} />. A first weight and bias. A ReLU. A second weight and bias. A squared error against a target. Press One step and the four parameters take a single step. Nothing is trained beyond the steps you press.
+
+</Chapter>
+
+<Chapter id="forward" title="The forward numbers" objective="Recompute the four lines at the top of the table.">
+
+<Equation tex="z = w_1 x + b_1" />
+
+<Equation tex="h = \operatorname{ReLU}(z)" />
+
+<Equation tex="\hat{y} = w_2 h + b_2" />
+
+<Equation tex="L = (\hat{y} - t)^2" />
+
+The defaults are <Equation tex="x = 1" display={false} />, <Equation tex="w_1 = 0.5" display={false} />, <Equation tex="b_1 = 0.2" display={false} />, <Equation tex="w_2 = 0.8" display={false} />, <Equation tex="b_2 = -0.1" display={false} />, and <Equation tex="t = 1" display={false} />. Then <Equation tex="z = 0.7" display={false} />, the gate is open, <Equation tex="h = 0.7" display={false} />, and <Equation tex="\hat{y} = 0.46" display={false} />. The loss is <Equation tex="(0.46 - 1)^2 = 0.2916" display={false} />, printed as 0.292.
+
+ReLU’s gate is 1 when <Equation tex="z > 0" display={false} /> and 0 otherwise. At exactly zero the derivative is undefined; this figure uses 0, the same convention as the [activations](/studio/activations) drawing.
+
+</Chapter>
+
+<Chapter id="backward" title="The chain" objective="See which factor kills the first-layer gradient.">
+
+Differentiate the loss from the output backward.
+
+<Equation tex="\frac{\partial L}{\partial \hat{y}} = 2(\hat{y} - t)" />
+
+<Equation tex="\frac{\partial L}{\partial w_2} = \frac{\partial L}{\partial \hat{y}} \, h, \qquad \frac{\partial L}{\partial b_2} = \frac{\partial L}{\partial \hat{y}}" />
+
+<Equation tex="\frac{\partial L}{\partial h} = \frac{\partial L}{\partial \hat{y}} \, w_2" />
+
+The ReLU multiplies that hidden gradient by the gate:
+
+<Equation tex="\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial h} \cdot \text{gate} \cdot x, \qquad \frac{\partial L}{\partial b_1} = \frac{\partial L}{\partial h} \cdot \text{gate}." />
+
+At the default the gate is 1, so the first layer still receives a gradient. Lower <Equation tex="b_1" display={false} /> until <Equation tex="z" display={false} /> is negative. The hidden value becomes 0, the gate becomes 0, and both <Equation tex="\partial L / \partial w_1" display={false} /> and <Equation tex="\partial L / \partial b_1" display={false} /> become 0. The output side does not need the gate. <Equation tex="\partial L / \partial w_2" display={false} /> and <Equation tex="\partial L / \partial b_2" display={false} /> still depend on the output gap. If the hidden value is 0, <Equation tex="\partial L / \partial w_2" display={false} /> is 0 as well, because that gradient is the output gradient times <Equation tex="h" display={false} />. The bias <Equation tex="b_2" display={false} /> still receives <Equation tex="\partial L / \partial \hat{y}" display={false} />.
+
+One step replaces each parameter <Equation tex="\theta" display={false} /> with <Equation tex="\theta - 0.2 \,\partial L / \partial \theta" display={false} />. The input and the target are not parameters. Reset puts the defaults back. This is one step of the same kind of update as the descent figure, on a loss that was produced by a composition.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Use the gate, then answer.">
+
+<Check
+  id="gate"
+  prompt="The pre-activation is negative, so the ReLU gate is 0. What is dL/d w1?"
+  choices={[
+    'It equals dL/d hidden, because the weight is still in the graph.',
+    'It is 0. The chain multiplies by the gate.',
+    'It equals the input x.',
+  ]}
+  answer="It is 0. The chain multiplies by the gate."
+  why="dL/d w1 is the hidden gradient times the gate times x. A closed gate zeros it. Lower b1 on the figure until the pre-activation is negative and read that row."
+/>
+
+<Check
+  id="step"
+  prompt="You press One step. Which quantities can change?"
+  choices={[
+    'The input, the target, and the four parameters.',
+    'The four parameters. The input and the target stay.',
+    'Only the loss. The parameters are fixed.',
+  ]}
+  answer="The four parameters. The input and the target stay."
+  why="The step subtracts 0.2 times each parameter gradient from w1, b1, w2, and b2. x and the target are data for this figure, not parameters."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave the chain rule for the score a transformer uses.">
+
+The lecture that builds this up slowly, with a scalar automatic differentiation, is [The spelled-out intro to neural networks and backpropagation](/videos#building-micrograd). The note [How Neural Networks Learn](/knowledge/how-neural-networks-learn) is the written version of a larger stack. This page is the chain on one unit.
+
+[Attention patterns](/studio/attention-patterns) is a different mechanism: scores between positions, then a weighted average. Those scores, in a trained model, are [dot products](/studio/dot-product). The weights that produce the queries and keys would be trained by a chain rule of this kind. That training is not on the attention page. The scores there are written by hand.
+
+</Chapter>

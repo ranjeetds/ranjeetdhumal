@@ -1,0 +1,95 @@
+---
+title: A neuron
+description: Two inputs, two weights, a bias, and one activation. The output is computed, not trained.
+summary: The figure adds w1 times x1, w2 times x2, and a bias. That sum is the pre-activation. Sigmoid, tanh, or ReLU is then applied, and the large number is the neuron’s output. Move a slider and both numbers change. Nothing on the page is fitted to data.
+domain: deep-learning
+difficulty: Foundational
+estimatedTime: 12
+visualization: neuron
+status: published
+prerequisites:
+  - gradient-descent
+next: activations
+experiments:
+  - Leave ReLU on. Raise w1. The output rises, because x1 is positive.
+  - Drive the weighted sum below zero with negative weights. The ReLU output becomes 0.00 while the sum stays negative.
+  - Switch to sigmoid without touching the sliders. The same sum is now a number between 0 and 1.
+  - Set both weights to 0 and move only the bias. The output is the activation of the bias.
+tags:
+  - neuron
+  - weights
+  - bias
+  - activation
+---
+
+<Chapter id="intuition" title="Arithmetic, then a bend" objective="Name the two stages before any symbol.">
+
+A neuron here is not a picture of a cell. It is two steps.
+
+First it takes a weighted sum of its inputs and adds a bias. That is a straight line, or a plane, through the inputs. Second it bends that sum with an activation. The bend is what lets a stack of these units draw something other than a straight cut.
+
+This page has two inputs so the sum fits on one line. A layer in a network is many of these units, each with its own weights. You are looking at one.
+
+</Chapter>
+
+<Chapter id="sum" title="The weighted sum" objective="Compute the pre-activation from the sliders.">
+
+Write the inputs <Equation tex="x_1, x_2" display={false} />, the weights <Equation tex="w_1, w_2" display={false} />, and the bias <Equation tex="b" display={false} />. The pre-activation is
+
+<Equation tex="z = w_1 x_1 + w_2 x_2 + b." />
+
+The defaults are <Equation tex="x_1 = 1" display={false} />, <Equation tex="x_2 = 0.5" display={false} />, <Equation tex="w_1 = 0.4" display={false} />, <Equation tex="w_2 = -0.2" display={false} />, and <Equation tex="b = 0.1" display={false} />. Then
+
+<Equation tex="z = 0.4 \times 1 + (-0.2) \times 0.5 + 0.1 = 0.40." />
+
+That is the “weighted sum” line. A weight scales its own input. The bias shifts the sum no matter what the inputs are. Set both weights to 0 and the sum equals the bias.
+
+</Chapter>
+
+<Chapter id="bend" title="The activation" objective="See what the bend does to a negative sum.">
+
+The output is <Equation tex="y = f(z)" display={false} />, where <Equation tex="f" display={false} /> is the activation you pressed.
+
+ReLU is <Equation tex="\max(0, z)" display={false} />. At the default, <Equation tex="z" display={false} /> is positive, so the output equals the sum, 0.40. Push the sum below zero and the output becomes 0. The negative sum is still printed. ReLU threw it away.
+
+Sigmoid squashes any sum into <Equation tex="(0, 1)" display={false} />. Tanh squashes it into <Equation tex="(-1, 1)" display={false} />. Switch between them on a negative sum. ReLU says 0. The other two still move.
+
+The curves, and the slope of each curve, are the [activations](/studio/activations) figure. This page only applies the function.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Use the sliders, then answer.">
+
+<Check
+  id="relu-closed"
+  prompt="The weighted sum is −1.2 and the activation is ReLU. What is the output?"
+  choices={[
+    '−1.2. ReLU keeps the sum.',
+    '0.',
+    '1. ReLU always returns 1 on a negative sum.',
+  ]}
+  answer="0."
+  why="ReLU returns the sum when the sum is positive and 0 otherwise. Drive the figure’s sum negative and the output line reads 0.00."
+/>
+
+<Check
+  id="bias"
+  prompt="Both weights are 0. What is the weighted sum?"
+  choices={[
+    'It is 0, because there is nothing to add.',
+    'It is the bias.',
+    'It is the sum of the two inputs.',
+  ]}
+  answer="It is the bias."
+  why="Each weight multiplies its input. With both weights at 0 those products vanish, and the sum is the bias alone."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave with the bend, then the slope of the bend.">
+
+[Activations](/studio/activations) draws sigmoid, tanh, and ReLU, and the tangent at the input you pick. The slope on that tangent is what a backward pass multiplies by.
+
+[Backpropagation](/studio/backpropagation) puts one ReLU in a tiny network and shows the gradient of a squared error with respect to each weight. [Gradient descent](/studio/gradient-descent) is the walk that would take those gradients as its step.
+
+</Chapter>

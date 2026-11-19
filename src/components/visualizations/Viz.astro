@@ -5,8 +5,13 @@
  * which lets Markdown/MDX authors write `<Viz id="gradient-descent" />` with no imports.
  */
 import { type LiveVisualizationId, engineLabels, getVisualization } from './registry';
+import Activations from './svg/Activations';
 import AttentionPatterns from './svg/AttentionPatterns';
+import Backpropagation from './svg/Backpropagation';
+import DotProduct from './svg/DotProduct';
 import GradientDescent from './svg/GradientDescent';
+import Losses from './svg/Losses';
+import Neuron from './svg/Neuron';
 import NextToken from './svg/NextToken';
 import SampleMean from './svg/SampleMean';
 import Tokenization from './svg/Tokenization';
@@ -31,7 +36,12 @@ const visualization = getVisualization(id);
 >
   {/* Hydrate only once scrolled into view; the server-rendered figure is already complete. */}
   {id === 'sample-mean' && <SampleMean client:visible />}
+  {id === 'dot-product' && <DotProduct client:visible />}
+  {id === 'loss-functions' && <Losses client:visible />}
   {id === 'gradient-descent' && <GradientDescent client:visible />}
+  {id === 'neuron' && <Neuron client:visible />}
+  {id === 'activations' && <Activations client:visible />}
+  {id === 'backpropagation' && <Backpropagation client:visible />}
   {id === 'attention-patterns' && <AttentionPatterns client:visible />}
   {id === 'next-token' && <NextToken client:visible />}
   {id === 'tokenization' && <Tokenization client:visible />}

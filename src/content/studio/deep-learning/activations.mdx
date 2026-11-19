@@ -1,0 +1,100 @@
+---
+title: Activations
+description: Sigmoid, tanh, and ReLU, with the value and the slope at an input you choose.
+summary: One curve at a time, from input −4 to 4. A marker sits at the input slider. The short line through the marker is the tangent, and the caption prints its slope. Sigmoid stays between 0 and 1. Tanh stays between −1 and 1. ReLU is 0 left of zero and the identity to the right. At exactly zero, ReLU’s slope is undefined and this figure draws 0.
+domain: deep-learning
+difficulty: Foundational
+estimatedTime: 12
+visualization: activations
+status: published
+prerequisites:
+  - neuron
+next: backpropagation
+experiments:
+  - Stay on ReLU. The input starts at 1, the output is 1.00, and the slope is 1.00.
+  - Move the input below 0. The output and the slope are both 0.00.
+  - Put the input on 0. The caption says the slope at the kink is undefined and the figure draws 0.
+  - Switch to sigmoid and slide across 0. The output stays inside 0 and 1, and the tangent is steepest near 0.
+  - Switch to tanh. The output stays inside −1 and 1.
+tags:
+  - sigmoid
+  - tanh
+  - relu
+  - derivative
+---
+
+<Chapter id="intuition" title="The bend, drawn" objective="Say what the curve is doing in a neuron.">
+
+[A neuron](/studio/neuron) computes a weighted sum and then bends it. This page is only the bend.
+
+The horizontal axis is the sum, called <Equation tex="x" display={false} /> here. The curve is <Equation tex="f(x)" display={false} />. The marker is the input you chose. The short line is the tangent: if the sum moved a little, the output would move by the slope times that little step.
+
+A backward pass multiplies by this slope. Where the slope is near zero, a change in the sum barely changes the output, and the gradient that flows back is near zero too.
+
+</Chapter>
+
+<Chapter id="three" title="The three functions" objective="Match each button to a formula.">
+
+Sigmoid:
+
+<Equation tex="\sigma(x) = \frac{1}{1 + e^{-x}}." />
+
+It sits between 0 and 1. Far to the left it is nearly 0. Far to the right it is nearly 1. Its slope is <Equation tex="\sigma(x)\,(1 - \sigma(x))" display={false} />, which is largest at <Equation tex="x = 0" display={false} /> and shrinks toward both ends.
+
+Tanh:
+
+<Equation tex="\tanh x." />
+
+It sits between −1 and 1, and it is an odd function: the value at <Equation tex="-x" display={false} /> is the negative of the value at <Equation tex="x" display={false} />. Its slope is <Equation tex="1 - \tanh^2 x" display={false} />.
+
+ReLU:
+
+<Equation tex="\operatorname{ReLU}(x) = \max(0, x)." />
+
+Left of zero the output is 0 and the slope is 0. Right of zero the output is <Equation tex="x" display={false} /> and the slope is 1. At exactly zero the slope is not defined. The left-hand slope is 0 and the right-hand slope is 1, so any value between them is a subgradient. This figure draws 0 at that single point, and the caption says so. It is a convention for the drawing, not a fact the kink has a unique slope.
+
+</Chapter>
+
+<Chapter id="tangent" title="Reading the tangent" objective="Use the slope the caption prints.">
+
+Slide ReLU from 1 down through 0. The output follows the input while the input is positive, then sticks at 0. The tangent is diagonal on the right and flat on the left.
+
+Slide sigmoid across 0. The marker climbs a steep part of the curve and then flattens. The slope the caption prints gets smaller as you leave 0, even while the output is still changing. Far out, the output has almost stopped moving. A gradient multiplied by that slope almost stops too. That is the saturation people mean when they say a sigmoid unit has stopped learning: the bend is flat, so the backward signal is small.
+
+Tanh does the same around both ends, with room to be negative.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Read the figure, then answer.">
+
+<Check
+  id="range"
+  prompt="You can set the input anywhere from −4 to 4. Where can a sigmoid output sit?"
+  choices={[
+    'Anywhere, including numbers above 1.',
+    'Between 0 and 1.',
+    'Only at 0 or 1.',
+  ]}
+  answer="Between 0 and 1."
+  why="Sigmoid maps every real input into (0, 1). The curve on the figure never leaves that band. ReLU is the one that can grow past 1."
+/>
+
+<Check
+  id="kink"
+  prompt="ReLU’s input is exactly 0. What is true of the slope?"
+  choices={[
+    'The slope is 1, because the right-hand side has slope 1.',
+    'The slope is undefined. This figure draws 0.',
+    'The slope is 0.5, the average of the two sides.',
+  ]}
+  answer="The slope is undefined. This figure draws 0."
+  why="The left-hand derivative is 0 and the right-hand derivative is 1. Put the slider on 0 and the caption says the slope is undefined and that the drawn value is 0."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Use the slope in a backward pass.">
+
+[Backpropagation](/studio/backpropagation) multiplies by a ReLU slope, which it calls the gate: 1 when the pre-activation is positive, and 0 otherwise, including at exactly zero. Close the gate and the gradients of the first weight and the first bias become 0.
+
+</Chapter>

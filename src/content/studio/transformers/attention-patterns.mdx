@@ -51,7 +51,7 @@ Each <Equation tex="a_j" display={false} /> is positive, and the row sums to 1. 
 
 The figure’s softmax subtracts the row’s largest score before the exponential. That does not change <Equation tex="a_j" display={false} />. It keeps the exponential from overflowing. You do not see the subtraction.
 
-What you do not see, because it is not there, is a query vector, a key vector, or a scale. In a trained model the score is a dot product of a query and a key, often divided by the square root of the key dimension. Here the score is the number in the table. The softmax is the part the figure really runs.
+What you do not see, because it is not there, is a query vector, a key vector, or a scale. In a trained model the score is a dot product of a query and a key, often divided by the square root of the key dimension. The [dot product](/studio/dot-product) figure is that product, with two arrows you can drag. Here the score is the number in the table. The softmax is the part the figure really runs.
 
 </Chapter>
 

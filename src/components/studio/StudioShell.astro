@@ -6,6 +6,7 @@
 import 'katex/dist/katex.min.css';
 import GradientDescentStudio from '@/components/studio/GradientDescentStudio';
 import Viz from '@/components/visualizations/Viz.astro';
+import type { LiveVisualizationId } from '@/components/visualizations/registry';
 import { getStudioDomain, liveStudioModules, resolveStep, type StudioModule } from '@/data/studio';
 import type { StudioLesson } from '@/lib/content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -18,6 +19,20 @@ interface Props {
 const { module, lesson } = Astro.props;
 const instruments = liveStudioModules();
 const domain = getStudioDomain(lesson.data.domain);
+
+function isEmbeddedViz(id: string): id is Exclude<LiveVisualizationId, 'gradient-descent'> {
+  return (
+    id === 'sample-mean' ||
+    id === 'dot-product' ||
+    id === 'loss-functions' ||
+    id === 'neuron' ||
+    id === 'activations' ||
+    id === 'backpropagation' ||
+    id === 'attention-patterns' ||
+    id === 'tokenization' ||
+    id === 'next-token'
+  );
+}
 
 const relations = [
   { label: 'Prerequisite', id: lesson.data.prerequisites[0] },
@@ -57,23 +72,11 @@ const relations = [
       {
         module.id === 'gradient-descent' ? (
           <GradientDescentStudio client:visible />
-        ) : module.id === 'sample-mean' ? (
+        ) : isEmbeddedViz(module.id) ? (
           <div class="px-gutter py-6">
-            <Viz id="sample-mean" />
+            <Viz id={module.id} />
           </div>
-        ) : module.id === 'attention-patterns' ? (
-          <div class="px-gutter py-6">
-            <Viz id="attention-patterns" />
-          </div>
-        ) : module.id === 'tokenization' ? (
-          <div class="px-gutter py-6">
-            <Viz id="tokenization" />
-          </div>
-        ) : (
-          <div class="px-gutter py-6">
-            <Viz id="next-token" />
-          </div>
-        )
+        ) : null
       }
     </div>
 

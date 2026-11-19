@@ -19,7 +19,12 @@ export type StudioDomainId = (typeof studioDomainIds)[number];
 
 export const liveVisualizationIds = [
   'sample-mean',
+  'dot-product',
+  'loss-functions',
   'gradient-descent',
+  'neuron',
+  'activations',
+  'backpropagation',
   'attention-patterns',
   'tokenization',
   'next-token',
@@ -81,10 +86,45 @@ export const studioModules = [
     status: 'live',
   },
   {
+    id: 'dot-product',
+    title: 'Dot product',
+    subtitle: 'Two arrows, their product, and the angle between them.',
+    domainId: 'mathematics',
+    status: 'live',
+  },
+  {
+    id: 'loss-functions',
+    title: 'Loss functions',
+    subtitle: 'Squared error and cross-entropy for one prediction and one target.',
+    domainId: 'machine-learning',
+    status: 'live',
+  },
+  {
     id: 'gradient-descent',
     title: 'Gradient descent',
     subtitle: 'Move an optimizer across a loss surface by changing the step it is allowed to take.',
     domainId: 'machine-learning',
+    status: 'live',
+  },
+  {
+    id: 'neuron',
+    title: 'A neuron',
+    subtitle: 'Two inputs, two weights, a bias, and one activation.',
+    domainId: 'deep-learning',
+    status: 'live',
+  },
+  {
+    id: 'activations',
+    title: 'Activations',
+    subtitle: 'Sigmoid, tanh, and ReLU, and the slope at the input you choose.',
+    domainId: 'deep-learning',
+    status: 'live',
+  },
+  {
+    id: 'backpropagation',
+    title: 'Backpropagation',
+    subtitle: 'The chain rule on one ReLU and one linear output, and a single step.',
+    domainId: 'deep-learning',
     status: 'live',
   },
   {
@@ -116,20 +156,6 @@ export const studioModules = [
     status: 'planned',
   },
   {
-    id: 'neural-playground',
-    title: 'Neurons and a forward pass',
-    subtitle: 'Layers, activations, and the numbers a forward pass produces.',
-    domainId: 'deep-learning',
-    status: 'planned',
-  },
-  {
-    id: 'backpropagation',
-    title: 'Backpropagation',
-    subtitle: 'The chain rule, stepped through a small network.',
-    domainId: 'deep-learning',
-    status: 'planned',
-  },
-  {
     id: 'embedding-space',
     title: 'Embedding space',
     subtitle: 'Neighbours in a projection, and what the projection hides.',
@@ -151,16 +177,21 @@ export const studioDomains = [
   {
     id: 'mathematics',
     title: 'Mathematics & Statistics',
-    description: 'The quantities later lessons treat as given: a sample, a mean, a spread.',
-    why: 'A loss is an average of mistakes. Until that average is a concrete picture, the rest of training is a slogan.',
+    description: 'The quantities later lessons treat as given: a sample, a mean, and a score between two vectors.',
+    why: 'A loss is an average of mistakes. A similarity is a dot product. Both are pictures before they are slogans.',
     prerequisites: 'None. This is a starting point. The derivative a descent needs is taught inside the gradient descent lesson.',
     related: ['machine-learning'],
-    sequence: ['sample-mean', 'gradient-descent'],
+    sequence: ['sample-mean', 'dot-product', 'gradient-descent'],
     groups: [
       {
         title: 'Estimation',
         lede: 'One population, many draws, and a mean that moves less as the draw grows.',
         modules: ['sample-mean'],
+      },
+      {
+        title: 'Scores',
+        lede: 'The product of two vectors, which is the score attention will use later.',
+        modules: ['dot-product'],
       },
     ],
     reading: [{ href: '/knowledge/a-sample-and-its-mean', title: 'A sample and its mean' }],
@@ -172,12 +203,12 @@ export const studioDomains = [
     why: 'Almost every trained system is a search for parameters that make a loss smaller. The search is the thing worth seeing.',
     prerequisites: 'A mean, from the mathematics domain. The slope itself is defined in the lesson.',
     related: ['mathematics', 'deep-learning'],
-    sequence: ['gradient-descent', 'decision-boundaries'],
+    sequence: ['loss-functions', 'gradient-descent', 'decision-boundaries'],
     groups: [
       {
         title: 'Optimization',
-        lede: 'Follow the slope of a loss. The step size decides whether you arrive, crawl, or leave.',
-        modules: ['gradient-descent'],
+        lede: 'A number for how wrong a prediction is, then a walk that makes that number smaller.',
+        modules: ['loss-functions', 'gradient-descent'],
       },
       {
         title: 'Decisions',
@@ -194,17 +225,17 @@ export const studioDomains = [
     why: 'Depth is composition. The update is still a step along a gradient. Seeing the step first makes the stack legible.',
     prerequisites: 'Gradient descent. A network does not introduce a new kind of learning. It introduces a function the learning is applied to.',
     related: ['machine-learning', 'transformers'],
-    sequence: ['gradient-descent', 'neural-playground', 'backpropagation'],
+    sequence: ['neuron', 'activations', 'backpropagation'],
     groups: [
       {
         title: 'Foundations',
-        lede: 'A unit, an activation, and a forward pass. The playground is not built.',
-        modules: ['neural-playground'],
+        lede: 'One unit, then the bend it applies.',
+        modules: ['neuron', 'activations'],
       },
       {
         title: 'Learning',
-        lede: 'The loss, the gradient, and the chain rule that carries the gradient back through the stack.',
-        modules: ['gradient-descent', 'backpropagation'],
+        lede: 'The chain rule through that unit, and one step of the weights.',
+        modules: ['backpropagation'],
       },
     ],
     reading: [
@@ -223,7 +254,7 @@ export const studioDomains = [
     why: 'The public object is a chatbot. The mechanism is a distribution over pieces, conditioned on other pieces.',
     prerequisites: 'A vector as a list of numbers, and a dot product as a score. The lessons define both before they use them.',
     related: ['deep-learning', 'generative'],
-    sequence: ['tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
+    sequence: ['dot-product', 'tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
     groups: [
       {
         title: 'The pieces a model sees',
@@ -294,8 +325,8 @@ export const studioPaths = [
   {
     id: 'neural-networks',
     title: 'Understand Neural Networks',
-    description: 'From a single update on a surface to a stack the playground does not draw yet.',
-    steps: ['gradient-descent', 'neural-playground', 'backpropagation'],
+    description: 'A step on a surface, one neuron, the bend, and the chain rule through that neuron.',
+    steps: ['gradient-descent', 'neuron', 'activations', 'backpropagation'],
     reading: [
       { href: '/knowledge/how-neural-networks-learn', title: 'How Neural Networks Learn' },
       { href: '/videos#building-micrograd', title: 'The spelled-out intro to neural networks and backpropagation' },
@@ -304,14 +335,14 @@ export const studioPaths = [
   {
     id: 'descent-to-deep',
     title: 'From Gradient Descent to Deep Learning',
-    description: 'A mean, a slope, a step, and the two instruments that are still missing.',
-    steps: ['sample-mean', 'gradient-descent', 'neural-playground', 'backpropagation'],
+    description: 'A mean, a loss, a step, a neuron, and the chain rule that trains it.',
+    steps: ['sample-mean', 'loss-functions', 'gradient-descent', 'neuron', 'activations', 'backpropagation'],
   },
   {
     id: 'transformers',
     title: 'How Transformers Work',
     description: 'Cut a string, mix the pieces, and read the distribution the next piece is drawn from.',
-    steps: ['tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
+    steps: ['dot-product', 'tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
     reading: [{ href: '/knowledge/attention-and-transformers', title: 'Attention Mechanisms and Transformers' }],
   },
   {

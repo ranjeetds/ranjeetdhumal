@@ -9,7 +9,9 @@ visualization: gradient-descent
 status: published
 prerequisites:
   - sample-mean
-next: backpropagation
+related:
+  - loss-functions
+next: neuron
 experiments:
   - Choose Convex bowl and press Play. One well. The walk settles near the cross.
   - Choose Across the ridge, then Deeper valley. Same rule, different start, different cross.
@@ -200,14 +202,14 @@ Backpropagation is how a network obtains <Equation tex="\nabla_\theta J" display
 
 </Chapter>
 
-<Chapter id="continue" title="What to open next" objective="Leave with a true next step, including the one that is not built.">
+<Chapter id="continue" title="What to open next" objective="Leave with the instrument that comes after this surface.">
 
 The live module before this one is the sample mean. A training loss is a mean of per-example mistakes. That lesson is the mean, not the slope.
 
 The written companion on this site is [Training Dynamics and Optimization](/knowledge/training-dynamics). The derivative this lesson uses is defined here. There is no separate derivatives experiment.
 
-A loss function deserves its own hour, and there is no loss-function instrument yet. What you have is the surface the loss became.
+The number this surface is made of is a loss. [Loss functions](/studio/loss-functions) is that number for one prediction: squared error, and cross-entropy.
 
-The continuation is backpropagation: the chain rule that produces the gradient when the loss depends on a stack of functions. That instrument is not built. The lecture that actually builds it, slowly, is on the videos page: [The spelled-out intro to neural networks and backpropagation](/videos#building-micrograd). The note [How Neural Networks Learn](/knowledge/how-neural-networks-learn) is the written version of the stack this step would be applied to. Adam’s update, as used above, is the one in Kingma and Ba, “Adam: A Method for Stochastic Optimization”, [arXiv:1412.6980](https://arxiv.org/abs/1412.6980).
+The next instrument is [a neuron](/studio/neuron): two inputs, a weighted sum, and a bend. [Activations](/studio/activations) is the bend by itself. [Backpropagation](/studio/backpropagation) is the chain rule that turns a loss on that neuron into a gradient, and then one step. The lecture that builds a larger version, slowly, is [The spelled-out intro to neural networks and backpropagation](/videos#building-micrograd). The note [How Neural Networks Learn](/knowledge/how-neural-networks-learn) is the written version of the stack. Adam’s update, as used above, is the one in Kingma and Ba, “Adam: A Method for Stochastic Optimization”, [arXiv:1412.6980](https://arxiv.org/abs/1412.6980).
 
 </Chapter>

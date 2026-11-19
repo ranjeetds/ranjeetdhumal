@@ -1,0 +1,90 @@
+---
+title: Loss functions
+description: Squared error and binary cross-entropy, each as a curve over one prediction.
+summary: One prediction, one target, and the number that says how wrong the prediction is. Squared error is the square of the gap, a parabola with its bottom at the target. Cross-entropy is the negative log of the predicted probability of a 0 or 1 label, and it climbs without bound as that probability approaches the wrong end.
+domain: machine-learning
+difficulty: Foundational
+estimatedTime: 15
+visualization: loss-functions
+status: published
+next: gradient-descent
+experiments:
+  - Stay on squared error. Set the target to 1 and move the prediction to 1. The marker sits at the bottom of the curve and the loss is 0.
+  - Move that prediction to 0. The loss is 1.00, the square of the gap.
+  - Switch to cross-entropy, label 1, and push the prediction toward 0. The loss climbs.
+  - Switch the label to 0 at the same prediction. The loss falls, because the prediction now agrees with the label.
+tags:
+  - loss
+  - squared error
+  - cross-entropy
+---
+
+<Chapter id="intuition" title="A number for being wrong" objective="Separate the prediction from the score you give it.">
+
+A model emits a number. A loss turns that number, and the answer you wanted, into a single measure of disagreement.
+
+This figure has no model. You are the model: the prediction slider is the output, and the target is the answer. The curve is every prediction from 0 to 1, scored against the target you chose. The marker is the prediction you are on now.
+
+Two scores are here, because they punish a miss differently. Squared error cares about the size of the gap. Cross-entropy cares about how much probability you assigned to the label that was true.
+
+</Chapter>
+
+<Chapter id="mse" title="Squared error" objective="Read the parabola.">
+
+For a prediction <Equation tex="\hat{y}" display={false} /> and a target <Equation tex="t" display={false} />,
+
+<Equation tex="(\hat{y} - t)^2." />
+
+The default is prediction 0.20 and target 1. The gap is 0.80 and the loss is 0.64. Move the prediction onto the target and the loss is 0. Move it the same distance to the other side and the loss is the same, because the gap is squared. The curve is a parabola and its bottom is the target. Drag the target and the bottom moves with it.
+
+Both sliders run from 0 to 1 so this curve can sit next to the cross-entropy curve. A squared error in a real regression is not limited to that interval. The shape is the same.
+
+</Chapter>
+
+<Chapter id="bce" title="Cross-entropy" objective="Read a loss that is not symmetric around the label.">
+
+The label <Equation tex="t" display={false} /> is 0 or 1. The prediction <Equation tex="\hat{y}" display={false} /> is read as a probability. The loss is
+
+<Equation tex="-\left(t \log \hat{y} + (1 - t) \log (1 - \hat{y})\right)." />
+
+If the label is 1, this is <Equation tex="-\log \hat{y}" display={false} />. Predicting 1 would be a loss of 0. Predicting something small is a large loss, and the loss grows without a bound as the prediction approaches 0. The label-0 case is the mirror: <Equation tex="-\log (1 - \hat{y})" display={false} />.
+
+The logarithm is undefined at 0 and at 1. The figure clamps the prediction to the open interval from <Equation tex="10^{-4}" display={false} /> to <Equation tex="1 - 10^{-4}" display={false} /> before taking the log. The slider itself starts at 0, so the marker can sit on the edge while the number in the caption uses the clamp.
+
+Switch the label and do not touch the prediction. The same output is a different loss, because the loss asks how much probability you gave the label that occurred, not how close you were to a number on a line.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Use the curve, then answer.">
+
+<Check
+  id="bottom"
+  prompt="Squared error is zero. Where is the prediction?"
+  choices={[
+    'At 0, whatever the target is.',
+    'At the target.',
+    'Halfway between 0 and the target.',
+  ]}
+  answer="At the target."
+  why="The square of a gap is zero only when the gap is zero. On the figure, put the prediction on the target and the marker sits at the bottom."
+/>
+
+<Check
+  id="label"
+  prompt="Cross-entropy, label 1. You move the prediction from 0.9 toward 0. What happens to the loss?"
+  choices={[
+    'It falls, because the prediction is getting smaller.',
+    'It stays flat, because the label did not change.',
+    'It rises, because less probability is sitting on the true label.',
+  ]}
+  answer="It rises, because less probability is sitting on the true label."
+  why="With label 1 the loss is the negative log of the prediction. A smaller prediction is a larger loss. Switch the label to 0 and the same move makes the loss fall."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Take the number into a search that tries to shrink it.">
+
+[Gradient descent](/studio/gradient-descent) is a walk that tries to make a loss smaller. The surface there is a designed function of two parameters. It is this kind of number, drawn so the walk is visible. The step does not know the formula. It only uses the slope where it stands.
+
+</Chapter>

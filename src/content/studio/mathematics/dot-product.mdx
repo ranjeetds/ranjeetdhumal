@@ -1,0 +1,97 @@
+---
+title: Dot product
+description: Two vectors in the plane, the product of their components, and the angle that product implies.
+summary: Two arrows from the same origin. Their dot product is a1 times b1 plus a2 times b2. That number is also the product of the lengths times the cosine of the angle between them. Drag a component and both readings move. A vector of length zero has no angle.
+domain: mathematics
+difficulty: Foundational
+estimatedTime: 12
+visualization: dot-product
+status: published
+next: attention-patterns
+experiments:
+  - Leave the defaults. The product is 0.60 and the angle is 53.13 degrees.
+  - Point b the same way as a, at (1, 0). The angle is 0 and the product is the product of the lengths.
+  - Point b straight up, at (0, 1). The angle is 90 degrees and the product is 0.
+  - Point b opposite a, at (−1, 0). The angle is 180 degrees and the product is negative.
+  - Set either vector to (0, 0). The caption says there is no angle.
+tags:
+  - dot product
+  - vectors
+  - cosine
+---
+
+<Chapter id="intuition" title="A score you can see" objective="Say what the number is for, before the formula.">
+
+Two arrows start at the same point. You can ask a blunt question: do they point the same way?
+
+The figure answers with one number, the dot product. It is large and positive when the arrows agree, zero when they are at a right angle, and negative when they point against each other. Attention will later use a number of this kind as a score between two positions. This page is only the number.
+
+Nothing here is learned. The four sliders are the components you typed.
+
+</Chapter>
+
+<Chapter id="number" title="The product of the components" objective="Compute the number the caption prints.">
+
+A vector in the plane is a pair. Write them <Equation tex="a = (a_1, a_2)" display={false} /> and <Equation tex="b = (b_1, b_2)" display={false} />. Their dot product is
+
+<Equation tex="a \cdot b = a_1 b_1 + a_2 b_2." />
+
+The default arrows are <Equation tex="(1, 0)" display={false} /> and <Equation tex="(0.6, 0.8)" display={false} />. The product is <Equation tex="1 \times 0.6 + 0 \times 0.8 = 0.60" display={false} />, which is the number under the figure. Change any slider and add the two products again. The caption is that sum, printed to two decimals.
+
+The length of a vector is <Equation tex="|a| = \sqrt{a_1^2 + a_2^2}" display={false} />. The caption prints both lengths beside the product.
+
+</Chapter>
+
+<Chapter id="angle" title="The same number is an angle" objective="Connect the product to the picture of the arrows.">
+
+The product is also
+
+<Equation tex="a \cdot b = |a| \, |b| \cos \theta," />
+
+where <Equation tex="\theta" display={false} /> is the angle between the arrows. Divide the product by the two lengths and you have the cosine. The figure turns that cosine into degrees.
+
+Three cases are worth forcing with the sliders.
+
+Same direction. Set <Equation tex="b" display={false} /> to <Equation tex="(1, 0)" display={false} />, parallel to <Equation tex="a" display={false} />. The angle reads 0 degrees. Cosine is 1, so the product is just the product of the lengths.
+
+A right angle. Set <Equation tex="b" display={false} /> to <Equation tex="(0, 1)" display={false} />. The angle reads 90 degrees and the product is 0. The arrows are perpendicular. Neither one has a component along the other.
+
+Opposite directions. Set <Equation tex="b" display={false} /> to <Equation tex="(-1, 0)" display={false} />. The angle reads 180 degrees and the product is negative.
+
+A vector of length zero has no direction, so it has no angle with anything. Set either arrow to <Equation tex="(0, 0)" display={false} />. The product is 0, and the caption refuses the angle rather than inventing one.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Use the figure, then answer.">
+
+<Check
+  id="right-angle"
+  prompt="The arrows are at a right angle. What is their dot product?"
+  choices={[
+    'It equals 1.',
+    'It equals 0.',
+    'It equals the product of the lengths.',
+  ]}
+  answer="It equals 0."
+  why="Cosine of 90 degrees is 0, so the product of the lengths and the cosine is 0. Set b to (0, 1) with a at (1, 0) and the caption prints 0.00."
+/>
+
+<Check
+  id="zero"
+  prompt="One of the two vectors is (0, 0). What does the figure do with the angle?"
+  choices={[
+    'It reports 0 degrees.',
+    'It reports 90 degrees, because a zero vector is perpendicular to everything.',
+    'It says there is no angle.',
+  ]}
+  answer="It says there is no angle."
+  why="A zero vector has no direction. The product is 0, and the angle is left undefined."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Take the score into the place that uses it.">
+
+[Attention patterns](/studio/attention-patterns) is a table of scores between positions in one sentence. In a trained model those scores are dot products of query and key vectors, usually divided by the square root of the key dimension. That figure’s scores are typed by hand. This one is the product those scores stand in for.
+
+</Chapter>
