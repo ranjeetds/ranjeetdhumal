@@ -6,11 +6,7 @@ const query = Astro.url.searchParams.get('q') ?? '';
 ---
 
 <BaseLayout title="Search" description="Search lessons, domains, paths, figures, videos, projects, and research.">
-  <PageHeader
-    eyebrow="Search"
-    title="Search the notebook."
-    lede="Lessons, domains, paths, figures, videos, projects, and research. A planned film or a queued paper is labelled as such."
-  >
+  <PageHeader eyebrow="Search" title="Search the notebook.">
     <form action="/search" method="get" role="search" class="rise mt-8 max-w-xl" style="--i:3">
       <label for="q" class="mono-label text-ink-faint">Query</label>
       <div class="mt-2 flex gap-2">
@@ -45,7 +41,7 @@ const query = Astro.url.searchParams.get('q') ?? '';
       }
     </div>
     <p id="search-status" class="mono-label mt-6 text-ink-faint" aria-live="polite"></p>
-    <ul id="search-results" class="mt-4 divide-y divide-line border-y border-line"></ul>
+    <ul id="search-results" class="mt-4 grid gap-px border border-line bg-line sm:grid-cols-2"></ul>
   </div>
 </BaseLayout>
 
@@ -83,20 +79,21 @@ const query = Astro.url.searchParams.get('q') ?? '';
 
     for (const [index, record] of matched.entries()) {
       const item = document.createElement('li');
+      item.className = 'bg-canvas';
       const link = document.createElement('a');
       link.href = record.href;
-      link.className = 'block py-5 outline-none focus:bg-surface';
+      link.className = 'group block h-full p-6 outline-none';
       link.dataset.index = String(index);
-      const title = document.createElement('span');
-      title.className = 'block font-serif text-title text-ink';
-      title.textContent = record.title;
       const meta = document.createElement('span');
-      meta.className = 'mono-label mt-2 block text-ink-faint';
+      meta.className = 'mono-label block text-ink-faint';
       meta.textContent = record.available ? record.kind : `${record.kind} · not available yet`;
+      const title = document.createElement('span');
+      title.className = 'mt-3 block font-serif text-title text-ink';
+      title.textContent = record.title;
       const description = document.createElement('span');
-      description.className = 'mt-2 block max-w-2xl text-sm leading-relaxed text-ink-muted';
+      description.className = 'mt-3 block text-sm leading-relaxed text-ink-muted';
       description.textContent = record.description;
-      link.append(title, meta, description);
+      link.append(meta, title, description);
       item.append(link);
       list.append(item);
     }

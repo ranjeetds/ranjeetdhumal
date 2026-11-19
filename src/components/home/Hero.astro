@@ -11,50 +11,38 @@ import { site } from '@/config/site';
   >
   </div>
 
-  <div
-    class="mx-auto grid max-w-page items-center gap-x-10 gap-y-14 px-gutter pt-14 pb-20 sm:pt-20 lg:grid-cols-12 lg:pt-24 lg:pb-28"
-  >
+  <div class="mx-auto grid max-w-page items-end gap-x-10 gap-y-12 px-gutter pt-16 pb-16 sm:pt-24 lg:grid-cols-12 lg:pt-28 lg:pb-20">
     <div class="lg:col-span-5">
-      <p class="rise mono-label flex items-center gap-2.5 text-ink-faint" style="--i:0">
-        <span class="size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
-        {site.tagline}
+      <p class="rise mono-label text-ink-faint" style="--i:0">
+        {site.role}
+        <span class="mx-2" aria-hidden="true">/</span>
+        {site.location}
       </p>
-
-      <h1 id="hero-title" class="rise mt-6 font-serif text-display text-ink" style="--i:1">
-        Learn how intelligence works.
+      <h1 id="hero-title" class="rise mt-5 font-serif text-display text-ink" style="--i:1">
+        {site.name}
       </h1>
-
-      <div class="rise mt-7 max-w-xl space-y-4 text-lede text-ink-muted" style="--i:2">
-        <p>
-          A public notebook of lessons, figures, and code. Start from a sample and a mean,
-          then follow the mechanisms a modern system is actually made of: a loss, a search,
-          a representation, attention, a distribution over the next token, and a loop that
-          is allowed to act.
-        </p>
+      <p class="rise mt-4 font-serif text-title text-ink" style="--i:2">AI. Intelligence. Systems. Research.</p>
+      <p class="rise mt-4 max-w-md text-ink-muted" style="--i:3">
+        Senior Data Scientist exploring the foundations and frontiers of artificial intelligence — from machine learning and deep learning to generative and agentic systems.
+      </p>
+      <div class="rise mt-8 flex flex-wrap gap-3" style="--i:4">
+        <Button href="/studio/gradient-descent" arrow>Explore Learning Studio</Button>
+        <Button href="/projects" variant="secondary">Explore my work</Button>
       </div>
-
-      <form action="/search" method="get" role="search" class="rise mt-8 max-w-md" style="--i:3">
-        <label for="home-search" class="sr-only">Search the notebook</label>
-        <div class="flex gap-2">
-          <input
-            id="home-search"
-            name="q"
-            type="search"
-            placeholder="Search lessons, figures, paths"
-            class="h-11 min-w-0 flex-1 border border-line-strong bg-canvas px-3 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-ink"
-          />
-          <button type="submit" class="h-11 bg-ink px-4 text-sm font-medium text-canvas hover:bg-accent hover:text-accent-ink">
-            Search
-          </button>
-        </div>
-      </form>
-
-      <div class="rise mt-6 flex flex-wrap gap-3" style="--i:4">
-        <Button href="/explore" arrow>Explore knowledge</Button>
-        <Button href="/visual-lab" variant="secondary">Enter the visual lab</Button>
-      </div>
+      <ul class="rise mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm" style="--i:5">
+        <li><a href="/research" class="link-underline text-ink-muted hover:text-ink">Research</a></li>
+        <li><a href="/resume" class="link-underline text-ink-muted hover:text-ink">Résumé</a></li>
+        {
+          site.socials.map((social) => (
+            <li>
+              <a href={social.href} class="link-underline text-ink-muted hover:text-ink" rel="noopener noreferrer" target="_blank">
+                {social.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
     </div>
-
     <div class="rise lg:col-span-7" style="--i:4">
       <Viz id="gradient-descent" number="01" />
     </div>

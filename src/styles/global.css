@@ -343,3 +343,9 @@
 .prose :where(:not(pre) > code):not(:where(.not-prose, .not-prose *))::after {
   content: none;
 }
+
+/* Astro sets `display: contents` on an island, which gives it no box. The visible
+   hydration observer then never fires. A block box matches the component inside it. */
+astro-island {
+  display: block !important;
+}

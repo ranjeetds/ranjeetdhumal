@@ -1,9 +1,8 @@
 ---
 /**
- * Videos grouped by series. A curated lecture with a YouTube URL is embedded.
- * An entry without a URL is a film this notebook has not made.
+ * Videos as cards, grouped by series. A curated lecture with a URL links out and
+ * embeds. An entry without a URL is a film this notebook has not made.
  */
-import Status from '@/components/ui/Status.astro';
 import type { Video } from '@/lib/content';
 
 interface Props {
@@ -38,61 +37,55 @@ const youtubeId = (url: string | undefined): string | undefined => {
 };
 ---
 
-<div class="space-y-14">
+<div class="grid gap-14">
   {
     series.map((name) => (
       <section aria-labelledby={`series-${name.replace(/\s+/g, '-').toLowerCase()}`}>
         <h3 id={`series-${name.replace(/\s+/g, '-').toLowerCase()}`} class="font-serif text-title text-ink">
           {name}
         </h3>
-        <ul class="mt-4 border-t border-line">
+        <ul class="mt-6 grid gap-px border border-line bg-line sm:grid-cols-2">
           {videos
             .filter((video) => video.data.series === name)
             .map((video) => {
               const embed = youtubeId(video.data.url);
               return (
-                <li id={video.id} class="scroll-mt-28 border-b border-line py-8">
-                  <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-                    <span class="mono-label text-ink-faint">{video.data.duration ?? '—'}</span>
-                    {video.data.chapter && <span class="mono-label text-ink-faint">{video.data.chapter}</span>}
-                    <Status tone={video.data.url ? 'live' : 'planned'}>
+                <li id={video.id} class:list={['scroll-mt-28 bg-canvas', embed && 'sm:col-span-2']}>
+                  <article class="flex h-full flex-col p-6">
+                    <p class="mono-label text-ink-faint">
+                      {video.data.duration ?? '—'}
+                      <span class="mx-2" aria-hidden="true">/</span>
                       {video.data.origin === 'curated' ? 'Lecture' : video.data.url ? 'Published' : 'Planned'}
-                    </Status>
-                  </div>
-                  <h4 class="mt-3 font-serif text-xl text-ink">
-                    {video.data.url ? (
-                      <a
-                        href={video.data.url}
-                        class="link-underline hover:text-accent"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                      >
-                        {video.data.title}
-                      </a>
-                    ) : (
-                      video.data.title
-                    )}
-                  </h4>
-                  <p class="mt-3 max-w-2xl leading-relaxed text-ink-muted">{video.data.description}</p>
-                  {video.data.why && (
-                    <p class="mt-3 max-w-2xl leading-relaxed text-ink-muted">
-                      <span class="text-ink">Watch for. </span>
-                      {video.data.why}
                     </p>
-                  )}
-                  {embed && (
-                    <div class="mt-5 max-w-3xl">
-                      <iframe
-                        class="aspect-video w-full border border-line"
-                        src={`https://www.youtube-nocookie.com/embed/${embed}`}
-                        title={video.data.title}
-                        loading="lazy"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        allowfullscreen
-                      />
-                    </div>
-                  )}
+                    <h4 class="mt-3 font-serif text-title text-ink">
+                      {video.data.url ? (
+                        <a
+                          href={video.data.url}
+                          class="link-underline hover:text-accent"
+                          rel="noopener noreferrer"
+                          target="_blank"
+                        >
+                          {video.data.title}
+                        </a>
+                      ) : (
+                        video.data.title
+                      )}
+                    </h4>
+                    <p class="mt-3 text-sm leading-relaxed text-ink-muted">{video.data.description}</p>
+                    {embed && (
+                      <div class="mt-5">
+                        <iframe
+                          class="aspect-video w-full border border-line"
+                          src={`https://www.youtube-nocookie.com/embed/${embed}`}
+                          title={video.data.title}
+                          loading="lazy"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerpolicy="strict-origin-when-cross-origin"
+                          allowfullscreen
+                        />
+                      </div>
+                    )}
+                  </article>
                 </li>
               );
             })}

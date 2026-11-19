@@ -57,6 +57,15 @@ export interface SiteSection {
 
 export const sections = [
   {
+    id: 'studio',
+    href: '/studio',
+    label: 'Studio',
+    title: 'Learning Studio',
+    description:
+      'Interactive experiments. Change a parameter and watch the mechanism move. A module that is not built is marked as such.',
+    group: 'primary',
+  },
+  {
     id: 'explore',
     href: '/explore',
     label: 'Explore',
@@ -66,48 +75,12 @@ export const sections = [
     group: 'primary',
   },
   {
-    id: 'knowledge',
-    href: '/knowledge',
-    label: 'Knowledge',
-    title: 'Knowledge Hub',
-    description:
-      'Eight fields, written as essays. Each one explains why it matters, then the ideas it is responsible for. Notes are linked from the field they belong to.',
-    group: 'reference',
-  },
-  {
     id: 'learning-paths',
     href: '/learning-paths',
     label: 'Paths',
     title: 'Learning Paths',
     description:
       'Several journeys. From Data to Intelligence is the one to follow first. The others are branches, opened only where the essays exist.',
-    group: 'primary',
-  },
-  {
-    id: 'visual-lab',
-    href: '/visual-lab',
-    label: 'Lab',
-    title: 'Interactive Visual Lab',
-    description:
-      'Interactive figures you can take apart. Small, focused experiments that each make one idea visible.',
-    group: 'primary',
-  },
-  {
-    id: 'videos',
-    href: '/videos',
-    label: 'Videos',
-    title: 'Videos',
-    description:
-      'Lectures placed on the path, with a note on what to watch for, and films this notebook has not made yet.',
-    group: 'primary',
-  },
-  {
-    id: 'projects',
-    href: '/projects',
-    label: 'Projects',
-    title: 'Code & Projects',
-    description:
-      'Public repositories, each with the problem, the approach in the code, and what that code demonstrates. Employer work is on the résumé.',
     group: 'primary',
   },
   {
@@ -120,12 +93,38 @@ export const sections = [
     group: 'primary',
   },
   {
+    id: 'projects',
+    href: '/projects',
+    label: 'Projects',
+    title: 'Code & Projects',
+    description:
+      'Public repositories, each with the problem, the approach in the code, and what that code demonstrates. Employer work is on the résumé.',
+    group: 'primary',
+  },
+  {
+    id: 'knowledge',
+    href: '/knowledge',
+    label: 'Knowledge',
+    title: 'Knowledge Hub',
+    description:
+      'Eight fields, written as essays. Each one explains why it matters, then the ideas it is responsible for. Notes are linked from the field they belong to.',
+    group: 'reference',
+  },
+  {
+    id: 'videos',
+    href: '/videos',
+    label: 'Videos',
+    title: 'Videos',
+    description:
+      'Lectures placed on the path, with a note on what to watch for, and films this notebook has not made yet.',
+    group: 'reference',
+  },
+  {
     id: 'contact',
     href: '/contact',
     label: 'Contact',
     title: 'Contact',
-    description:
-      'Write after you have followed the work. Email and LinkedIn are here; a hosted form is not connected yet.',
+    description: 'Email, LinkedIn, and GitHub.',
     group: 'secondary',
   },
   {
@@ -151,6 +150,7 @@ export type SectionId = (typeof sections)[number]['id'];
 
 export const primaryNav = sections.filter((section) => section.group === 'primary');
 export const secondaryNav = sections.filter((section) => section.group === 'secondary');
+export const referenceNav = sections.filter((section) => section.group === 'reference');
 
 export function getSection(id: SectionId) {
   const section = sections.find((candidate) => candidate.id === id);

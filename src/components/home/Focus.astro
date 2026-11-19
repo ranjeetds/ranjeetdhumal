@@ -1,0 +1,34 @@
+---
+/**
+ * Topics as labels. Each one opens a domain or the research log, not an article grid.
+ */
+import Section from '@/components/ui/Section.astro';
+
+const topics = [
+  { label: 'Artificial intelligence', href: '/explore/machine-learning' },
+  { label: 'Machine learning', href: '/explore/machine-learning' },
+  { label: 'Deep learning', href: '/explore/deep-learning' },
+  { label: 'Generative AI & LLMs', href: '/explore/generative-ai' },
+  { label: 'Agentic AI', href: '/explore/agentic-ai' },
+  { label: 'Mathematics & statistics', href: '/explore/mathematics' },
+  { label: 'Python & computer science', href: '/explore/computer-science' },
+  { label: 'AI research', href: '/research' },
+];
+---
+
+<Section id="focus" label="Focus" title="Areas of work.">
+  <ul class="flex flex-wrap gap-2">
+    {
+      topics.map((topic) => (
+        <li>
+          <a
+            href={topic.href}
+            class="inline-block border border-line px-3 py-2 text-sm text-ink-muted transition-colors duration-200 hover:border-line-strong hover:text-ink"
+          >
+            {topic.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

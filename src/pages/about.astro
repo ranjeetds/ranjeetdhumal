@@ -14,50 +14,6 @@ const colophon = [
 ---
 
 <PageLayout section="about">
-  <Section
-    id="premise"
-    label="Premise"
-    title="Most explanations of AI ask you to take the picture on trust."
-  >
-    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
-      <p>
-        The ideas behind modern AI are visual and mechanical: surfaces being descended, vectors
-        being rotated, attention moving across a sentence. The way through them is one path,
-        <a href="/learning-paths#from-data-to-intelligence" class="link-underline text-ink hover:text-accent">From Data to Intelligence</a>,
-        from a sample to an agent. Text alone is a poor medium for that walk, so the
-        path points at a figure whenever the figure exists.
-      </p>
-      <p>
-        This notebook explains those ideas the way they are easiest to understand — with figures
-        you can manipulate, code you can run, and paths that put things in a sensible order.
-      </p>
-    </div>
-  </Section>
-
-  <Section id="teaching" label="Teaching" title="How a page is supposed to teach.">
-    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
-      <p>
-        Visual first. If an idea has a shape, the shape is the explanation and the paragraph is
-        the caption. A loss, a boundary, a gradient, and a pattern of attention are objects. The
-        lab exists so those objects can be changed, and so the change is the lesson. A definition
-        that arrives before the picture asks the reader to trust a word.
-      </p>
-      <p>
-        Structured, in the strong sense. A path is a sequence of dependencies. Each module says
-        what you should be able to do at the end of it, which ideas that ability depends on, why
-        those ideas are the ones that matter, and what the next module will assume. The order is
-        the teaching. A list of related topics is not.
-      </p>
-      <p>
-        Interactive where interaction carries a belief, and research-oriented everywhere else. A
-        control that does not change what you think is decoration. A research entry either points
-        at a source or states a question it has not answered. Notes are published when they are
-        ready to be argued with, marked with their maturity, and revised in place. Code accompanies
-        a claim that can be run, and it is the same code the figure uses.
-      </p>
-    </div>
-  </Section>
-
   <Section id="author" label="Author" title={site.name}>
     <div class="grid items-start gap-10 lg:grid-cols-[11rem_1fr]">
       <div class="flex aspect-[4/5] w-40 items-end border border-line bg-surface p-4 lg:w-full">
@@ -90,15 +46,15 @@ const colophon = [
   </Section>
 
   <Section id="colophon" label="Colophon" title="How this site is made.">
-    <dl class="max-w-2xl border-t border-line">
+    <ul class="grid gap-px border border-line bg-line sm:grid-cols-2">
       {
         colophon.map((item) => (
-          <div class="grid gap-x-8 gap-y-1 border-b border-line py-4 sm:grid-cols-[9rem_1fr]">
-            <dt class="mono-label pt-1 text-ink-faint">{item.term}</dt>
-            <dd class="text-ink-muted">{item.detail}</dd>
-          </div>
+          <li class="bg-canvas p-6">
+            <p class="mono-label text-ink-faint">{item.term}</p>
+            <p class="mt-3 font-serif text-title text-ink">{item.detail}</p>
+          </li>
         ))
       }
-    </dl>
+    </ul>
   </Section>
 </PageLayout>

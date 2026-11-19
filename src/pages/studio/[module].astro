@@ -1,0 +1,19 @@
+---
+import type { GetStaticPaths } from 'astro';
+import StudioShell from '@/components/studio/StudioShell.astro';
+import { type StudioModule, liveStudioModules } from '@/data/studio';
+
+export const getStaticPaths = (() =>
+  liveStudioModules().map((module) => ({
+    params: { module: module.id },
+    props: { module },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  module: StudioModule;
+}
+
+const { module } = Astro.props;
+---
+
+<StudioShell module={module} />

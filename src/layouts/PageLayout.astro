@@ -24,7 +24,6 @@ const section = getSection(Astro.props.section);
     index={sectionIndex(section.id)}
     eyebrow={section.group === 'secondary' ? 'Author' : 'Notebook'}
     title={section.title}
-    lede={section.description}
   >
     <slot name="header" />
   </PageHeader>

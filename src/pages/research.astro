@@ -8,23 +8,6 @@ const entries = await getPublishedResearch();
 ---
 
 <PageLayout section="research">
-  <Section id="streams" label="Streams" title="Four kinds of entry.">
-    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
-      <p>
-        The path explains the mechanisms. This log is where a claim is pulled apart from the
-        evidence offered for it. A note records a method or a distinction that other pages will
-        reuse. An experiment states a setup small enough to run, and it states that setup before
-        any result. A paper entry is a close reading. A direction is an open problem written so
-        that progress on it would be visible.
-      </p>
-      <p>
-        Posted entries link to a source and carry the argument as it stands. Planned entries are
-        the queue. They describe the question and the shape of the work. They are not findings, and
-        they are not written as if the result had already come back.
-      </p>
-    </div>
-  </Section>
-
   <Section id="log" label="Log" title="The log">
     <ResearchList entries={entries} />
   </Section>

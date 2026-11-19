@@ -1,100 +1,15 @@
 ---
-import Section from '@/components/ui/Section.astro';
-import Status from '@/components/ui/Status.astro';
-import { engineLabels, visualizations } from '@/components/visualizations/registry';
-import Viz from '@/components/visualizations/Viz.astro';
-import { labEssays } from '@/data/lab-essays';
-import { getTopic } from '@/data/topics';
-import PageLayout from '@/layouts/PageLayout.astro';
-
-const figures = visualizations.map((visualization, index) => ({
-  visualization,
-  essay: labEssays[visualization.id],
-  number: String(index + 1).padStart(2, '0'),
-}));
+import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 
-<PageLayout section="visual-lab">
-  <Section id="purpose" label="Purpose" title="Change the picture, and see which belief moves.">
-    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
-      <p>
-        A learning system is a mechanical object. A loss is a surface. A boundary is the set of
-        points a chosen family of functions calls a tie. A gradient is a product of local
-        derivatives along a path. Attention is a pattern of weights across a sentence. None of
-        these is easier to understand as a paragraph than as a thing you can alter. The lab is
-        that alteration, done one idea at a time.
-      </p>
-      <p>
-        The test for a figure is whether moving it changes a belief the caption could not. If the
-        same step size and the same momentum settle in different valleys, the start point is doing
-        the work, and saying so is weaker than watching it. If a linear cut stays flat no matter
-        where the points go, capacity is a property of the model, not of the data. Figures that
-        only play are videos. These are specified as experiments: what is on the screen, what you
-        can change, and the insight the change is for.
-      </p>
-      <p>
-        Five figures are built: a sample and its mean, a loss surface, a pair of attention heads,
-        a next-token distribution, and a tokenizer. The others are specified at the same depth, so they can be implemented
-        without redesigning the question. SVG where the picture is a diagram, D3 where it is data,
-        Three.js only when the third dimension carries the idea. Every interaction has a keyboard
-        equivalent, and a reduced-motion state shows the result without the walk.
-      </p>
-    </div>
-  </Section>
+<BaseLayout title="Learning Studio" description="The visual lab is now the Learning Studio.">
+  <p class="mx-auto max-w-page px-gutter py-24 text-ink-muted">
+    <a href="/studio/gradient-descent" class="link-underline text-ink hover:text-accent">Continue to the Learning Studio</a>
+  </p>
+</BaseLayout>
 
-  <Section
-    id="figures"
-    label="Figures"
-    title="The experiments."
-    lede="The built figure is on the bench. The rest are specified completely enough to build: the scene, the interaction, and the belief the interaction is meant to produce."
-  >
-    <ol class="border-t border-line">
-      {
-        figures.map(({ visualization, essay, number }) => (
-          <li id={visualization.id} class="scroll-mt-28 border-b border-line py-12">
-            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <span class="mono-label text-ink-faint">{number}</span>
-              <Status tone={visualization.status === 'live' ? 'live' : 'planned'}>
-                {visualization.status === 'live' ? 'Live' : 'Planned'}
-              </Status>
-              <span class="mono-label text-ink-faint">{engineLabels[visualization.engine]}</span>
-              <span class="mono-label text-ink-faint">{getTopic(visualization.topic).title}</span>
-            </div>
-            <h3 class="mt-4 font-serif text-title text-ink">{visualization.title}</h3>
-            <p class="mt-3 max-w-2xl leading-relaxed text-ink">
-              <span class="mono-label mr-2 text-ink-faint">Objective</span>
-              {visualization.objective}
-            </p>
-            {visualization.status === 'live' && (
-              <div class="mt-8 max-w-4xl">
-                <Viz id={visualization.id} number={number} />
-              </div>
-            )}
-            <div class="mt-8 max-w-2xl space-y-6">
-              <div>
-                <h4 class="font-serif text-xl text-ink">What you see</h4>
-                <p class="mt-2 leading-relaxed text-ink-muted">{essay.scene}</p>
-              </div>
-              <div>
-                <h4 class="font-serif text-xl text-ink">How you change it</h4>
-                <p class="mt-2 leading-relaxed text-ink-muted">{essay.interaction}</p>
-              </div>
-              <div>
-                <h4 class="font-serif text-xl text-ink">The insight</h4>
-                <p class="mt-2 leading-relaxed text-ink-muted">{essay.insight}</p>
-              </div>
-              <div>
-                <h4 class="font-serif text-xl text-ink">What becomes intuitive</h4>
-                <ul class="mt-2 space-y-1 leading-relaxed text-ink-muted">
-                  {essay.concepts.map((concept) => (
-                    <li>{concept}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </li>
-        ))
-      }
-    </ol>
-  </Section>
-</PageLayout>
+<script>
+  const live = new Set(['sample-mean', 'gradient-descent', 'attention-patterns', 'tokenization', 'next-token']);
+  const id = location.hash.replace('#', '');
+  location.replace(live.has(id) ? `/studio/${id}` : '/studio/gradient-descent');
+</script>

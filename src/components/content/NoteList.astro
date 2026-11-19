@@ -1,6 +1,6 @@
 ---
-/** A ruled list of notes: date, title, description and maturity. */
-import Status from '@/components/ui/Status.astro';
+/** A card grid of notes: label, title, and the description. */
+import CardGrid from '@/components/ui/CardGrid.astro';
 import { type Note, formatDate, noteHref } from '@/lib/content';
 
 interface Props {
@@ -10,28 +10,11 @@ interface Props {
 const { notes } = Astro.props;
 ---
 
-<ul class="border-t border-line">
-  {
-    notes.map((note) => (
-      <li class="border-b border-line">
-        <a
-          href={noteHref(note)}
-          class="group grid gap-x-8 gap-y-2 py-6 transition-colors duration-300 hover:bg-surface sm:px-4 md:grid-cols-[7.5rem_1fr_auto] md:items-baseline"
-        >
-          <time datetime={note.data.publishedAt.toISOString()} class="mono-label text-ink-faint">
-            {formatDate(note.data.publishedAt)}
-          </time>
-          <span>
-            <span class="block font-serif text-title text-ink">{note.data.title}</span>
-            <span class="mt-1.5 block max-w-2xl text-[0.9375rem] leading-relaxed text-ink-muted">
-              {note.data.description}
-            </span>
-          </span>
-          <Status tone={note.data.maturity === 'evergreen' ? 'live' : 'planned'}>
-            {note.data.maturity}
-          </Status>
-        </a>
-      </li>
-    ))
-  }
-</ul>
+<CardGrid
+  items={notes.map((note) => ({
+    href: noteHref(note),
+    label: formatDate(note.data.publishedAt),
+    title: note.data.title,
+    description: note.data.description,
+  }))}
+/>

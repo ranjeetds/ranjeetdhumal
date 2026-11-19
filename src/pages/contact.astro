@@ -10,23 +10,9 @@ const action = usesMailto ? `mailto:${site.email}` : endpoint;
 ---
 
 <PageLayout section="contact">
-  <Section id="write" label="Write" title="After the path, if you want to talk.">
-    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
-      <p>
-        The useful notes are about a chapter, a figure, or a claim on the research log. Say which
-        one, and what you think it gets wrong. The address below is the one on the public résumé.
-      </p>
-      <p>
-        {
-          usesMailto
-            ? 'No hosted form is connected. Sending opens your mail client, with the message in the body. A Formspree or Worker URL can replace that later, in the site config, without changing this page.'
-            : 'The form posts to the endpoint configured for this site.'
-        }
-      </p>
-    </div>
-
+  <Section id="write" label="Write">
     <form
-      class="mt-10 max-w-xl space-y-5"
+      class="max-w-xl space-y-5"
       action={action}
       method="post"
       enctype={usesMailto ? 'text/plain' : 'application/x-www-form-urlencoded'}

@@ -1,4 +1,5 @@
 ---
+import CardGrid from '@/components/ui/CardGrid.astro';
 import Section from '@/components/ui/Section.astro';
 import { domains } from '@/data/domains';
 import PageLayout from '@/layouts/PageLayout.astro';
@@ -6,23 +7,14 @@ import PageLayout from '@/layouts/PageLayout.astro';
 
 <PageLayout section="explore">
   <Section id="domains" label="Domains" title="Choose a place to start.">
-    <p class="max-w-2xl text-lede text-ink-muted">
-      A card is a domain, not a course. Open one to read what it is for, which ideas it owns, and
-      which lessons have actually been written. The older field essays remain at
-      <a href="/knowledge" class="link-underline text-ink hover:text-accent">the Knowledge Hub</a>.
-    </p>
-    <ul class="mt-10 grid gap-px border border-line bg-line sm:grid-cols-2">
-      {
-        domains.map((domain, index) => (
-          <li class="bg-canvas">
-            <a href={`/explore/${domain.id}`} class="group block h-full p-6 transition-colors duration-200 hover:bg-surface">
-              <p class="mono-label text-ink-faint">{String(index + 1).padStart(2, '0')}</p>
-              <h3 class="mt-3 font-serif text-title text-ink group-hover:text-accent">{domain.title}</h3>
-              <p class="mt-3 text-sm leading-relaxed text-ink-muted">{domain.description}</p>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+    <CardGrid
+      columns={2}
+      items={domains.map((domain, index) => ({
+        href: `/explore/${domain.id}`,
+        label: String(index + 1).padStart(2, '0'),
+        title: domain.title,
+        description: domain.description,
+      }))}
+    />
   </Section>
 </PageLayout>

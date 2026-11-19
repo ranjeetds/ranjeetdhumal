@@ -1,8 +1,8 @@
 ---
 /**
  * Learning paths in teaching order. Each path is an anchor, so the homepage can link
- * to a specific one. A module states an outcome, the concepts it turns on, why those
- * concepts are the ones that matter, and what the next module will assume.
+ * to a specific one. A module is a card: the outcome, why it is here, and the links
+ * to an essay, a figure, or a lecture when one exists.
  */
 import type { Path } from '@/lib/content';
 
@@ -19,79 +19,45 @@ const levelLabel = {
 } as const;
 ---
 
-<ol class="border-t border-line">
+<div class="grid gap-16">
   {
     paths.map((path) => (
-      <li id={path.id} class="scroll-mt-28 border-b border-line py-12">
-        <p class="mono-label text-ink-faint">
-          {path.data.primary ? 'The path' : levelLabel[path.data.level]}
-        </p>
-        <h3 class="mt-3 font-serif text-title text-ink">{path.data.title}</h3>
-        <div class="mt-4 max-w-2xl space-y-4 leading-relaxed text-ink-muted">
-          <p>{path.data.overview}</p>
-        </div>
-        <ol class="mt-10 max-w-2xl space-y-10">
+      <article id={path.id} class="scroll-mt-28">
+        <p class="mono-label text-ink-faint">{path.data.primary ? 'The path' : levelLabel[path.data.level]}</p>
+        <h3 class="mt-3 font-serif text-headline text-ink">{path.data.title}</h3>
+        <ul class="mt-8 grid gap-px border border-line bg-line sm:grid-cols-2">
           {path.data.modules.map((module, index) => (
-            <li>
-              <p class="mono-label text-ink-faint">{String(index + 1).padStart(2, '0')}</p>
-              <h4 class="mt-2 font-serif text-xl text-ink">{module.title}</h4>
-              <p class="mt-3 leading-relaxed text-ink-muted">
-                <span class="text-ink">By the end of this module. </span>
-                {module.outcome}
-              </p>
-              <p class="mono-label mt-4 text-ink-faint">Concepts</p>
-              <ul class="mt-2 space-y-1 text-[0.9375rem] leading-relaxed text-ink-muted">
-                {module.concepts.map((concept) => (
-                  <li>{concept}</li>
-                ))}
-              </ul>
-              <p class="mt-4 leading-relaxed text-ink-muted">
-                <span class="text-ink">Why these. </span>
-                {module.why}
-              </p>
-              <p class="mt-3 leading-relaxed text-ink-muted">
-                <span class="text-ink">What comes next. </span>
-                {module.next}
-              </p>
-              {module.experiment && (
-                <p class="mt-3 leading-relaxed text-ink-muted">
-                  <span class="text-ink">Try. </span>
-                  {module.experiment}
-                </p>
-              )}
-              {(module.article || module.figure || module.reading) && (
-                <ul class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            <li class="bg-canvas">
+              <div class="flex h-full flex-col p-6">
+                <p class="mono-label text-ink-faint">{String(index + 1).padStart(2, '0')}</p>
+                <h4 class="mt-3 font-serif text-title text-ink">{module.title}</h4>
+                <p class="mt-3 text-sm leading-relaxed text-ink-muted">{module.outcome}</p>
+                <p class="mt-3 text-sm leading-relaxed text-ink-muted">{module.why}</p>
+                <p class="mt-3 text-sm leading-relaxed text-ink-muted">{module.next}</p>
+                {module.experiment && <p class="mt-3 text-sm leading-relaxed text-ink-muted">{module.experiment}</p>}
+                <p class="mt-3 text-sm leading-relaxed text-ink-faint">{module.concepts.join(' · ')}</p>
+                <div class="mt-auto flex flex-wrap gap-x-5 gap-y-2 pt-5 text-sm">
                   {module.article && (
-                    <li>
-                      <a href={module.article} class="link-underline text-ink hover:text-accent">
-                        Chapter essay
-                      </a>
-                    </li>
+                    <a href={module.article} class="link-underline text-ink hover:text-accent">
+                      Essay
+                    </a>
                   )}
                   {module.figure && (
-                    <li>
-                      <a href={`/visual-lab#${module.figure}`} class="link-underline text-ink hover:text-accent">
-                        Figure
-                      </a>
-                    </li>
+                    <a href={`/studio/${module.figure}`} class="link-underline text-ink hover:text-accent">
+                      Figure
+                    </a>
                   )}
                   {module.reading && (
-                    <li>
-                      <a href={module.reading} class="link-underline text-ink hover:text-accent">
-                        Lecture
-                      </a>
-                    </li>
+                    <a href={module.reading} class="link-underline text-ink hover:text-accent">
+                      Lecture
+                    </a>
                   )}
-                </ul>
-              )}
+                </div>
+              </div>
             </li>
           ))}
-        </ol>
-        <p class="mt-10 max-w-2xl border-t border-line pt-4 leading-relaxed text-ink-muted">
-          <span class="text-ink">By the end of the path. </span>
-          {path.data.outcome}
-        </p>
-      </li>
+        </ul>
+      </article>
     ))
   }
-</ol>
+</div>

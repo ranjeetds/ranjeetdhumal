@@ -1,0 +1,73 @@
+---
+/**
+ * A short record of experiments, repositories, and posted research.
+ * The full catalogues stay on their own pages.
+ */
+import Section from '@/components/ui/Section.astro';
+import { liveStudioModules } from '@/data/studio';
+import { getPublishedProjects, getPublishedResearch } from '@/lib/content';
+
+const experiments = liveStudioModules().slice(0, 4);
+const projects = (await getPublishedProjects()).slice(0, 3);
+const research = (await getPublishedResearch()).filter((entry) => entry.data.stage === 'posted').slice(0, 2);
+---
+
+<Section id="studio" label="Studio" title="Experiments you can change.">
+  <ul class="divide-y divide-line border-y border-line">
+    {
+      experiments.map((experiment) => (
+        <li>
+          <a href={`/studio/${experiment.id}`} class="grid gap-1 py-4 sm:grid-cols-[14rem_1fr] sm:items-baseline">
+            <span class="font-serif text-title text-ink">{experiment.title}</span>
+            <span class="text-sm text-ink-muted">{experiment.subtitle}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Section>
+
+<Section id="work" label="Work" title="Selected work.">
+  <ul class="divide-y divide-line border-y border-line">
+    {
+      projects.map((project) => (
+        <li>
+          <a href={project.data.repository ?? `/projects#${project.id}`} class="grid gap-1 py-4 sm:grid-cols-[8rem_1fr] sm:items-baseline" rel={project.data.repository ? 'noopener noreferrer' : undefined} target={project.data.repository ? '_blank' : undefined}>
+            <span class="mono-label text-ink-faint">{project.data.year}</span>
+            <span>
+              <span class="font-serif text-title text-ink">{project.data.title}</span>
+              <span class="mt-1 block text-sm text-ink-muted">{project.data.description}</span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="mt-6 text-sm">
+    <a href="/projects" class="link-underline text-ink hover:text-accent">All projects</a>
+    <span class="mx-3 text-ink-faint" aria-hidden="true">/</span>
+    <a href="/resume" class="link-underline text-ink hover:text-accent">Résumé</a>
+  </p>
+</Section>
+
+{
+  research.length > 0 && (
+    <Section id="research" label="Research" title="Posted.">
+      <ul class="divide-y divide-line border-y border-line">
+        {research.map((entry) => (
+          <li>
+            <a
+              href={entry.data.source ?? `/research#${entry.id}`}
+              class="block py-4"
+              rel={entry.data.source ? 'noopener noreferrer' : undefined}
+              target={entry.data.source ? '_blank' : undefined}
+            >
+              <span class="font-serif text-title text-ink">{entry.data.title}</span>
+              <span class="mt-1 block text-sm text-ink-muted">{entry.data.description}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  )
+}

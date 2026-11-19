@@ -1,0 +1,62 @@
+---
+/**
+ * The Explore card grid: a hairline frame, a mono label, a title, and one line of detail.
+ * Use it for anything a reader chooses. Pass `href` to make the whole card a link.
+ */
+export interface CardItem {
+  href?: string;
+  title: string;
+  description?: string;
+  label?: string;
+  external?: boolean;
+}
+
+interface Props {
+  items: CardItem[];
+  columns?: 2 | 3;
+  /** Card titles sit under the section heading. Use h4 when this grid is already inside an h3. */
+  heading?: 'h3' | 'h4' | 'p';
+}
+
+const { items, columns = 2, heading = 'h3' } = Astro.props;
+const grid = columns === 3 ? 'sm:grid-cols-2 xl:grid-cols-3' : 'sm:grid-cols-2';
+---
+
+<ul class:list={['grid gap-px border border-line bg-line', grid]}>
+  {
+    items.map((item, index) => (
+      <li class="bg-canvas">
+        {item.href ? (
+          <a
+            href={item.href}
+            class="group block h-full p-6 transition-colors duration-200 hover:bg-surface"
+            rel={item.external ? 'noopener noreferrer' : undefined}
+            target={item.external ? '_blank' : undefined}
+          >
+            <p class="mono-label text-ink-faint">{item.label ?? String(index + 1).padStart(2, '0')}</p>
+            {heading === 'h4' ? (
+              <h4 class="mt-3 font-serif text-title text-ink group-hover:text-accent">{item.title}</h4>
+            ) : heading === 'p' ? (
+              <p class="mt-3 font-serif text-title text-ink group-hover:text-accent">{item.title}</p>
+            ) : (
+              <h3 class="mt-3 font-serif text-title text-ink group-hover:text-accent">{item.title}</h3>
+            )}
+            {item.description && <p class="mt-3 text-sm leading-relaxed text-ink-muted">{item.description}</p>}
+          </a>
+        ) : (
+          <article class="h-full p-6">
+            <p class="mono-label text-ink-faint">{item.label ?? String(index + 1).padStart(2, '0')}</p>
+            {heading === 'h4' ? (
+              <h4 class="mt-3 font-serif text-title text-ink">{item.title}</h4>
+            ) : heading === 'p' ? (
+              <p class="mt-3 font-serif text-title text-ink">{item.title}</p>
+            ) : (
+              <h3 class="mt-3 font-serif text-title text-ink">{item.title}</h3>
+            )}
+            {item.description && <p class="mt-3 text-sm leading-relaxed text-ink-muted">{item.description}</p>}
+          </article>
+        )}
+      </li>
+    ))
+  }
+</ul>

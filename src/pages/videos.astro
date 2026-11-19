@@ -16,21 +16,6 @@ const seriesOrder = [
 ---
 
 <PageLayout section="videos">
-  <Section id="formats" label="Library" title="Lectures on the path, and films not yet made.">
-    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
-      <p>
-        A lecture belongs here when it shows a mechanism the path has already named, and when
-        there is something specific to watch for. The embedded films are other people’s. Each one
-        says which chapter it serves and which minute of attention it is worth.
-      </p>
-      <p>
-        The planned entries are films this notebook intends to make, built around a figure on the
-        lab bench. A title in that list is not a link. Nothing is being claimed as recorded until
-        a URL is set.
-      </p>
-    </div>
-  </Section>
-
   <Section id="library" label="Films" title="By series.">
     <VideoList videos={videos} seriesOrder={seriesOrder} />
   </Section>

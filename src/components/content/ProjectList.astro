@@ -1,10 +1,8 @@
 ---
 /**
- * Project index. Each entry states the problem, the approach taken in the public
- * repository, the techniques, and what that repository demonstrates. The title links
- * to the source. Employer work lives on the résumé, not here.
+ * Project cards. Each one states the problem, the approach in the public repository,
+ * and what that repository demonstrates. The title links to the source.
  */
-import Status from '@/components/ui/Status.astro';
 import type { Project } from '@/lib/content';
 
 interface Props {
@@ -22,56 +20,54 @@ const parts = [
 ] as const;
 ---
 
-<ol class="border-t border-line">
+<ul class="grid gap-px border border-line bg-line sm:grid-cols-2">
   {
     projects.map((project) => (
-      <li id={project.id} class="scroll-mt-28 border-b border-line py-12">
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <Status tone={project.data.status === 'archived' ? 'planned' : 'live'}>
+      <li id={project.id} class="scroll-mt-28 bg-canvas">
+        <article class="flex h-full flex-col p-6">
+          <p class="mono-label text-ink-faint">
             {statusLabel[project.data.status]}
-          </Status>
-          <span class="mono-label text-ink-faint">{project.data.year}</span>
-        </div>
-        <h3 class="mt-4 font-serif text-title text-ink">
-          {project.data.repository ? (
+            <span class="mx-2" aria-hidden="true">/</span>
+            {project.data.year}
+          </p>
+          <h3 class="mt-3 font-serif text-title text-ink">
+            {project.data.repository ? (
+              <a
+                href={project.data.repository}
+                class="link-underline hover:text-accent"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {project.data.title}
+              </a>
+            ) : (
+              project.data.title
+            )}
+          </h3>
+          <p class="mt-3 text-sm leading-relaxed text-ink-muted">{project.data.description}</p>
+          <dl class="mt-5 space-y-4">
+            {parts.map(([key, label]) => (
+              <div>
+                <dt class="mono-label text-ink-faint">{label}</dt>
+                <dd class="mt-1.5 text-sm leading-relaxed text-ink-muted">{project.data[key]}</dd>
+              </div>
+            ))}
+          </dl>
+          {project.data.stack.length > 0 && (
+            <p class="mt-5 text-sm leading-relaxed text-ink-faint">{project.data.stack.join(' · ')}</p>
+          )}
+          {project.data.url && (
             <a
-              href={project.data.repository}
-              class="link-underline hover:text-accent"
+              href={project.data.url}
+              class="link-underline mt-5 inline-block text-sm text-ink hover:text-accent"
               rel="noopener noreferrer"
               target="_blank"
             >
-              {project.data.title}
+              Live site
             </a>
-          ) : (
-            project.data.title
           )}
-        </h3>
-        <p class="mt-3 max-w-2xl leading-relaxed text-ink-muted">{project.data.description}</p>
-        <div class="mt-8 max-w-2xl space-y-6">
-          {parts.map(([key, label]) => (
-            <div>
-              <h4 class="font-serif text-xl text-ink">{label}</h4>
-              <p class="mt-2 leading-relaxed text-ink-muted">{project.data[key]}</p>
-            </div>
-          ))}
-          {project.data.stack.length > 0 && (
-            <div>
-              <h4 class="font-serif text-xl text-ink">Techniques</h4>
-              <p class="mt-2 leading-relaxed text-ink-muted">{project.data.stack.join(', ')}</p>
-            </div>
-          )}
-        </div>
-        {project.data.url && (
-          <a
-            href={project.data.url}
-            class="link-underline mt-6 inline-block text-sm text-ink-muted hover:text-ink"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Live site
-          </a>
-        )}
+        </article>
       </li>
     ))
   }
-</ol>
+</ul>

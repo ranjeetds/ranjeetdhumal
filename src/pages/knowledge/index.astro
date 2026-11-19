@@ -1,4 +1,5 @@
 ---
+import CardGrid from '@/components/ui/CardGrid.astro';
 import NoteList from '@/components/content/NoteList.astro';
 import EmptyState from '@/components/ui/EmptyState.astro';
 import Section from '@/components/ui/Section.astro';
@@ -18,22 +19,6 @@ const countLabel = (count: number) =>
 ---
 
 <PageLayout section="knowledge">
-  <Section id="structure" label="Structure" title="A map, and the notes that have been written on it.">
-    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
-      <p>
-        The hub is a map of eight fields. Each field opens with why it belongs in the study of
-        learning systems, and how it connects to the fields beside it. Under that are the ideas
-        the field is responsible for, explained in place: what the idea is, and why getting it
-        wrong changes the work that follows.
-      </p>
-      <p>
-        An explanation on the map is not a note. A note is a separate page, written when an idea
-        has a figure or an argument that deserves one, and it is linked from the field it belongs
-        to. Start with a field. The notes, where they exist, are the deeper cut.
-      </p>
-    </div>
-  </Section>
-
   <Section id="latest" label="Latest" title="Recently published">
     {
       notes.length > 0 ? (
@@ -46,72 +31,55 @@ const countLabel = (count: number) =>
     }
   </Section>
 
-  <Section
-    id="fields"
-    label="Fields"
-    title="Eight fields."
-    lede="Choose a field. The introduction says why it is here. The entries under it are the ideas, explained. Links are notes that have been written."
-  >
-    <nav aria-label="Fields" class="mb-10">
-      <ul class="flex flex-wrap gap-2">
-        {
-          fields.map((field) => (
-            <li>
-              <a
-                href={`#${field.id}`}
-                class="mono-label inline-block border border-line px-3 py-2 text-ink-muted transition-colors duration-200 hover:border-line-strong hover:text-ink"
-              >
-                {field.title}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
+  <Section id="fields" label="Fields" title="Eight fields.">
+    <CardGrid
+      items={fields.map((field, index) => ({
+        href: `#${field.id}`,
+        label: `${String(index + 1).padStart(2, '0')} / ${countLabel(field.notes.length)}`,
+        title: field.title,
+        description: field.entries.map((entry) => entry.title).join(' · '),
+      }))}
+    />
 
-    <ul class="border-t border-line">
+    <ul class="mt-16 grid gap-16">
       {
-        fields.map((field, i) => (
-          <li id={field.id} class="scroll-mt-28 border-b border-line py-12">
-            <p class="mono-label text-ink-faint">
-              {String(i + 1).padStart(2, '0')}
-              <span class="mx-2 text-line-strong" aria-hidden="true">/</span>
-              {countLabel(field.notes.length)}
-            </p>
-            <h3 class="mt-3 font-serif text-title text-ink">{field.title}</h3>
-            <div class="mt-4 max-w-2xl space-y-4 leading-relaxed text-ink-muted">
-              {field.introduction.map((paragraph) => (
-                <p>{paragraph}</p>
-              ))}
-            </div>
+        fields.map((field) => (
+          <li id={field.id} class="scroll-mt-28">
+            <h3 class="font-serif text-headline text-ink">{field.title}</h3>
             {
               field.notes.length > 0 && (
-                <div class="mt-6">
-                  <p class="mono-label text-ink-faint">Written</p>
-                  <ul class="mt-3 space-y-1.5">
-                    {field.notes.map((note) => (
-                      <li>
-                        <a href={noteHref(note)} class="link-underline text-ink hover:text-accent">
-                          {note.data.title}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+                <div class="mt-8">
+                  <CardGrid
+                    heading="h4"
+                    items={field.notes.map((note) => ({
+                      href: noteHref(note),
+                      title: note.data.title,
+                      description: note.data.description,
+                    }))}
+                  />
                 </div>
               )
             }
-            <ol class="mt-10 max-w-2xl space-y-10">
+            <ul class="mt-8 grid gap-px border border-line bg-line sm:grid-cols-2">
+              <li class="bg-canvas p-6 sm:col-span-2">
+                <p class="mono-label text-ink-faint">Why this field</p>
+                <div class="mt-3 max-w-2xl space-y-3 text-sm leading-relaxed text-ink-muted">
+                  {field.introduction.map((paragraph) => (
+                    <p>{paragraph}</p>
+                  ))}
+                </div>
+              </li>
               {field.entries.map((entry) => (
-                <li>
-                  <h4 class="font-serif text-xl text-ink">{entry.title}</h4>
-                  <div class="mt-3 space-y-3 leading-relaxed text-ink-muted">
+                <li class="bg-canvas p-6">
+                  <h4 class="font-serif text-title text-ink">{entry.title}</h4>
+                  <div class="mt-3 space-y-3 text-sm leading-relaxed text-ink-muted">
                     {entry.paragraphs.map((paragraph) => (
                       <p>{paragraph}</p>
                     ))}
                   </div>
                 </li>
               ))}
-            </ol>
+            </ul>
           </li>
         ))
       }

@@ -3,6 +3,7 @@
  * Published lessons, available videos, the research log, and public repositories.
  * Planned videos and queued research stay on their own pages, where the label is explicit.
  */
+import CardGrid from '@/components/ui/CardGrid.astro';
 import Section from '@/components/ui/Section.astro';
 import {
   getPublishedNotes,
@@ -19,76 +20,47 @@ const projects = (await getPublishedProjects()).slice(0, 4);
 ---
 
 <Section id="lessons" index="04" label="Lessons" title="Essays that have been written.">
-  <ul class="border-t border-line">
-    {
-      notes.map((note) => (
-        <li class="border-b border-line">
-          <a href={noteHref(note)} class="block py-5">
-            <span class="block font-serif text-title text-ink">{note.data.title}</span>
-            <span class="mt-1.5 block max-w-2xl text-sm leading-relaxed text-ink-muted">{note.data.description}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
+  <CardGrid
+    items={notes.map((note) => ({
+      href: noteHref(note),
+      title: note.data.title,
+      description: note.data.description,
+    }))}
+  />
   <p class="mt-6 text-sm">
     <a href="/knowledge" class="link-underline text-ink hover:text-accent">Knowledge Hub</a>
   </p>
 </Section>
 
 <Section id="videos" index="05" label="Videos" title="Lectures you can watch.">
-  <ul class="border-t border-line">
-    {
-      videos.map((video) => (
-        <li class="border-b border-line py-5">
-          <a href={`/videos#${video.id}`} class="block">
-            <span class="mono-label text-ink-faint">
-              {video.data.duration ?? 'Lecture'}
-              <span class="mx-2" aria-hidden="true">/</span>
-              {video.data.origin === 'curated' ? 'Curated' : 'Original'}
-            </span>
-            <span class="mt-2 block font-serif text-title text-ink">{video.data.title}</span>
-            <span class="mt-1.5 block max-w-2xl text-sm leading-relaxed text-ink-muted">{video.data.description}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
-  <p class="mt-6 text-sm text-ink-muted">
-    Films this notebook has not made are listed on the
-    <a href="/videos" class="link-underline text-ink hover:text-accent">video page</a>
-    as planned, not as recordings.
-  </p>
+  <CardGrid
+    items={videos.map((video) => ({
+      href: `/videos#${video.id}`,
+      label: `${video.data.duration ?? 'Lecture'} / ${video.data.origin === 'curated' ? 'Curated' : 'Original'}`,
+      title: video.data.title,
+      description: video.data.description,
+    }))}
+  />
 </Section>
 
 <Section id="research" index="06" label="Research" title="Claims, evidence, and the queue.">
-  <ul class="border-t border-line">
-    {
-      research.map((entry) => (
-        <li class="border-b border-line py-5">
-          <a href={`/research#${entry.id}`} class="block">
-            <span class="mono-label text-ink-faint">{entry.data.stage === 'posted' ? 'Posted' : 'Planned'}</span>
-            <span class="mt-2 block font-serif text-title text-ink">{entry.data.title}</span>
-            <span class="mt-1.5 block max-w-2xl text-sm leading-relaxed text-ink-muted">{entry.data.description}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
+  <CardGrid
+    items={research.map((entry) => ({
+      href: `/research#${entry.id}`,
+      label: entry.data.stage === 'posted' ? 'Posted' : 'Planned',
+      title: entry.data.title,
+      description: entry.data.description,
+    }))}
+  />
 </Section>
 
 <Section id="projects" index="07" label="Code" title="Repositories, with the problem they were built for.">
-  <ul class="border-t border-line">
-    {
-      projects.map((project) => (
-        <li class="border-b border-line py-5">
-          <a href={`/projects#${project.id}`} class="block">
-            <span class="mono-label text-ink-faint">{project.data.year}</span>
-            <span class="mt-2 block font-serif text-title text-ink">{project.data.title}</span>
-            <span class="mt-1.5 block max-w-2xl text-sm leading-relaxed text-ink-muted">{project.data.description}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
+  <CardGrid
+    items={projects.map((project) => ({
+      href: `/projects#${project.id}`,
+      label: String(project.data.year),
+      title: project.data.title,
+      description: project.data.description,
+    }))}
+  />
 </Section>

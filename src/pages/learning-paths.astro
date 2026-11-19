@@ -1,4 +1,5 @@
 ---
+import CardGrid from '@/components/ui/CardGrid.astro';
 import PathList from '@/components/content/PathList.astro';
 import Section from '@/components/ui/Section.astro';
 import { journeys } from '@/data/journeys';
@@ -9,40 +10,15 @@ const paths = await getPublishedPaths();
 ---
 
 <PageLayout section="learning-paths">
-  <Section id="anatomy" label="Anatomy" title="A path is a sequence of dependencies.">
-    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
-      <p>
-        From Data to Intelligence is the journey to follow first. It starts at a sample and ends
-        at an agent. The other paths on this page are branches that already have a written
-        sequence. Python, NLP as its own course, RAG, computer vision, MLOps, and a separate
-        computer-science path are not opened yet. They are domains on
-        <a href="/explore" class="link-underline text-ink hover:text-accent">Explore</a>,
-        not empty courses.
-      </p>
-      <p>
-        Each chapter states an outcome, the ideas that outcome depends on, why those ideas are
-        the ones that matter, and what the next chapter will assume. Where an essay, a figure, or
-        a lecture exists, the chapter links to it.
-      </p>
-    </div>
-  </Section>
-
-  <Section id="catalogue" label="Catalogue" title="Journeys, including the ones not opened.">
-    <ul class="border-t border-line">
-      {
-        journeys.map((journey) => (
-          <li class="border-b border-line">
-            <a href={journey.href} class="grid gap-2 py-5 sm:grid-cols-[8rem_1fr] sm:items-baseline">
-              <span class="mono-label text-ink-faint">{journey.status === 'open' ? 'Open' : 'Map only'}</span>
-              <span>
-                <span class="block font-serif text-title text-ink">{journey.title}</span>
-                <span class="mt-1 block text-sm leading-relaxed text-ink-muted">{journey.audience}</span>
-              </span>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+  <Section id="catalogue" label="Catalogue" title="Journeys.">
+    <CardGrid
+      items={journeys.map((journey) => ({
+        href: journey.href,
+        label: journey.status === 'open' ? 'Open' : 'Map only',
+        title: journey.title,
+        description: journey.audience,
+      }))}
+    />
   </Section>
 
   <Section id="paths" label="Paths" title="The path, and the branches.">

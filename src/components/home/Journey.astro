@@ -1,8 +1,9 @@
 ---
 /**
- * The primary path as a sequence you can see before you read it. Titles and order
- * come from the path collection, so the homepage cannot drift from the chapter list.
+ * The primary path as cards you can open before you read the full sequence.
+ * Titles and order come from the path collection.
  */
+import CardGrid from '@/components/ui/CardGrid.astro';
 import Section from '@/components/ui/Section.astro';
 import { getPublishedPaths } from '@/lib/content';
 
@@ -11,34 +12,13 @@ const path = paths.find((candidate) => candidate.data.primary);
 if (!path) throw new Error('The primary learning path is missing.');
 ---
 
-<Section
-  id="path"
-  index="02"
-  label="The path"
-  title="From data to intelligence."
-  lede="Nine chapters, in the order the mechanisms depend on each other. Start at the first. The essays, figures, and lectures are linked from each chapter."
->
-  <ol class="border-t border-line">
-    {
-      path.data.modules.map((module, index) => (
-        <li class="grid gap-x-8 gap-y-2 border-b border-line py-6 sm:grid-cols-[3rem_1fr] rise" style={`--i:${index}`}>
-          <span class="mono-label pt-1 text-accent">{String(index + 1).padStart(2, '0')}</span>
-          <div>
-            <h3 class="font-serif text-xl text-ink">
-              <a href={`/learning-paths#${path.id}`} class="link-underline hover:text-accent">
-                {module.title}
-              </a>
-            </h3>
-            <p class="mt-2 max-w-2xl leading-relaxed text-ink-muted">{module.outcome}</p>
-          </div>
-        </li>
-      ))
-    }
-  </ol>
-  <p class="mt-8 max-w-2xl leading-relaxed text-ink-muted">
-    <a href={`/learning-paths#${path.id}`} class="link-underline text-ink hover:text-accent">
-      Read the path in full
-    </a>
-    <span class="text-ink-faint"> — each chapter says why it is there, and what to try.</span>
-  </p>
+<Section id="path" index="02" label="The path" title="From data to intelligence.">
+  <CardGrid
+    items={path.data.modules.map((module, index) => ({
+      href: module.article ?? `/learning-paths#${path.id}`,
+      label: String(index + 1).padStart(2, '0'),
+      title: module.title,
+      description: module.outcome,
+    }))}
+  />
 </Section>

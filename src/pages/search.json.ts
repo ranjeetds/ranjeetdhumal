@@ -53,7 +53,7 @@ export const GET: APIRoute = async () => {
     })),
     ...visualizations.map((figure) => ({
       title: figure.title,
-      href: `/visual-lab#${figure.id}`,
+      href: `/studio/${figure.id}`,
       description: figure.summary,
       kind: 'figure' as const,
       available: figure.status === 'live',

@@ -1,0 +1,125 @@
+---
+/**
+ * The studio workspace: a module list, the experiment, and the notes for that experiment.
+ * Planned modules stay in the list and do not get a page.
+ */
+import GradientDescentStudio from '@/components/studio/GradientDescentStudio';
+import Viz from '@/components/visualizations/Viz.astro';
+import { type StudioModule, getStudioModule, studioModules } from '@/data/studio';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+interface Props {
+  module: StudioModule;
+}
+
+const { module } = Astro.props;
+const domains = [...new Set(studioModules.map((entry) => entry.domain))];
+const next = module.next ? getStudioModule(module.next) : undefined;
+---
+
+<BaseLayout title={`${module.title} — Learning Studio`} description={module.subtitle}>
+  <div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
+    <nav aria-label="Studio modules" class="border-b border-line lg:sticky lg:top-16 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto lg:border-r lg:border-b-0">
+      <div class="flex gap-6 overflow-x-auto px-gutter py-4 lg:block lg:space-y-6 lg:px-4 lg:py-6">
+        {
+          domains.map((domain) => (
+            <div class="min-w-40 shrink-0 lg:min-w-0">
+              <p class="mono-label text-ink-faint">{domain}</p>
+              <ul class="mt-2 space-y-1">
+                {studioModules
+                  .filter((entry) => entry.domain === domain)
+                  .map((entry) => (
+                    <li>
+                      {entry.status === 'live' ? (
+                        <a
+                          href={`/studio/${entry.id}`}
+                          aria-current={entry.id === module.id ? 'page' : undefined}
+                          class="block py-1 text-sm text-ink-muted hover:text-ink aria-[current=page]:text-ink"
+                        >
+                          {entry.title}
+                        </a>
+                      ) : (
+                        <span class="block py-1 text-sm text-ink-faint">
+                          {entry.title}
+                          <span class="mono-label ml-2">Not built</span>
+                        </span>
+                      )}
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </nav>
+
+    <div class="min-w-0">
+      <header class="border-b border-line px-gutter py-6 lg:px-8">
+        <p class="mono-label text-ink-faint">{module.domain}{module.level ? ` / ${module.level}` : ''}</p>
+        <h1 class="mt-2 font-serif text-headline text-ink">{module.title}</h1>
+        <p class="mt-2 max-w-2xl text-ink-muted">{module.subtitle}</p>
+      </header>
+
+      <div class="border-b border-line">
+        {
+          module.id === 'gradient-descent' ? (
+            <GradientDescentStudio client:visible />
+          ) : module.id === 'sample-mean' ? (
+            <div class="px-gutter py-6 lg:px-8"><Viz id="sample-mean" /></div>
+          ) : module.id === 'attention-patterns' ? (
+            <div class="px-gutter py-6 lg:px-8"><Viz id="attention-patterns" /></div>
+          ) : module.id === 'tokenization' ? (
+            <div class="px-gutter py-6 lg:px-8"><Viz id="tokenization" /></div>
+          ) : module.id === 'next-token' ? (
+            <div class="px-gutter py-6 lg:px-8"><Viz id="next-token" /></div>
+          ) : null
+        }
+      </div>
+
+      {
+        (module.why || module.observe || module.challenges) && (
+          <div class="grid gap-10 px-gutter py-10 lg:grid-cols-2 lg:px-8">
+            <div class="space-y-4 text-sm leading-relaxed text-ink-muted">
+              {module.why && <p class="text-ink">{module.why}</p>}
+              {module.usedIn && <p>{module.usedIn}</p>}
+              {module.prerequisites && module.prerequisites.length > 0 && (
+                <p>Before this: {module.prerequisites.join(', ')}.</p>
+              )}
+              {module.equations?.map((equation) => (
+                <p>
+                  <span class="block font-serif text-lg text-ink">{equation.formula}</span>
+                  <span class="mt-1 block">{equation.caption}</span>
+                </p>
+              ))}
+            </div>
+            <div class="space-y-6">
+              {module.observe && (
+                <div>
+                  <h2 class="font-serif text-title text-ink">What to look at</h2>
+                  <ol class="mt-3 space-y-2 text-sm leading-relaxed text-ink-muted">
+                    {module.observe.map((item) => <li>{item}</li>)}
+                  </ol>
+                </div>
+              )}
+              {module.challenges && (
+                <div>
+                  <h2 class="font-serif text-title text-ink">Try this</h2>
+                  <ol class="mt-3 space-y-2 text-sm leading-relaxed text-ink-muted">
+                    {module.challenges.map((item) => <li>{item}</li>)}
+                  </ol>
+                </div>
+              )}
+              {next && next.status === 'live' && (
+                <p class="text-sm">
+                  <a href={`/studio/${next.id}`} class="link-underline text-ink hover:text-accent">
+                    Next: {next.title}
+                  </a>
+                </p>
+              )}
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>

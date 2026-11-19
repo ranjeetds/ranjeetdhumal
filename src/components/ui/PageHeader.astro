@@ -2,7 +2,7 @@
 /** The opening block of every inner page: index, title and lede over a fading dot grid. */
 interface Props {
   title: string;
-  lede: string;
+  lede?: string;
   /** Mono eyebrow, e.g. "Section". */
   eyebrow?: string;
   /** Ordinal shown before the eyebrow, e.g. "03". */
@@ -30,7 +30,7 @@ const { title, lede, eyebrow, index } = Astro.props;
       )
     }
     <h1 class="rise mt-6 max-w-4xl font-serif text-display text-ink" style="--i:1">{title}</h1>
-    <p class="rise mt-7 max-w-2xl text-lede text-ink-muted" style="--i:2">{lede}</p>
+    {lede && <p class="rise mt-7 max-w-2xl text-lede text-ink-muted" style="--i:2">{lede}</p>}
     <slot />
   </div>
 </header>

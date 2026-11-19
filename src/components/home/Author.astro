@@ -7,12 +7,10 @@ import { site } from '@/config/site';
 <Section id="author" index="08" label="Author">
   <div class="max-w-3xl">
     <p class="font-serif text-headline text-ink">
-      A working notebook, maintained in the open by {site.name}.
+      {site.name}
     </p>
-    <p class="mt-6 max-w-2xl text-lede text-ink-muted">
-      {site.role} at {site.employer}, in {site.location}, and a physicist by training. Notes are
-      published as they mature and revised as understanding improves. Nothing here is final, and
-      that is the point.
+    <p class="mt-3 text-ink-muted">
+      {site.role} at {site.employer}, {site.location}.
     </p>
     <div class="mt-9 flex flex-wrap gap-3">
       <Button href="/about" variant="secondary" arrow>About this notebook</Button>

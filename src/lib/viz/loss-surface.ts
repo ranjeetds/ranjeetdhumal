@@ -86,3 +86,97 @@ export function descend(start: Point): Trajectory {
 
   return { points, losses };
 }
+
+export type SurfaceId = 'valleys' | 'bowl';
+export type OptimizerId = 'sgd' | 'momentum' | 'adam';
+
+export interface DescentOptions {
+  learningRate: number;
+  momentum: number;
+  maxSteps: number;
+  optimizer: OptimizerId;
+}
+
+/** One recorded position. Loss and gradient match the same function the step used. */
+export interface DescentStep {
+  x: number;
+  y: number;
+  loss: number;
+  gradient: number;
+}
+
+/**
+ * Loss and gradient for the studio. The bowl term is quadratic, so the value the
+ * readout shows is the function being descended. `valleys` is the two-well surface.
+ * `bowl` is a single convex well.
+ */
+export function surfaceLoss(surface: SurfaceId, x: number, y: number): number {
+  if (surface === 'bowl') {
+    const dx = x - 0.4;
+    const dy = y + 0.2;
+    return 0.15 * dx * dx + 0.25 * dy * dy;
+  }
+  return loss(x, y);
+}
+
+export function surfaceGradient(surface: SurfaceId, x: number, y: number): [number, number] {
+  if (surface === 'bowl') return [0.3 * (x - 0.4), 0.5 * (y + 0.2)];
+  return gradient(x, y);
+}
+
+/** SGD, momentum, or Adam. Adam uses β₁ = 0.9, β₂ = 0.999, ε = 1e-8. */
+export function optimize(surface: SurfaceId, start: Point, options: DescentOptions): DescentStep[] {
+  let x = start[0];
+  let y = start[1];
+  let vx = 0;
+  let vy = 0;
+  let mx = 0;
+  let my = 0;
+  let sx = 0;
+  let sy = 0;
+  const beta1 = 0.9;
+  const beta2 = 0.999;
+  const epsilon = 1e-8;
+  const steps: DescentStep[] = [];
+
+  const record = () => {
+    const [gx, gy] = surfaceGradient(surface, x, y);
+    steps.push({ x, y, loss: surfaceLoss(surface, x, y), gradient: Math.hypot(gx, gy) });
+    return [gx, gy] as const;
+  };
+
+  let [gx, gy] = record();
+  for (let step = 1; step <= options.maxSteps; step++) {
+    if (options.optimizer === 'adam') {
+      mx = beta1 * mx + (1 - beta1) * gx;
+      my = beta1 * my + (1 - beta1) * gy;
+      sx = beta2 * sx + (1 - beta2) * gx * gx;
+      sy = beta2 * sy + (1 - beta2) * gy * gy;
+      const mxHat = mx / (1 - beta1 ** step);
+      const myHat = my / (1 - beta1 ** step);
+      const sxHat = sx / (1 - beta2 ** step);
+      const syHat = sy / (1 - beta2 ** step);
+      x -= (options.learningRate * mxHat) / (Math.sqrt(sxHat) + epsilon);
+      y -= (options.learningRate * myHat) / (Math.sqrt(syHat) + epsilon);
+    } else {
+      const mu = options.optimizer === 'momentum' ? options.momentum : 0;
+      vx = mu * vx - options.learningRate * gx;
+      vy = mu * vy - options.learningRate * gy;
+      x += vx;
+      y += vy;
+    }
+    [gx, gy] = record();
+    const last = steps.at(-1);
+    const previous = steps.at(-2);
+    if (
+      last &&
+      previous &&
+      last.gradient < 5e-4 &&
+      Math.hypot(last.x - previous.x, last.y - previous.y) < 5e-4
+    ) {
+      break;
+    }
+  }
+
+  return steps;
+}

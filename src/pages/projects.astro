@@ -8,23 +8,6 @@ const projects = await getPublishedProjects();
 ---
 
 <PageLayout section="projects">
-  <Section id="approach" label="Approach" title="Public work, with its source.">
-    <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
-      <p>
-        The path is how the mechanisms are taught. These are public repositories that use some of
-        them, not case studies of employer systems. Each entry states the problem the repository
-        takes on, the approach that is actually in the code, the techniques it uses, and what the
-        repository demonstrates. A demonstration is not a measured result. Where the repository
-        does not report a number, this page does not supply one.
-      </p>
-      <p>
-        Status is part of the reading. Shipped means finished and usable. Archived means kept so
-        the pipeline can be reread, not maintained. Employer work — the systems behind a job — lives
-        on the résumé, where the context is the role rather than a repository.
-      </p>
-    </div>
-  </Section>
-
   <Section id="index" label="Index" title="Selected projects">
     <ProjectList projects={projects} />
   </Section>
