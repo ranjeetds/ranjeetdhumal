@@ -1,0 +1,117 @@
+---
+title: Next-token distribution
+description: A handwritten distribution over six words, and what temperature does to it.
+summary: Four prefixes, six possible next words, scores written by hand. The bars are a softmax of those scores divided by a temperature. They sum to one. Lowering the temperature piles the probability on the tallest bar. It does not change which words exist. This is not the output of a trained model, and the figure does not draw a sample. The tallest bar is what a greedy choice would pick.
+domain: transformers
+difficulty: Intermediate
+estimatedTime: 18
+visualization: next-token
+status: published
+prerequisites:
+  - tokenization
+related:
+  - attention-patterns
+next: embedding-space
+experiments:
+  - Leave the temperature at 1 and switch prefixes. The tallest bar moves.
+  - On one prefix, set the temperature low and then high. The words stay. The shares change.
+  - Find a prefix where the second bar is still visible at temperature 1, and watch it shrink as the temperature falls.
+tags:
+  - softmax
+  - temperature
+  - decoding
+---
+
+<Chapter id="intuition" title="The model returns a distribution" objective="Stop treating a generated sentence as the thing the model produced.">
+
+Ask a model to continue “the cat” and it prints a word. What it computed, just before that word, was a probability for every piece in its vocabulary. Printing one piece is a policy applied to that distribution. Greedy takes the largest. Sampling draws. Temperature changes the distribution before either policy runs.
+
+This figure is the distribution, for a toy vocabulary of six words and four prefixes. The scores were written so that the obvious continuation is obvious: after “the”, “cat” is tall; after “the cat”, “sat” is tall. Nothing was trained. The value of the figure is the shape of the policy, not a claim about a model.
+
+</Chapter>
+
+<Chapter id="mechanism" title="What the bars are" objective="Read a bar as a share of one distribution.">
+
+The vocabulary is the, cat, sat, on, mat, and a period. A prefix button selects a list of six scores, one per word. The bars are those scores after a softmax. Hovering is unnecessary. The height is the probability, and the probabilities add to one.
+
+Temperature is a single slider. At 1, the scores are used as written. Below 1, the largest score takes more of the row and the others shrink. Above 1, the row flattens. The slider does not add words, remove words, or change which score is largest. A word that was behind stays behind. It becomes less behind, or more.
+
+The figure does not sample. If you want the greedy continuation, read the tallest bar. A sample would sometimes pick a shorter one, more often when the temperature is high.
+
+</Chapter>
+
+<Chapter id="mathematics" title="Temperature is a division before the softmax" objective="Define the formula the slider implements.">
+
+Let <Equation tex="z_i" display={false} /> be the unnormalized score of word i, the logit. At temperature <Equation tex="T" display={false} />,
+
+<Equation tex="p_i = \frac{\exp(z_i / T)}{\sum_j \exp(z_j / T)}" />
+
+<Equation tex="p_i" display={false} /> is the bar. <Equation tex="T" display={false} /> is the slider. The figure will not let T sit at 0. The division is by at least a small positive number, so the softmax stays defined.
+
+At <Equation tex="T = 1" display={false} /> this is an ordinary softmax of the written scores. As <Equation tex="T" display={false} /> shrinks, the gaps between the scores are magnified, and the largest <Equation tex="z_i" display={false} /> takes nearly all of the mass. As <Equation tex="T" display={false} /> grows, every <Equation tex="z_i / T" display={false} /> shrinks toward 0, the exponentials shrink toward 1, and the bars move toward equal shares.
+
+Dividing the scores is not the same as dividing the probabilities. Temperature acts before the softmax. A probability that is already 0.9 does not become 0.45 at temperature 2.
+
+The scores depend on the prefix because each button selects a different list. A real model would compute that list from the prefix. Here the list is a constant. Changing the prefix changes which constant you are looking at.
+
+</Chapter>
+
+<Chapter id="experiment" title="Move the mass without moving the winner" objective="Separate the mode of the distribution from its sharpness.">
+
+Stay on one prefix. Set the temperature to 1 and note the tallest word and a shorter one that is still visible. Lower the temperature. The tallest bar grows. The shorter one shrinks. The winner does not change.
+
+Raise the temperature past 1. The shorter bars recover. The winner is still the winner. Then change the prefix. Now the winner moves, because the scores moved, not because the temperature did.
+
+That is the whole experimental content of the figure. There is no prompt box and no sampled sentence, on purpose.
+
+</Chapter>
+
+<Chapter id="apply" title="Decoding is a policy on this row" objective="Name the choice a sampling setting is making.">
+
+Greedy decoding prints the tallest bar, every time. It is repeatable and dull, and it can get stuck in a loop the distribution would have left if anyone had sampled. Sampling draws an index with probability <Equation tex="p_i" display={false} />. A low temperature makes that draw almost greedy. A high temperature lets dull and wrong pieces through, including the ones a reader will call a hallucination when the piece happens to be a fact.
+
+Temperature does not add knowledge. It redistributes the mass the scores already implied. If the scores are bad, a low temperature makes the model confidently bad. If the vocabulary is the wrong cut, the distribution is over the wrong pieces. That is the tokenization lesson, one step upstream.
+
+Attention is a different distribution. Its softmax is over positions in a sequence. This softmax is over the vocabulary. Sharing a function does not make them the same object. The next instrument people usually want here is an embedding space, where the ids would be vectors. It is not built.
+
+A lecture that builds a real next-token model, as opposed to this toy, is [Let's build GPT from scratch](/videos#lets-build-gpt). The survey lecture is [Intro to Large Language Models](/videos#intro-to-large-language-models). The note is [Large Language Models](/knowledge/large-language-models).
+
+</Chapter>
+
+<Chapter id="check" title="Check the slider" objective="Say what temperature cannot do.">
+
+<Check
+  id="winner"
+  prompt="You lower the temperature and the tallest bar grows. Which of these can also happen, from the temperature alone?"
+  choices={[
+    'A different word becomes the tallest.',
+    'A word that was not in the six appears.',
+    'Neither. The ordering of the scores is unchanged, and the vocabulary is unchanged.',
+  ]}
+  answer="Neither. The ordering of the scores is unchanged, and the vocabulary is unchanged."
+  why="Dividing every score by the same positive T preserves which score is largest. The six words are the whole vocabulary of the figure. Only the prefix button replaces the scores."
+/>
+
+<Check
+  id="greedy"
+  prompt="The figure never prints a sampled word. Where is the greedy choice?"
+  choices={[
+    'It is not available. Greedy needs a trained model.',
+    'It is the tallest bar. Greedy would print that word and no other.',
+    'It is the temperature at 1.',
+  ]}
+  answer="It is the tallest bar. Greedy would print that word and no other."
+  why="Greedy is a policy: take the mode. Temperature 1 is just the scores as written, which may still have a runner-up. Sampling would sometimes print the runner-up. The figure stops at the distribution, so the mode is readable and the sample is not."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave toward the mixer, or toward the space that is missing.">
+
+Tokenization is the prerequisite. The distribution is over ids, and an id is only a piece relative to a vocabulary.
+
+Attention is the related live module. It is a softmax over positions. This is a softmax over words. Reading them against each other is the point of having both.
+
+The continuation in the catalogue is an embedding space, where a dot product between pieces could produce a score like the ones attention uses. That instrument is not built. Until it is, the handwritten scores are the honest substitute, and they are labelled as such.
+
+</Chapter>

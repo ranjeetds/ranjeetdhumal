@@ -1,0 +1,109 @@
+---
+title: A sample and its mean
+description: One designed population, a draw from it, and a mean that moves less as the draw grows.
+summary: Grey bars are a fixed population of 240 numbers. Coloured bars are one draw. The dashed line is the population mean, 6.7 to one decimal. The solid line is the mean of the draw. At n = 8 it jumps when you draw again. At n = 120 it stays near the dashed line.
+domain: mathematics
+difficulty: Foundational
+estimatedTime: 15
+visualization: sample-mean
+status: published
+next: gradient-descent
+experiments:
+  - Draw again at n = 8 until the solid line is clearly away from the dashed line.
+  - Raise that same draw to n = 30 and then n = 120. The coloured shape approaches the grey one, and the solid line approaches the dashed line.
+  - Draw again at n = 120. The solid line should move much less than it did at n = 8.
+tags:
+  - mean
+  - sample
+  - population
+---
+
+<Chapter id="intuition" title="A mean is a fact about the rows you have" objective="Separate the population from the draw before any symbol.">
+
+Someone hands you eight measurements and asks for the average. You can compute it. You cannot, from those eight, know the average of the measurements you were not handed. The eight are a sample. The thing they were drawn from is the population.
+
+A loss and an accuracy are means of this kind. They are facts about the rows in the batch, or about the rows in a test set. They are not facts about every example the model will ever see. This figure is that distinction, with the population drawn so you can see what the sample is missing.
+
+The population is designed. It is 240 numbers from a fixed skewed generator, seed 7. It is not a public dataset. The skew is the point: the dashed line, the mean, does not sit on the tallest bar. The tail pulls it.
+
+</Chapter>
+
+<Chapter id="mechanism" title="What the figure is doing" objective="Name the two histograms and the two lines.">
+
+Grey bars are the whole population, as fractions of 240. Coloured bars are one sample, as fractions of the sample, so a small sample can look taller than the population even when it contains fewer points.
+
+The dashed line is the mean of all 240 numbers, which prints as 6.7. The solid line is the mean of the current draw.
+
+The sample sizes are 8, 30, and 120. Changing the size does not reshuffle. A larger size extends the same draw, so n = 8 is a prefix of n = 30 of that draw. Draw again starts a new shuffle. The shuffle is seeded, so the figure is repeatable. There is no animation. The picture updates when you choose.
+
+</Chapter>
+
+<Chapter id="mathematics" title="The mean, and what a larger n does to it" objective="Define the symbol the solid line is, and the limit of the picture.">
+
+The mean of n numbers is
+
+<Equation tex="\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i" />
+
+<Equation tex="x_i" display={false} /> is one drawn number. <Equation tex="n" display={false} /> is the sample size on the buttons. <Equation tex="\bar{x}" display={false} /> is the solid line.
+
+The population mean is the same formula with all 240 numbers. It does not move when you draw again. Call it <Equation tex="\mu" display={false} />. The dashed line is <Equation tex="\mu" display={false} />.
+
+A larger sample is not magically closer on every draw. It is harder to push. One unusual number is a fraction <Equation tex="1/n" display={false} /> of the sum. At n = 8 that fraction is large, so the solid line jumps. At n = 120 it is small. This is the phenomenon a law of large numbers names. This figure is one population and a handful of draws. It is an illustration, not a proof, and it is not a confidence interval.
+
+The spread printed with the figure is the spread of the current sample, not a standard error of the mean. Do not read it as “how wrong the mean is.” It is how spread out the rows you drew are.
+
+</Chapter>
+
+<Chapter id="experiment" title="Make the solid line move, then pin it" objective="See the same draw change character as n grows.">
+
+Leave the figure on n = 8 and draw again until the solid line is more than a tick away from 6.7. Then, without drawing again, raise n. You are adding points from the same shuffle, not replacing the story. The coloured histogram fills in toward the grey one, and the solid line comes back toward the dashed line.
+
+Draw again at n = 120. The line still moves. It should move less. If a single draw at n = 120 looks as wild as your n = 8 draw, look again at the scale. The population is skewed, so a large sample still shows the tail. What stabilises is the mean, not the shape of every bar.
+
+</Chapter>
+
+<Chapter id="apply" title="Why a training loss is this picture" objective="Carry the mean into the next lesson without pretending the loss is the population.">
+
+A training step averages a mistake over a batch. That average is a sample mean. A different batch is Draw again. A larger batch is a larger n, which is why the loss number jitters less, not why the model is better.
+
+The number you actually care about, performance on examples you did not train on, is a different mean, over a population you do not have in the figure. Reporting the training loss as if it were that number is reporting the solid line as if it were the dashed line.
+
+The next live module takes a loss as given and walks downhill on it. The walk is only as honest as the loss. If the loss is a mean of the wrong rows, the walk is a careful descent of the wrong hill.
+
+</Chapter>
+
+<Chapter id="check" title="Check the distinction" objective="Tell the two lines apart.">
+
+<Check
+  id="which-line"
+  prompt="You draw again at the same n and one line moves. Which one, and why?"
+  choices={[
+    'The dashed line, because the population mean depends on the draw.',
+    'The solid line, because it is the mean of this draw and the dashed line is the mean of the fixed population.',
+    'Both, because every mean is random.',
+  ]}
+  answer="The solid line, because it is the mean of this draw and the dashed line is the mean of the fixed population."
+  why="Draw again replaces the sample. The 240 numbers do not change, so their mean does not change."
+/>
+
+<Check
+  id="larger-n"
+  prompt="You raise n on the same draw and the solid line moves closer to the dashed line. What did you not do?"
+  choices={[
+    'You did not reshuffle. You extended one draw.',
+    'You replaced the population.',
+    'You computed a median.',
+  ]}
+  answer="You did not reshuffle. You extended one draw."
+  why="The size buttons keep the shuffle and take a longer prefix. Only Draw again starts a new one. The closer line is more of the same draw, not a new population."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave toward the lesson that uses a mean as a height.">
+
+The next module is gradient descent. There the mean has already been taken. The loss is a height, and the question is which way to step.
+
+The same material, written without the instrument, is [A sample and its mean](/knowledge/a-sample-and-its-mean).
+
+</Chapter>

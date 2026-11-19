@@ -1,0 +1,19 @@
+---
+/**
+ * Applies a named preset on the gradient-descent instrument without leaving the lesson.
+ * The preset id must match a preset in `GradientDescentStudio`.
+ */
+interface Props {
+  preset: string;
+}
+
+const { preset } = Astro.props;
+---
+
+<button
+  type="button"
+  data-studio-preset={preset}
+  class="not-prose mono-label my-2 mr-2 rounded-sm border border-line px-3 py-2 text-ink-muted hover:border-line-strong hover:text-ink"
+>
+  <slot />
+</button>

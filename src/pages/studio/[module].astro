@@ -1,19 +1,32 @@
 ---
+import { render, type CollectionEntry } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
+import Chapter from '@/components/studio/Chapter.astro';
+import Check from '@/components/studio/Check.astro';
+import Equation from '@/components/studio/Equation.astro';
 import StudioShell from '@/components/studio/StudioShell.astro';
-import { type StudioModule, liveStudioModules } from '@/data/studio';
+import Try from '@/components/studio/Try.astro';
+import { liveStudioModules, type StudioModule } from '@/data/studio';
+import { getPublishedStudioLessons, getStudioLessonByVisualization } from '@/lib/content';
 
-export const getStaticPaths = (() =>
-  liveStudioModules().map((module) => ({
-    params: { module: module.id },
-    props: { module },
-  }))) satisfies GetStaticPaths;
+export const getStaticPaths = (async () => {
+  const lessons = await getPublishedStudioLessons();
+  return liveStudioModules().map((module) => {
+    const lesson = getStudioLessonByVisualization(lessons, module.id);
+    if (!lesson) throw new Error(`Live studio module “${module.id}” has no published lesson.`);
+    return { params: { module: module.id }, props: { module, lesson } };
+  });
+}) satisfies GetStaticPaths;
 
 interface Props {
   module: StudioModule;
+  lesson: CollectionEntry<'studio'>;
 }
 
-const { module } = Astro.props;
+const { module, lesson } = Astro.props;
+const { Content } = await render(lesson);
 ---
 
-<StudioShell module={module} />
+<StudioShell module={module} lesson={lesson}>
+  <Content components={{ Chapter, Check, Equation, Try }} />
+</StudioShell>

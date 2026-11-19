@@ -1,125 +1,274 @@
 ---
 /**
- * The studio workspace: a module list, the experiment, and the notes for that experiment.
- * Planned modules stay in the list and do not get a page.
+ * A focused studio workspace: one module, one figure, Learn or Explore.
+ * The library is not listed here. The drawer holds the current domain sequence,
+ * or the path the reader arrived from.
  */
+import 'katex/dist/katex.min.css';
 import GradientDescentStudio from '@/components/studio/GradientDescentStudio';
 import Viz from '@/components/visualizations/Viz.astro';
-import { type StudioModule, getStudioModule, studioModules } from '@/data/studio';
+import {
+  getStudioDomain,
+  resolveStep,
+  studioPaths,
+  type StudioModule,
+} from '@/data/studio';
+import type { StudioLesson } from '@/lib/content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 
 interface Props {
   module: StudioModule;
+  lesson: StudioLesson;
 }
 
-const { module } = Astro.props;
-const domains = [...new Set(studioModules.map((entry) => entry.domain))];
-const next = module.next ? getStudioModule(module.next) : undefined;
+const { module, lesson } = Astro.props;
+const domain = getStudioDomain(lesson.data.domain);
+const sequence = (domain?.sequence ?? []).map((id) => resolveStep(id));
+const index = sequence.findIndex((step) => step.id === module.id);
+const previous = index > 0 ? sequence[index - 1] : undefined;
+const nextStep = sequence[index + 1];
+
+const relations = [
+  { label: 'Prerequisite', id: lesson.data.prerequisites[0] },
+  { label: 'Related', id: lesson.data.related[0] },
+  { label: 'Continue', id: lesson.data.next },
+]
+  .filter((item): item is { label: string; id: string } => typeof item.id === 'string')
+  .map((item) => ({ ...item, step: resolveStep(item.id) }));
+
+const pathIndex = studioPaths.map((path) => ({
+  id: path.id,
+  steps: path.steps.map((id) => {
+    const step = resolveStep(id);
+    return { id: step.id, title: step.title, status: step.status };
+  }),
+}));
 ---
 
-<BaseLayout title={`${module.title} — Learning Studio`} description={module.subtitle}>
-  <div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
-    <nav aria-label="Studio modules" class="border-b border-line lg:sticky lg:top-16 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto lg:border-r lg:border-b-0">
-      <div class="flex gap-6 overflow-x-auto px-gutter py-4 lg:block lg:space-y-6 lg:px-4 lg:py-6">
-        {
-          domains.map((domain) => (
-            <div class="min-w-40 shrink-0 lg:min-w-0">
-              <p class="mono-label text-ink-faint">{domain}</p>
-              <ul class="mt-2 space-y-1">
-                {studioModules
-                  .filter((entry) => entry.domain === domain)
-                  .map((entry) => (
-                    <li>
-                      {entry.status === 'live' ? (
-                        <a
-                          href={`/studio/${entry.id}`}
-                          aria-current={entry.id === module.id ? 'page' : undefined}
-                          class="block py-1 text-sm text-ink-muted hover:text-ink aria-[current=page]:text-ink"
-                        >
-                          {entry.title}
-                        </a>
-                      ) : (
-                        <span class="block py-1 text-sm text-ink-faint">
-                          {entry.title}
-                          <span class="mono-label ml-2">Not built</span>
-                        </span>
-                      )}
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          ))
-        }
+<BaseLayout title={`${lesson.data.title} — Learning Studio`} description={lesson.data.description}>
+  <noscript>
+    <style>
+      [data-panel='learn'] {
+        display: block !important;
+      }
+    </style>
+  </noscript>
+  <article class="mx-auto min-w-0 max-w-page" data-studio-module data-module={module.id}>
+    <header class="sticky top-16 z-30 border-b border-line bg-canvas/90 px-gutter py-3 backdrop-blur-md">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <nav aria-label="Studio location" class="mono-label flex flex-wrap items-center gap-x-2 text-ink-faint">
+          <a href="/studio" class="hover:text-ink">Studio</a>
+          <span aria-hidden="true">/</span>
+          {
+            domain && (
+              <a href={`/studio/domain/${domain.id}`} class="hover:text-ink">
+                {domain.title}
+              </a>
+            )
+          }
+          <span aria-hidden="true">/</span>
+          <span class="text-ink">{lesson.data.title}</span>
+        </nav>
+        <div role="group" aria-label="Learning mode" class="ml-auto flex gap-1">
+          <button
+            type="button"
+            data-set-mode="explore"
+            aria-pressed="true"
+            class="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
+          >
+            Explore
+          </button>
+          <button
+            type="button"
+            data-set-mode="learn"
+            aria-pressed="false"
+            class="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
+          >
+            Learn
+          </button>
+        </div>
       </div>
-    </nav>
-
-    <div class="min-w-0">
-      <header class="border-b border-line px-gutter py-6 lg:px-8">
-        <p class="mono-label text-ink-faint">{module.domain}{module.level ? ` / ${module.level}` : ''}</p>
-        <h1 class="mt-2 font-serif text-headline text-ink">{module.title}</h1>
-        <p class="mt-2 max-w-2xl text-ink-muted">{module.subtitle}</p>
-      </header>
-
-      <div class="border-b border-line">
+      <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
         {
-          module.id === 'gradient-descent' ? (
-            <GradientDescentStudio client:visible />
-          ) : module.id === 'sample-mean' ? (
-            <div class="px-gutter py-6 lg:px-8"><Viz id="sample-mean" /></div>
-          ) : module.id === 'attention-patterns' ? (
-            <div class="px-gutter py-6 lg:px-8"><Viz id="attention-patterns" /></div>
-          ) : module.id === 'tokenization' ? (
-            <div class="px-gutter py-6 lg:px-8"><Viz id="tokenization" /></div>
-          ) : module.id === 'next-token' ? (
-            <div class="px-gutter py-6 lg:px-8"><Viz id="next-token" /></div>
-          ) : null
+          previous?.href && (
+            <a data-step="prev" href={previous.href} class="text-sm text-ink-muted hover:text-ink">
+              Previous: {previous.title}
+            </a>
+          )
         }
+        {
+          !previous?.href && (
+            <a data-step="prev" href="/studio" hidden class="text-sm text-ink-muted hover:text-ink">
+              Previous
+            </a>
+          )
+        }
+        {
+          nextStep?.href && (
+            <a data-step="next" href={nextStep.href} class="text-sm text-ink-muted hover:text-ink">
+              Next: {nextStep.title}
+            </a>
+          )
+        }
+        {
+          !nextStep?.href && (
+            <a data-step="next" href="/studio" hidden class="text-sm text-ink-muted hover:text-ink">
+              Next
+            </a>
+          )
+        }
+        <p class="mono-label ml-auto text-ink-faint" data-progress aria-live="polite">Nothing marked yet</p>
+        <div class="h-px w-24 bg-line" aria-hidden="true">
+          <div data-progress-bar class="h-px bg-ink" style="width: 0%"></div>
+        </div>
       </div>
+    </header>
 
+    <div class="px-gutter pt-8">
+      <p class="mono-label text-ink-faint">
+        {lesson.data.difficulty} · {lesson.data.estimatedTime} min
+      </p>
+      <h1 class="mt-2 font-serif text-headline text-ink">{lesson.data.title}</h1>
+    </div>
+
+    <div class="mt-6 border-y border-line">
       {
-        (module.why || module.observe || module.challenges) && (
-          <div class="grid gap-10 px-gutter py-10 lg:grid-cols-2 lg:px-8">
-            <div class="space-y-4 text-sm leading-relaxed text-ink-muted">
-              {module.why && <p class="text-ink">{module.why}</p>}
-              {module.usedIn && <p>{module.usedIn}</p>}
-              {module.prerequisites && module.prerequisites.length > 0 && (
-                <p>Before this: {module.prerequisites.join(', ')}.</p>
-              )}
-              {module.equations?.map((equation) => (
-                <p>
-                  <span class="block font-serif text-lg text-ink">{equation.formula}</span>
-                  <span class="mt-1 block">{equation.caption}</span>
-                </p>
-              ))}
-            </div>
-            <div class="space-y-6">
-              {module.observe && (
-                <div>
-                  <h2 class="font-serif text-title text-ink">What to look at</h2>
-                  <ol class="mt-3 space-y-2 text-sm leading-relaxed text-ink-muted">
-                    {module.observe.map((item) => <li>{item}</li>)}
-                  </ol>
-                </div>
-              )}
-              {module.challenges && (
-                <div>
-                  <h2 class="font-serif text-title text-ink">Try this</h2>
-                  <ol class="mt-3 space-y-2 text-sm leading-relaxed text-ink-muted">
-                    {module.challenges.map((item) => <li>{item}</li>)}
-                  </ol>
-                </div>
-              )}
-              {next && next.status === 'live' && (
-                <p class="text-sm">
-                  <a href={`/studio/${next.id}`} class="link-underline text-ink hover:text-accent">
-                    Next: {next.title}
-                  </a>
-                </p>
-              )}
-            </div>
+        module.id === 'gradient-descent' ? (
+          <GradientDescentStudio client:visible />
+        ) : module.id === 'sample-mean' ? (
+          <div class="px-gutter py-6">
+            <Viz id="sample-mean" />
+          </div>
+        ) : module.id === 'attention-patterns' ? (
+          <div class="px-gutter py-6">
+            <Viz id="attention-patterns" />
+          </div>
+        ) : module.id === 'tokenization' ? (
+          <div class="px-gutter py-6">
+            <Viz id="tokenization" />
+          </div>
+        ) : (
+          <div class="px-gutter py-6">
+            <Viz id="next-token" />
           </div>
         )
       }
     </div>
-  </div>
+
+    <div class="mx-auto max-w-prose px-gutter py-8">
+      <details class="border border-line p-4">
+        <summary data-drawer-summary class="cursor-pointer text-sm text-ink">In this {domain ? 'domain' : 'studio'}</summary>
+        <ul data-drawer-list class="mt-3 space-y-1">
+          {
+            sequence.map((step) => (
+              <li>
+                {step.href ? (
+                  <a
+                    href={step.href}
+                    aria-current={step.id === module.id ? 'page' : undefined}
+                    class="block py-1 text-sm text-ink-muted hover:text-ink aria-[current=page]:text-ink"
+                  >
+                    {step.title}
+                  </a>
+                ) : (
+                  <span class="block py-1 text-sm text-ink-faint">
+                    {step.title}
+                    <span class="mono-label ml-2">Not built</span>
+                  </span>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </details>
+
+      <div class="mt-8 min-w-0">
+        <div data-panel="explore">
+          <p class="text-sm leading-relaxed text-ink">{lesson.data.summary}</p>
+          {
+            lesson.data.experiments.length > 0 && (
+              <div class="mt-6">
+                <h2 class="font-serif text-title text-ink">Suggested runs</h2>
+                <ul class="mt-3 space-y-2 text-sm leading-relaxed text-ink-muted">
+                  {lesson.data.experiments.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+          <p class="mt-6">
+            <button
+              type="button"
+              data-set-mode="learn"
+              class="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink"
+            >
+              Read the lesson
+            </button>
+          </p>
+        </div>
+
+        <div data-panel="learn" hidden>
+          <div class="flex flex-wrap gap-4">
+            <button type="button" data-chapter-prev class="text-sm text-ink-muted hover:text-ink">
+              Previous part
+            </button>
+            <button type="button" data-chapter-next class="text-sm text-ink-muted hover:text-ink">
+              Next part
+            </button>
+          </div>
+          <details class="mt-4 border border-line p-4">
+            <summary class="cursor-pointer text-sm text-ink">Parts of this lesson</summary>
+            <ol data-toc class="mt-3"></ol>
+          </details>
+          <div class="prose mt-2">
+            <slot />
+          </div>
+          <p class="mt-10">
+            <button
+              type="button"
+              data-clear-progress
+              class="mono-label text-ink-faint hover:text-ink"
+            >
+              Clear learning progress on this browser
+            </button>
+          </p>
+          <p data-cleared hidden class="mt-2 text-sm text-ink-muted" role="status"></p>
+        </div>
+
+        {
+          relations.length > 0 && (
+            <div class="mt-10 border-t border-line pt-6">
+              <h2 class="font-serif text-title text-ink">Where this leads</h2>
+              <ul class="mt-4 divide-y divide-line border-y border-line">
+                {relations.map((relation) => (
+                  <li class="grid gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:items-baseline">
+                    <span class="mono-label text-ink-faint">{relation.label}</span>
+                    {relation.step.href ? (
+                      <a href={relation.step.href} class="text-ink hover:text-accent">
+                        {relation.step.title}
+                      </a>
+                    ) : (
+                      <p class="text-ink">
+                        {relation.step.title}
+                        <span class="mono-label ml-2 text-ink-faint">Not built</span>
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+    </div>
+    <script type="application/json" data-path-index set:html={JSON.stringify(pathIndex).replaceAll('<', '\\u003c')} />
+  </article>
 </BaseLayout>
+
+<script>
+  import { mountStudioModule } from '@/lib/studio-client';
+
+  const root = document.querySelector('[data-studio-module]');
+  if (root instanceof HTMLElement) mountStudioModule(root);
+</script>

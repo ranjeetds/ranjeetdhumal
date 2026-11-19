@@ -11,6 +11,7 @@
 import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { liveVisualizationIds, studioDomainIds, studioModules } from './data/studio';
 import { topicIds } from './data/topics';
 
 const pattern = ['**/*.{md,mdx}', '!**/_*', '!**/_*/**'];
@@ -142,4 +143,51 @@ const videos = defineCollection({
   }),
 });
 
-export const collections = { notes, paths, research, projects, videos };
+/**
+ * Studio lessons. The file name is the module id (`machine-learning/gradient-descent.mdx`
+ * is the lesson for `/studio/gradient-descent`). The visualization id is separate so the
+ * same figure can serve Learn and Explore. Drafts render in dev and are omitted from
+ * production. A private scratch note belongs in a file or folder starting with `_`.
+ */
+const studio = defineCollection({
+  loader: folder('studio'),
+  schema: z
+    .object({
+      title: z.string(),
+      description: z.string(),
+      /** Explore mode: what the experiment demonstrates, in one paragraph. */
+      summary: z.string(),
+      domain: z.enum(studioDomainIds),
+      difficulty: z.enum(['Foundational', 'Intermediate', 'Advanced']),
+      /** Minutes, for a careful reading plus the experiment. */
+      estimatedTime: z.number().int().positive(),
+      visualization: z.enum(liveVisualizationIds),
+      status: z.enum(['published', 'draft']).default('published'),
+      /** Catalogue ids. Planned modules are allowed; unknown ids are not. */
+      prerequisites: z.array(z.string()).default([]),
+      related: z.array(z.string()).default([]),
+      next: z.string().optional(),
+      /** Suggested runs, named the way the figure names them. */
+      experiments: z.array(z.string()).default([]),
+      tags: z.array(z.string()).default([]),
+    })
+    .superRefine((value, context) => {
+      const known = new Set<string>(studioModules.map((module) => module.id));
+      const relations = [
+        ...value.prerequisites.map((id) => ({ field: 'prerequisites' as const, id })),
+        ...value.related.map((id) => ({ field: 'related' as const, id })),
+        ...(value.next ? [{ field: 'next' as const, id: value.next }] : []),
+      ];
+      for (const relation of relations) {
+        if (!known.has(relation.id)) {
+          context.addIssue({
+            code: 'custom',
+            message: `Unknown studio module “${relation.id}”.`,
+            path: [relation.field],
+          });
+        }
+      }
+    }),
+});
+
+export const collections = { notes, paths, research, projects, videos, studio };

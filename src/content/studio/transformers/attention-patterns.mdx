@@ -1,0 +1,150 @@
+---
+title: Attention patterns
+description: How scores between positions become a weighted average, and what a causal mask does to that average.
+summary: One sentence, two designed heads, and a causal mask. Each row is a query. The cells are how much that query takes from each key, and the row sums to one. The scores were written by hand. They are not weights from a trained model. The mask closes the future and the remaining row still sums to one.
+domain: transformers
+difficulty: Intermediate
+estimatedTime: 25
+visualization: attention-patterns
+status: published
+prerequisites:
+  - tokenization
+related:
+  - next-token
+next: embedding-space
+experiments:
+  - Select the row “sat” under Who acted. Most of that row sits on “cat”.
+  - Switch to Nearby. The same row sits on the neighbours instead.
+  - Turn Causal mask on. Cells after the query go empty, and the row still sums to one.
+tags:
+  - attention
+  - softmax
+  - query
+  - mask
+---
+
+<Chapter id="why" title="Why mix the positions at all" objective="Name the problem attention is a solution to.">
+
+A sentence is a sequence of pieces. A position needs information that lives at other positions. “Sat” means something different once you know who sat. A model that processes the sequence one step at a time can carry that information forward in a state, and the state has to survive every step in between. Attention is the alternative that lets a position look at the others directly and take a weighted average of them.
+
+The average is the whole mechanism. The rest is how the weights are chosen, and which positions are forbidden.
+
+</Chapter>
+
+<Chapter id="sentence" title="The sentence this figure actually uses" objective="Keep the demonstration inside what is drawn.">
+
+The sentence is fixed: the, cat, sat, on, the, mat. Six positions. You can select a row. The selected row is the query you are reading. The columns are the keys, in the same order.
+
+There are two heads, Who acted and Nearby. Each head is a table of scores, written by hand, one number for every query and key. Who acted was written so the verb looks back at “cat”. Nearby was written so each position looks at its neighbours. Switching heads swaps the table. It does not train anything.
+
+The note under the buttons is the intention of that table. The numbers in the cells are the weights after the softmax, not the scores that were typed.
+
+</Chapter>
+
+<Chapter id="softmax" title="Scores become a distribution" objective="Define the softmax this figure computes, and name what it does not compute.">
+
+A row of scores <Equation tex="s_1, \ldots, s_n" display={false} /> becomes weights
+
+<Equation tex="a_j = \frac{\exp(s_j)}{\sum_{k=1}^{n} \exp(s_k)}" />
+
+Each <Equation tex="a_j" display={false} /> is positive, and the row sums to 1. A larger score takes a larger share. The share is a fraction of the whole row, so raising one score lowers the others. That is why the cells of a row are a distribution, not six independent facts.
+
+The figure’s softmax subtracts the row’s largest score before the exponential. That does not change <Equation tex="a_j" display={false} />. It keeps the exponential from overflowing. You do not see the subtraction.
+
+What you do not see, because it is not there, is a query vector, a key vector, or a scale. In a trained model the score is a dot product of a query and a key, often divided by the square root of the key dimension. Here the score is the number in the table. The softmax is the part the figure really runs.
+
+</Chapter>
+
+<Chapter id="mask" title="A causal mask forbids a direction" objective="Say what goes to zero, and what happens to the rest of the row.">
+
+With the mask on, a query may not look at a later key. The figure implements that by replacing those scores with a large negative number, <Equation tex="-10^{9}" display={false} />, and then running the same softmax. The exponential of a large negative is effectively zero, so those cells empty. The denominator is now the sum over the keys that remain, so the surviving cells grow and the row still sums to one.
+
+The mask does not delete the position from the sentence. It deletes it from this query’s average. “Sat” can still look at “the” and “cat”. It cannot look at “on”, “the”, or “mat”. Turn the mask off and those cells return, because the underlying scores were never removed. They were only hidden from the softmax.
+
+A model that generates left to right needs some version of this, otherwise a position could condition on the piece it is supposed to be predicting. A model that reads a whole document can be allowed to look both ways. The mask is a decision about what information is legal, not a property of the softmax.
+
+</Chapter>
+
+<Chapter id="heads" title="What a second head is, here and in a model" objective="Separate two designed tables from learned projections.">
+
+In this figure a head is a score table plus a sentence about it. Two heads are two ways the same six positions might be mixed. Who acted answers “which earlier position did this?” Nearby answers “what is beside me?” The values being averaged are not drawn. You are looking at the weights only. A weighted average of value vectors would be the next line, <Equation tex="\sum_j a_j v_j" display={false} />, and the figure stops before it.
+
+In a transformer the head is computed. Each head has matrices that project the same input into a query, a key, and a value. The scores are the scaled dot products. Several heads are several projections, so the same position can be compared under different notions of similarity. Their outputs are concatenated and mixed by one more matrix. None of those matrices exist here. Saying “multi-head” about this figure means “two handwritten patterns,” not “the architecture from Vaswani et al.”
+
+The formula those matrices implement, for one head, is
+
+<Equation tex="\mathrm{Attention}(Q, K, V) = \mathrm{softmax}\!\left(\frac{QK^{\mathsf T}}{\sqrt{d_k}}\right) V" />
+
+<Equation tex="Q" display={false} />, <Equation tex="K" display={false} />, and <Equation tex="V" display={false} /> are the projected queries, keys, and values. <Equation tex="d_k" display={false} /> is the dimension of a key. The scale keeps the dot products from growing with that dimension and pushing the softmax into a near one-hot. This figure has no <Equation tex="d_k" display={false} /> to scale by. The mask, when there is one, is added to the scores before the softmax, as a zero or a large negative.
+
+</Chapter>
+
+<Chapter id="experiment" title="Read one row until it becomes obvious" objective="Use the three controls the figure actually has.">
+
+Select “sat” under Who acted, mask off. The row should put most of its weight on “cat”, which is what the table was written to do, and the caption under the grid states the percentages.
+
+Switch to Nearby. The same query should move its weight onto the neighbouring positions. The sentence did not change. The score table did.
+
+Turn the causal mask on, still on “sat”. The three cells to the right go empty. Add the remaining percentages. They still make a whole row. Select the last position, “mat”. The mask has nothing to its right to close, so that row is unchanged.
+
+</Chapter>
+
+<Chapter id="apply" title="What to be careful about" objective="Know which claims this instrument cannot support.">
+
+Attention is a mixer. It does not, by itself, decide the next word. The next-token figure is that decision, and its scores are also written by hand. A full block would mix with attention, pass the result through a small network applied at each position, and add residual connections. That block is not drawn.
+
+Patterns in a trained model are easy to over-read. A bright cell means that, on this input, that query took a large share from that key. It does not mean the model “knows” a grammatical rule, and it does not mean the same cell will be bright on the next sentence. This figure is safer than a real attention map only because the scores are confessed up front.
+
+The paper that defined the architecture, which this lesson quotes and does not claim to extend, is Vaswani et al., “Attention Is All You Need”, [arXiv:1706.03762](https://arxiv.org/abs/1706.03762). A lecture that builds the picture slowly is [Attention in transformers, step by step](/videos#attention-in-transformers). The note on this site is [Attention Mechanisms and Transformers](/knowledge/attention-and-transformers).
+
+</Chapter>
+
+<Chapter id="check" title="Check the row" objective="Predict the mask and the head, not a slogan.">
+
+<Check
+  id="row-sum"
+  prompt="You turn the causal mask on and three cells in a row go to zero. What is true of the other cells?"
+  choices={[
+    'They keep the exact percentages they had, and the row no longer sums to one.',
+    'They are renormalized. The row sums to one over the positions the mask still allows.',
+    'They also go to zero. A mask clears the row.',
+  ]}
+  answer="They are renormalized. The row sums to one over the positions the mask still allows."
+  why="The forbidden scores are replaced by a large negative and the softmax is run again. The denominator shrinks to the legal keys, so each surviving weight grows. The row is a distribution either way."
+/>
+
+<Check
+  id="two-heads"
+  prompt="Who acted and Nearby disagree about where “sat” looks. What did you change?"
+  choices={[
+    'The sentence.',
+    'Which handwritten score table is passed to the softmax.',
+    'A trained projection.',
+  ]}
+  answer="Which handwritten score table is passed to the softmax."
+  why="The two buttons select two tables. There is no learned query or key behind them. The disagreement is the disagreement of the tables."
+/>
+
+<Check
+  id="not-the-word"
+  prompt="This figure never multiplies the weights by value vectors. What are you looking at?"
+  choices={[
+    'The output of the attention block.',
+    'The weights of the average, not the average.',
+    'The next-token distribution.',
+  ]}
+  answer="The weights of the average, not the average."
+  why="The cells are the softmax output. The weighted sum of values would be a vector per position, and it is not drawn. The next-token figure is a different distribution, over a vocabulary, not over positions in this sentence."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave toward the distribution a model actually returns.">
+
+Tokenization is the prerequisite that is live. The pieces attention would mix are whatever the tokenizer emitted. This sentence was chosen so the words stay intact.
+
+The related live module is the next-token distribution. Attention mixes positions. That figure is the distribution over what comes next, with temperature. They are not the same softmax. One is over positions. The other is over a vocabulary.
+
+An embedding space, where those ids would be vectors a dot product could compare, is not built. Multi-head attention as a set of learned projections is the formula in this lesson. It is not a separate instrument.
+
+</Chapter>

@@ -349,3 +349,9 @@
 astro-island {
   display: block !important;
 }
+
+/* KaTeX inherits the page colour. The library stylesheet is otherwise left alone. */
+.katex {
+  color: inherit;
+  font-size: 1.05em;
+}

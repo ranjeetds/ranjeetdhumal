@@ -1,4 +1,5 @@
 import { type CollectionEntry, getCollection } from 'astro:content';
+import { liveVisualizationIds } from '@/data/studio';
 
 export type Note = CollectionEntry<'notes'>;
 
@@ -34,6 +35,40 @@ export async function getPublishedResearch(): Promise<ResearchEntry[]> {
 export async function getPublishedVideos(): Promise<Video[]> {
   const videos = await getCollection('videos', isPublic);
   return videos.sort((a, b) => a.data.series.localeCompare(b.data.series) || a.data.title.localeCompare(b.data.title));
+}
+
+export type StudioLesson = CollectionEntry<'studio'>;
+
+/**
+ * Published studio lessons. Drafts stay available in dev.
+ * The file's basename must be the visualization id, which is the module URL.
+ */
+export async function getPublishedStudioLessons(): Promise<StudioLesson[]> {
+  const lessons = await getCollection(
+    'studio',
+    ({ data }) => import.meta.env.DEV || data.status === 'published',
+  );
+  const live = new Set<string>(liveVisualizationIds);
+  for (const lesson of lessons) {
+    const slash = lesson.id.lastIndexOf('/');
+    const basename = slash === -1 ? lesson.id : lesson.id.slice(slash + 1);
+    if (basename !== lesson.data.visualization) {
+      throw new Error(
+        `Studio lesson “${lesson.id}” must be named after its visualization “${lesson.data.visualization}”.`,
+      );
+    }
+    if (!live.has(lesson.data.visualization)) {
+      throw new Error(`Studio lesson “${lesson.id}” points at a figure that is not live.`);
+    }
+  }
+  return lessons.sort((a, b) => a.data.title.localeCompare(b.data.title));
+}
+
+export function getStudioLessonByVisualization(
+  lessons: readonly StudioLesson[],
+  visualization: string,
+): StudioLesson | undefined {
+  return lessons.find((lesson) => lesson.data.visualization === visualization);
 }
 
 export type Project = CollectionEntry<'projects'>;

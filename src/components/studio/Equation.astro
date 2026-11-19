@@ -1,0 +1,28 @@
+---
+/**
+ * One equation, typeset on the server. Pass TeX. Display mode is the default;
+ * set `display={false}` for a symbol inside a sentence.
+ */
+import katex from 'katex';
+
+interface Props {
+  tex: string;
+  display?: boolean;
+}
+
+const { tex, display = true } = Astro.props;
+const html = katex.renderToString(tex, {
+  displayMode: display,
+  throwOnError: true,
+  output: 'html',
+  trust: false,
+});
+---
+
+{
+  display ? (
+    <div class="not-prose my-4 overflow-x-auto" set:html={html} />
+  ) : (
+    <span class="not-prose" set:html={html} />
+  )
+}

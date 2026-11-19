@@ -1,0 +1,109 @@
+---
+title: Tokenization
+description: Two ways to cut one string, and why a word you see as one unit can arrive as several ids.
+summary: Words keeps a run of letters together. Pieces takes the longest match from a small vocabulary written for this figure. A space is its own piece. The ids are indexes into that vocabulary, not a model’s. “unbelievable” stays whole in Words and falls apart in Pieces.
+domain: transformers
+difficulty: Foundational
+estimatedTime: 15
+visualization: tokenization
+status: published
+related:
+  - attention-patterns
+next: attention-patterns
+experiments:
+  - Type unbelievable in both modes and count the pieces.
+  - Add a trailing space and watch it become its own piece.
+  - Type “the cat sat” in Pieces. Those fragments are in the vocabulary, so they stay whole.
+tags:
+  - tokens
+  - vocabulary
+  - words
+---
+
+<Chapter id="intuition" title="The model does not receive words" objective="See the cut before the algorithm.">
+
+You read “unbelievable” as one word. A model receives a list of integers. Something in front of the model decided where the string breaks, and which integer each piece gets. That decision is the tokenizer. Change it, and the model is looking at a different sequence, even though the letters on the page did not change.
+
+This figure makes the cut visible. It does not contain a model. The vocabulary is written by hand for the demonstration. A production tokenizer is learned from a corpus. The lesson below says what was learned, and what this figure refuses to pretend.
+
+</Chapter>
+
+<Chapter id="mechanism" title="Two cuts of the same string" objective="Predict the pieces before you press the button.">
+
+Words mode matches a run of letters, a run of digits, a run of whitespace, or a single other mark. A word stays together. A space is its own piece, including a trailing space. The id for any whitespace run is the id of a single space.
+
+Pieces mode walks the string from the left and takes the longest vocabulary entry that matches the lowercase text at the current position. The vocabulary is a short list of fragments — the, ing, able, tion, cat, sat, un, on, mat, pre — plus the letters, the digits, and a few marks, tried longest first. If nothing matches, it takes one character.
+
+So “unbelievable” in Pieces becomes “un”, then the letters of “believ” one at a time, then “able”. “the cat sat” is made of fragments that are in the list, plus spaces, so those words stay whole. The same letters take a different path depending on whether a longer entry exists.
+
+</Chapter>
+
+<Chapter id="mathematics" title="Longest match, and the algorithm this is not" objective="State the rule the Pieces button actually runs.">
+
+At position i, with the remainder r, Pieces chooses
+
+<Equation tex="p = \arg\max_{v \in V,\; r \text{ starts with } v} |v|" />
+
+and then advances by <Equation tex="|p|" display={false} />. <Equation tex="V" display={false} /> is the designed vocabulary. The id is the index of p in that vocabulary, starting at 1. A character that is not in it gets a fallback id. Those fallback ids are not a learned unknown token. They are a hash into a side range so the figure can still show a chip.
+
+A real byte-pair encoding does not start from a list someone typed. It starts from characters, counts adjacent pairs in a corpus, merges the most frequent pair, and repeats. The vocabulary is the set of merges. Longest match at run time is then a reasonable way to apply a vocabulary that was built that way. This figure skips the counting. The fragments were chosen so that a rare word falls apart and a few common words do not.
+
+That is why a trailing space matters. The space is in the vocabulary as its own entry. The model, if there were one, would see an extra position. Prompts that differ by a space are different sequences.
+
+</Chapter>
+
+<Chapter id="experiment" title="Break a word, then spare one" objective="Use both modes on one string.">
+
+Type unbelievable. Words should show one letter-run. Pieces should show un, then single letters, then able.
+
+Type “the cat sat on the mat”. Pieces should keep those words, because each of them is an entry, and should still show the spaces as pieces. Add a space at the end and count one more chip.
+
+Nothing here is the vocabulary of a named model. If a chip boundary surprises you, the vocabulary above is the complete explanation.
+
+</Chapter>
+
+<Chapter id="apply" title="What the cut changes downstream" objective="Connect the pieces to attention and to the next-token distribution.">
+
+Attention mixes positions. If “unbelievable” is eight positions, there are eight places to look, and none of them is the word. The next-token distribution is a distribution over ids, not over dictionary words. Temperature, sampling, and greedy choice all happen after this cut.
+
+A practitioner’s failure mode is to debug a generation in words when the model mis-cut the word. Another is to compare two tokenizers by how “natural” the pieces look. The pieces are a compression of the training text. They are not a theory of morphology, even when they sometimes coincide with one.
+
+The embedding that would place these ids in a space is not built.
+
+</Chapter>
+
+<Chapter id="check" title="Check the cut" objective="Say what the button changed, and what it did not.">
+
+<Check
+  id="space"
+  prompt="You add a trailing space and Pieces gains a chip. What is that chip?"
+  choices={[
+    'A property of the last word.',
+    'Its own piece, because the space is an entry in the vocabulary.',
+    'A bug. Spaces are not tokens.',
+  ]}
+  answer="Its own piece, because the space is an entry in the vocabulary."
+  why="The matcher does not skip whitespace. A space matches the space entry, and the position advances by one. Words mode also keeps a whitespace run as a piece."
+/>
+
+<Check
+  id="not-a-model"
+  prompt="The ids in this figure are not the ids of a particular model. Why does that matter?"
+  choices={[
+    'It does not. Ids are universal.',
+    'An id is an index into a vocabulary. A different vocabulary makes the same integer a different piece.',
+    'The figure is only wrong about spaces.',
+  ]}
+  answer="An id is an index into a vocabulary. A different vocabulary makes the same integer a different piece."
+  why="The integer is meaningful only together with the vocabulary that assigned it. This vocabulary was written for the figure. A model’s vocabulary was merged from its corpus."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Move from the cut to the mixing.">
+
+The next module is attention. It uses the sentence “the cat sat on the mat”, which this vocabulary happens to keep as whole words plus spaces. The attention figure shows the words, not the spaces. Read it as a designed pattern over those positions, not as the output of this tokenizer.
+
+The written note is [Attention Mechanisms and Transformers](/knowledge/attention-and-transformers). A retrieval setup that depends on this cut is the [RAG starter kit](/projects#rag-starter-kit), which is a repository, not a studio experiment.
+
+</Chapter>

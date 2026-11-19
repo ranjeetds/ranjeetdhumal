@@ -1,31 +1,75 @@
 /**
- * Learning Studio catalogue. A live module has a figure. A planned module is named
- * in the navigation and is not a page.
+ * Learning Studio catalogue.
+ *
+ * A live module has a page and a figure. A planned module is named in a sequence
+ * and is not a page. Lessons live in `src/content/studio`; this file is the map
+ * those lessons point at.
  */
 
-export type StudioStatus = 'live' | 'planned';
+export const studioDomainIds = [
+  'mathematics',
+  'machine-learning',
+  'deep-learning',
+  'transformers',
+  'generative',
+  'agents',
+] as const;
 
-export interface StudioEquation {
-  /** Plain-language form. The studio does not load a math typesetting library. */
-  formula: string;
-  caption: string;
-}
+export type StudioDomainId = (typeof studioDomainIds)[number];
+
+export const liveVisualizationIds = [
+  'sample-mean',
+  'gradient-descent',
+  'attention-patterns',
+  'tokenization',
+  'next-token',
+] as const;
+
+export type LiveVisualizationId = (typeof liveVisualizationIds)[number];
+
+export type StudioStatus = 'live' | 'planned';
 
 export interface StudioModule {
   id: string;
   title: string;
   subtitle: string;
-  domain: string;
+  domainId: StudioDomainId;
   status: StudioStatus;
-  level?: string;
-  prerequisites?: readonly string[];
-  why?: string;
-  usedIn?: string;
-  observe?: readonly string[];
-  challenges?: readonly string[];
-  equations?: readonly StudioEquation[];
-  /** Another live module id. */
-  next?: string;
+}
+
+export interface StudioGroup {
+  title: string;
+  /** One sentence on what the group is for. */
+  lede: string;
+  modules: readonly string[];
+}
+
+export interface StudioReading {
+  href: string;
+  title: string;
+}
+
+export interface StudioDomain {
+  id: StudioDomainId;
+  title: string;
+  description: string;
+  /** Why the domain is worth a learner's time. */
+  why: string;
+  /** What to know before the sequence. Plain language, not a module id. */
+  prerequisites: string;
+  related: readonly StudioDomainId[];
+  /** Recommended order, including modules that are not built. */
+  sequence: readonly string[];
+  groups: readonly StudioGroup[];
+  reading?: readonly StudioReading[];
+}
+
+export interface StudioPath {
+  id: string;
+  title: string;
+  description: string;
+  steps: readonly string[];
+  reading?: readonly StudioReading[];
 }
 
 export const studioModules = [
@@ -33,153 +77,263 @@ export const studioModules = [
     id: 'sample-mean',
     title: 'A sample and its mean',
     subtitle: 'Draw from a fixed population and watch the mean move.',
-    domain: 'Mathematics & statistics',
+    domainId: 'mathematics',
     status: 'live',
-    level: 'Foundational',
-    prerequisites: [],
-    why: 'A mean is a fact about the rows you have. A loss and an accuracy are means of that kind.',
-    usedIn: 'Every training loss that averages a mistake over a batch.',
-    observe: [
-      'Grey bars are the whole designed population. Coloured bars are one draw.',
-      'At n = 8 the solid line jumps when you draw again. At n = 120 it stays near the dashed line.',
-      'The dashed line does not sit on the tallest bar. The tail pulls it.',
-    ],
-    challenges: [
-      'Draw again at n = 8 until the sample mean is more than 1 away from the population mean.',
-      'Raise n on that same draw and watch the coloured shape approach the grey one.',
-    ],
-    next: 'gradient-descent',
   },
   {
     id: 'gradient-descent',
     title: 'Gradient descent',
     subtitle: 'Move an optimizer across a loss surface by changing the step it is allowed to take.',
-    domain: 'Mathematics & statistics',
+    domainId: 'machine-learning',
     status: 'live',
-    level: 'Foundational',
-    prerequisites: ['A sample and its mean'],
-    why: 'Training is this walk. The weights change by a step along the slope of the loss.',
-    usedIn: 'The update inside nearly every trained model, including a linear model and a transformer.',
-    observe: [
-      'The contour lines are the loss. The cross marks a minimum.',
-      'The trace is the sequence of positions. It is not a drawing of the gradient field.',
-      'On the two-valley surface, the start decides which cross the walk reaches.',
-    ],
-    equations: [
-      {
-        formula: 'θ ← θ − η ∇L(θ)',
-        caption: 'SGD. η is the learning rate. ∇L is the slope at the current point.',
-      },
-      {
-        formula: 'v ← μ v − η ∇L(θ),   θ ← θ + v',
-        caption: 'Momentum. μ keeps a fraction of the previous step. SGD is this rule with μ = 0.',
-      },
-    ],
-    challenges: [
-      'On the two valleys, start on the left of the ridge and again on the right. Name which minimum each run reaches.',
-      'Set momentum to 0 and raise the learning rate until the walk leaves the frame.',
-      'Switch to the convex bowl. The same steep rate should still settle, because that surface has one well.',
-      'Run momentum and Adam from the same start and compare the traces.',
-    ],
-    next: 'attention-patterns',
   },
   {
     id: 'attention-patterns',
     title: 'Attention patterns',
     subtitle: 'A designed pair of heads. The weights are written by hand, not taken from a trained model.',
-    domain: 'Transformers & LLMs',
+    domainId: 'transformers',
     status: 'live',
-    level: 'Intermediate',
-    prerequisites: ['A dot product as a score'],
-    why: 'One head is a weighted average of values. The pattern is the weights.',
-    usedIn: 'Every transformer block that mixes positions.',
-    observe: [
-      'Each row is a query. The cells are how much that query takes from each key.',
-      'A causal mask zeros the future and the remaining row still sums to one.',
-    ],
-    challenges: [
-      'Turn the mask on and off and watch which cells disappear.',
-      'Switch heads and see that the same sentence can be mixed two different ways.',
-    ],
-    next: 'tokenization',
   },
   {
     id: 'tokenization',
     title: 'Tokenization',
     subtitle: 'Cut one string two ways. The vocabulary is designed for this figure, not taken from a model.',
-    domain: 'Transformers & LLMs',
+    domainId: 'transformers',
     status: 'live',
-    level: 'Foundational',
-    prerequisites: [],
-    why: 'A model receives ids. A word you see as one unit may be several ids.',
-    usedIn: 'The front of every language model, before any attention.',
-    observe: [
-      'Words mode keeps a run of letters together.',
-      'Pieces mode takes the longest match from a small vocabulary. “unbelievable” falls apart.',
-    ],
-    challenges: [
-      'Type unbelievable in both modes and count the pieces.',
-      'Add a trailing space and see it become its own piece.',
-    ],
-    next: 'next-token',
   },
   {
     id: 'next-token',
     title: 'Next-token distribution',
     subtitle: 'A toy distribution over six words. The scores are written by hand.',
-    domain: 'Transformers & LLMs',
+    domainId: 'transformers',
     status: 'live',
-    level: 'Intermediate',
-    prerequisites: ['Tokenization'],
-    why: 'The model returns a distribution. A sentence is a sample from it, repeated.',
-    usedIn: 'Decoding: greedy, sampled, and temperature are policies on this distribution.',
-    observe: [
-      'The bars are probabilities. They sum to one.',
-      'Lowering the temperature makes the tallest bar taller. It does not change which words exist.',
-    ],
-    challenges: [
-      'Set a low temperature and a high one on the same prefix.',
-      'Change the prefix and see the tallest bar move.',
-    ],
   },
   {
     id: 'decision-boundaries',
     title: 'Decision boundaries',
-    subtitle: 'Drag points and compare a linear cut, a tree, and a small network.',
-    domain: 'Machine learning',
+    subtitle: 'A linear cut, a tree, and a small network on the same points.',
+    domainId: 'machine-learning',
     status: 'planned',
   },
   {
     id: 'neural-playground',
-    title: 'Neural network playground',
-    subtitle: 'Change the layers and watch a forward pass.',
-    domain: 'Deep learning',
+    title: 'Neurons and a forward pass',
+    subtitle: 'Layers, activations, and the numbers a forward pass produces.',
+    domainId: 'deep-learning',
     status: 'planned',
   },
   {
     id: 'backpropagation',
     title: 'Backpropagation',
-    subtitle: 'Step the chain rule through a small network.',
-    domain: 'Deep learning',
+    subtitle: 'The chain rule, stepped through a small network.',
+    domainId: 'deep-learning',
     status: 'planned',
   },
   {
     id: 'embedding-space',
     title: 'Embedding space',
     subtitle: 'Neighbours in a projection, and what the projection hides.',
-    domain: 'Transformers & LLMs',
+    domainId: 'transformers',
     status: 'planned',
   },
   {
     id: 'agent-loop',
     title: 'Agent loop',
-    subtitle: 'Step observe, decide, act, and the failure of a tool.',
-    domain: 'Agentic AI',
+    subtitle: 'Observe, decide, act, and the failure of a tool.',
+    domainId: 'agents',
     status: 'planned',
   },
 ] as const satisfies readonly StudioModule[];
 
 export type StudioModuleId = (typeof studioModules)[number]['id'];
+
+export const studioDomains = [
+  {
+    id: 'mathematics',
+    title: 'Mathematics & Statistics',
+    description: 'The quantities later lessons treat as given: a sample, a mean, a spread.',
+    why: 'A loss is an average of mistakes. Until that average is a concrete picture, the rest of training is a slogan.',
+    prerequisites: 'None. This is a starting point. The derivative a descent needs is taught inside the gradient descent lesson.',
+    related: ['machine-learning'],
+    sequence: ['sample-mean', 'gradient-descent'],
+    groups: [
+      {
+        title: 'Estimation',
+        lede: 'One population, many draws, and a mean that moves less as the draw grows.',
+        modules: ['sample-mean'],
+      },
+    ],
+    reading: [{ href: '/knowledge/a-sample-and-its-mean', title: 'A sample and its mean' }],
+  },
+  {
+    id: 'machine-learning',
+    title: 'Machine Learning',
+    description: 'A model is a function with adjustable numbers. Training is how those numbers move.',
+    why: 'Almost every trained system is a search for parameters that make a loss smaller. The search is the thing worth seeing.',
+    prerequisites: 'A mean, from the mathematics domain. The slope itself is defined in the lesson.',
+    related: ['mathematics', 'deep-learning'],
+    sequence: ['gradient-descent', 'decision-boundaries'],
+    groups: [
+      {
+        title: 'Optimization',
+        lede: 'Follow the slope of a loss. The step size decides whether you arrive, crawl, or leave.',
+        modules: ['gradient-descent'],
+      },
+      {
+        title: 'Decisions',
+        lede: 'How a fitted model cuts a space of examples. The instrument is not built.',
+        modules: ['decision-boundaries'],
+      },
+    ],
+    reading: [{ href: '/knowledge/training-dynamics', title: 'Training Dynamics and Optimization' }],
+  },
+  {
+    id: 'deep-learning',
+    title: 'Deep Learning',
+    description: 'A stack of weighted sums and a bend, trained by the same kind of step as a single surface.',
+    why: 'Depth is composition. The update is still a step along a gradient. Seeing the step first makes the stack legible.',
+    prerequisites: 'Gradient descent. A network does not introduce a new kind of learning. It introduces a function the learning is applied to.',
+    related: ['machine-learning', 'transformers'],
+    sequence: ['gradient-descent', 'neural-playground', 'backpropagation'],
+    groups: [
+      {
+        title: 'Foundations',
+        lede: 'A unit, an activation, and a forward pass. The playground is not built.',
+        modules: ['neural-playground'],
+      },
+      {
+        title: 'Learning',
+        lede: 'The loss, the gradient, and the chain rule that carries the gradient back through the stack.',
+        modules: ['gradient-descent', 'backpropagation'],
+      },
+    ],
+    reading: [
+      { href: '/knowledge/how-neural-networks-learn', title: 'How Neural Networks Learn' },
+      { href: '/videos#but-what-is-a-neural-network', title: 'But what is a neural network?' },
+      {
+        href: '/videos#building-micrograd',
+        title: 'The spelled-out intro to neural networks and backpropagation',
+      },
+    ],
+  },
+  {
+    id: 'transformers',
+    title: 'Transformers & LLMs',
+    description: 'How a sequence is cut into pieces, mixed, and continued. These figures use designed numbers, not a trained model.',
+    why: 'The public object is a chatbot. The mechanism is a distribution over pieces, conditioned on other pieces.',
+    prerequisites: 'A vector as a list of numbers, and a dot product as a score. The lessons define both before they use them.',
+    related: ['deep-learning', 'generative'],
+    sequence: ['tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
+    groups: [
+      {
+        title: 'The pieces a model sees',
+        lede: 'A word on the page is not the unit the model receives.',
+        modules: ['tokenization'],
+      },
+      {
+        title: 'Mixing positions',
+        lede: 'Attention turns scores between positions into a weighted average.',
+        modules: ['attention-patterns'],
+      },
+      {
+        title: 'Choosing a continuation',
+        lede: 'The model returns a distribution. Temperature changes how peaked it is.',
+        modules: ['next-token'],
+      },
+      {
+        title: 'Where the pieces live',
+        lede: 'An embedding is a position in a learned space. The projection is not built.',
+        modules: ['embedding-space'],
+      },
+    ],
+    reading: [
+      { href: '/knowledge/attention-and-transformers', title: 'Attention Mechanisms and Transformers' },
+      { href: '/videos#attention-in-transformers', title: 'Attention in transformers, step by step' },
+    ],
+  },
+  {
+    id: 'generative',
+    title: 'Generative AI & RAG',
+    description: 'A model continues a sequence. Retrieval puts source text in front of that continuation.',
+    why: 'Generation without a source invents. Retrieval does not make the model honest, but it changes what the model is allowed to see.',
+    prerequisites: 'Tokenization and a next-token distribution. Retrieval is a step in front of that distribution, not a replacement for it.',
+    related: ['transformers', 'agents'],
+    sequence: ['tokenization', 'next-token'],
+    groups: [
+      {
+        title: 'What is live',
+        lede: 'The continuation itself. A retrieval experiment is not built.',
+        modules: ['tokenization', 'next-token'],
+      },
+    ],
+    reading: [
+      { href: '/knowledge/large-language-models', title: 'Large Language Models' },
+      { href: '/projects#rag-starter-kit', title: 'RAG starter kit' },
+    ],
+  },
+  {
+    id: 'agents',
+    title: 'Agentic AI',
+    description: 'A loop that looks at a state, chooses an action, and has to survive a tool that fails.',
+    why: 'An agent is not a smarter chat window. It is a policy with side effects, and the failure that matters is a bad action, not a bad sentence.',
+    prerequisites: 'A next-token distribution, because the decision is often still a sample from one. The loop around that sample is the new part.',
+    related: ['generative', 'transformers'],
+    sequence: ['agent-loop'],
+    groups: [
+      {
+        title: 'The loop',
+        lede: 'Observe, decide, act. The instrument is not built.',
+        modules: ['agent-loop'],
+      },
+    ],
+    reading: [{ href: '/knowledge/agentic-systems', title: 'Agentic AI Systems' }],
+  },
+] as const satisfies readonly StudioDomain[];
+
+export const studioPaths = [
+  {
+    id: 'neural-networks',
+    title: 'Understand Neural Networks',
+    description: 'From a single update on a surface to a stack the playground does not draw yet.',
+    steps: ['gradient-descent', 'neural-playground', 'backpropagation'],
+    reading: [
+      { href: '/knowledge/how-neural-networks-learn', title: 'How Neural Networks Learn' },
+      { href: '/videos#building-micrograd', title: 'The spelled-out intro to neural networks and backpropagation' },
+    ],
+  },
+  {
+    id: 'descent-to-deep',
+    title: 'From Gradient Descent to Deep Learning',
+    description: 'A mean, a slope, a step, and the two instruments that are still missing.',
+    steps: ['sample-mean', 'gradient-descent', 'neural-playground', 'backpropagation'],
+  },
+  {
+    id: 'transformers',
+    title: 'How Transformers Work',
+    description: 'Cut a string, mix the pieces, and read the distribution the next piece is drawn from.',
+    steps: ['tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
+    reading: [{ href: '/knowledge/attention-and-transformers', title: 'Attention Mechanisms and Transformers' }],
+  },
+  {
+    id: 'rag',
+    title: 'Build an Understanding of RAG',
+    description: 'Retrieval in front of a continuation. The studio experiment is not built. The repository is real.',
+    steps: ['tokenization', 'next-token'],
+    reading: [
+      { href: '/projects#rag-starter-kit', title: 'RAG starter kit' },
+      { href: '/knowledge/large-language-models', title: 'Large Language Models' },
+    ],
+  },
+  {
+    id: 'agents',
+    title: 'Explore Agentic Systems',
+    description: 'The loop is named. The experiment is not built. The note is the written account.',
+    steps: ['agent-loop'],
+    reading: [{ href: '/knowledge/agentic-systems', title: 'Agentic AI Systems' }],
+  },
+] as const satisfies readonly StudioPath[];
+
+export const featuredStudioIds = ['gradient-descent', 'attention-patterns', 'tokenization'] as const;
 
 export function getStudioModule(id: string): StudioModule | undefined {
   return studioModules.find((module) => module.id === id);
@@ -188,3 +342,65 @@ export function getStudioModule(id: string): StudioModule | undefined {
 export function liveStudioModules(): StudioModule[] {
   return studioModules.filter((module) => module.status === 'live');
 }
+
+export function getStudioDomain(id: string): StudioDomain | undefined {
+  return studioDomains.find((domain) => domain.id === id);
+}
+
+export function getStudioPath(id: string): StudioPath | undefined {
+  return studioPaths.find((path) => path.id === id);
+}
+
+export interface ResolvedStep {
+  id: string;
+  title: string;
+  subtitle: string;
+  status: StudioStatus;
+  /** Set only for a live module. */
+  href?: string;
+}
+
+/** A catalogue id, resolved for a sequence. Unknown ids are a build error. */
+export function resolveStep(id: string, pathId?: string): ResolvedStep {
+  const module = getStudioModule(id);
+  if (!module) throw new Error(`Unknown studio module “${id}”.`);
+  const href = module.status === 'live' ? `/studio/${module.id}${pathId ? `?path=${pathId}` : ''}` : undefined;
+  return { id: module.id, title: module.title, subtitle: module.subtitle, status: module.status, href };
+}
+
+function assertCatalogue(): void {
+  const ids = new Set(studioModules.map((module) => module.id));
+  const live = new Set<string>(liveVisualizationIds);
+  for (const module of studioModules) {
+    if (module.status === 'live' && !live.has(module.id)) {
+      throw new Error(`Live studio module “${module.id}” is missing from liveVisualizationIds.`);
+    }
+  }
+  for (const id of liveVisualizationIds) {
+    const module = getStudioModule(id);
+    if (!module || module.status !== 'live') {
+      throw new Error(`Visualization “${id}” is not a live studio module.`);
+    }
+  }
+  for (const domain of studioDomains) {
+    if (!getStudioDomain(domain.id)) throw new Error(`Domain “${domain.id}” is missing.`);
+    for (const related of domain.related) {
+      if (!getStudioDomain(related)) throw new Error(`Domain “${domain.id}” relates to unknown “${related}”.`);
+    }
+    for (const id of domain.sequence) {
+      if (!ids.has(id)) throw new Error(`Domain “${domain.id}” lists unknown module “${id}”.`);
+    }
+    for (const group of domain.groups) {
+      for (const id of group.modules) {
+        if (!ids.has(id)) throw new Error(`Group “${group.title}” lists unknown module “${id}”.`);
+      }
+    }
+  }
+  for (const path of studioPaths) {
+    for (const id of path.steps) {
+      if (!ids.has(id)) throw new Error(`Path “${path.id}” lists unknown module “${id}”.`);
+    }
+  }
+}
+
+assertCatalogue();

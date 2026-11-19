@@ -1,0 +1,89 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Sequence from '@/components/studio/Sequence.astro';
+import { getStudioDomain, resolveStep, studioDomains, type StudioDomain } from '@/data/studio';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+export const getStaticPaths = (() =>
+  studioDomains.map((domain) => ({
+    params: { domain: domain.id },
+    props: { domain },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  domain: StudioDomain;
+}
+
+const { domain } = Astro.props;
+const related = domain.related.map((id) => {
+  const found = getStudioDomain(id);
+  if (!found) throw new Error(`Domain “${domain.id}” relates to unknown “${id}”.`);
+  return found;
+});
+---
+
+<BaseLayout title={`${domain.title} — Learning Studio`} description={domain.description}>
+  <article class="mx-auto max-w-page px-gutter py-12">
+    <header class="max-w-prose">
+      <p class="mono-label text-ink-faint">
+        <a href="/studio" class="hover:text-ink">Studio</a>
+      </p>
+      <h1 class="mt-2 font-serif text-headline text-ink">{domain.title}</h1>
+      <p class="mt-4 text-sm leading-relaxed text-ink">{domain.description}</p>
+      <p class="mt-3 text-sm leading-relaxed text-ink-muted">{domain.why}</p>
+      <p class="mt-3 text-sm leading-relaxed text-ink-muted">Before this: {domain.prerequisites}</p>
+    </header>
+
+    <section class="mt-12 max-w-prose" aria-labelledby="domain-sequence">
+      <h2 id="domain-sequence" class="font-serif text-title text-ink">Recommended sequence</h2>
+      <div class="mt-4">
+        <Sequence steps={domain.sequence.map((id) => resolveStep(id))} />
+      </div>
+    </section>
+
+    {
+      domain.groups.map((group) => (
+        <section class="mt-12 max-w-prose">
+          <h2 class="font-serif text-title text-ink">{group.title}</h2>
+          <p class="mt-2 text-sm leading-relaxed text-ink-muted">{group.lede}</p>
+          <div class="mt-4">
+            <Sequence steps={group.modules.map((id) => resolveStep(id))} />
+          </div>
+        </section>
+      ))
+    }
+
+    {
+      domain.reading && domain.reading.length > 0 && (
+        <section class="mt-12 max-w-prose" aria-labelledby="domain-reading">
+          <h2 id="domain-reading" class="font-serif text-title text-ink">Written elsewhere on this site</h2>
+          <ul class="mt-4 divide-y divide-line border-y border-line">
+            {domain.reading.map((item) => (
+              <li>
+                <a href={item.href} class="block py-3 text-sm text-ink hover:text-accent">
+                  {item.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <section class="mt-12 max-w-prose" aria-labelledby="domain-related">
+      <h2 id="domain-related" class="font-serif text-title text-ink">Related domains</h2>
+      <ul class="mt-4 divide-y divide-line border-y border-line">
+        {
+          related.map((item) => (
+            <li>
+              <a href={`/studio/domain/${item.id}`} class="grid gap-1 py-3 sm:grid-cols-[16rem_1fr] sm:items-baseline">
+                <span class="text-ink">{item.title}</span>
+                <span class="text-sm text-ink-muted">{item.description}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </article>
+</BaseLayout>

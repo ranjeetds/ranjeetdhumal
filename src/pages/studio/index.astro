@@ -1,3 +1,151 @@
 ---
-return Astro.redirect('/studio/gradient-descent');
+/**
+ * Studio home. A way in: resume, six domains, a few paths, a few experiments.
+ * The full list appears only as search results.
+ */
+import Sequence from '@/components/studio/Sequence.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import {
+  featuredStudioIds,
+  getStudioDomain,
+  getStudioModule,
+  liveStudioModules,
+  resolveStep,
+  studioDomains,
+  studioPaths,
+} from '@/data/studio';
+import { getPublishedStudioLessons, type StudioLesson } from '@/lib/content';
+import { sections } from '@/config/site';
+
+const section = sections.find((item) => item.id === 'studio');
+const lessons = await getPublishedStudioLessons();
+const lessonById = new Map<string, StudioLesson>(
+  lessons.map((lesson) => [lesson.data.visualization, lesson]),
+);
+
+const featured = featuredStudioIds.map((id) => {
+  const module = getStudioModule(id);
+  if (!module) throw new Error(`Featured studio module “${id}” is missing.`);
+  return module;
+});
+
+const searchIndex = [
+  ...studioDomains.map((domain) => ({
+    href: `/studio/domain/${domain.id}`,
+    title: domain.title,
+    kind: 'Domain',
+    text: `${domain.description} ${domain.why}`,
+  })),
+  ...studioPaths.map((path) => ({
+    href: `/studio/path/${path.id}`,
+    title: path.title,
+    kind: 'Path',
+    text: path.description,
+  })),
+  ...liveStudioModules().map((module) => {
+    const lesson = lessonById.get(module.id);
+    const domain = getStudioDomain(module.domainId);
+    return {
+      href: `/studio/${module.id}`,
+      title: module.title,
+      kind: 'Experiment',
+      text: `${module.subtitle} ${domain?.title ?? ''} ${lesson?.data.summary ?? ''} ${(lesson?.data.tags ?? []).join(' ')}`,
+    };
+  }),
+];
 ---
+
+<BaseLayout title="Learning Studio" description={section?.description ?? 'Lessons and experiments.'}>
+  <div class="mx-auto max-w-page px-gutter py-12" data-studio-home>
+    <header class="max-w-prose">
+      <p class="mono-label text-ink-faint">Learning Studio</p>
+      <h1 class="mt-2 font-serif text-headline text-ink">Explain, then change the thing.</h1>
+      <p class="mt-4 text-sm leading-relaxed text-ink-muted">
+        A domain, a short path, or one experiment. Each live module is a lesson and a figure. Anything not built is marked, and is not a page.
+      </p>
+    </header>
+
+    <section class="mt-12 max-w-prose" aria-labelledby="studio-continue">
+      <h2 id="studio-continue" class="font-serif text-title text-ink">Continue</h2>
+      <p data-continue hidden class="mt-4 border-t border-line py-4">
+        <a data-continue-link href="/studio/gradient-descent" class="font-serif text-title text-ink hover:text-accent">
+          Gradient descent
+        </a>
+        <span data-continue-meta class="mt-1 block text-sm text-ink-muted"></span>
+      </p>
+      <p class="mt-4 border-t border-line py-4">
+        <a href="/studio/path/descent-to-deep" class="font-serif text-title text-ink hover:text-accent">
+          From Gradient Descent to Deep Learning
+        </a>
+        <span class="mt-1 block text-sm text-ink-muted">
+          A mean, then a slope, then the two instruments that are still missing. A reasonable place to start.
+        </span>
+      </p>
+      <p class="mt-2">
+        <button type="button" data-clear-progress class="mono-label text-ink-faint hover:text-ink">
+          Clear learning progress on this browser
+        </button>
+      </p>
+    </section>
+
+    <section class="mt-14" aria-labelledby="studio-search">
+      <h2 id="studio-search" class="font-serif text-title text-ink">Search</h2>
+      <form role="search" class="mt-4 max-w-prose">
+        <label for="studio-query" class="mono-label text-ink-faint">Experiments, domains, paths</label>
+        <input
+          id="studio-query"
+          data-search
+          type="search"
+          placeholder="learning rate, attention, RAG"
+          class="mt-2 w-full border border-line-strong bg-canvas px-3 py-2 text-sm text-ink"
+        />
+      </form>
+      <ul data-search-results class="mt-2 max-w-prose" aria-live="polite"></ul>
+      <script type="application/json" data-search-index set:html={JSON.stringify(searchIndex).replaceAll('<', '\\u003c')} />
+    </section>
+
+    <section class="mt-14" aria-labelledby="studio-domains">
+      <h2 id="studio-domains" class="font-serif text-title text-ink">Domains</h2>
+      <ul class="mt-4 divide-y divide-line border-y border-line">
+        {
+          studioDomains.map((domain) => (
+            <li>
+              <a href={`/studio/domain/${domain.id}`} class="grid gap-1 py-4 sm:grid-cols-[16rem_1fr] sm:items-baseline">
+                <span class="font-serif text-title text-ink">{domain.title}</span>
+                <span class="text-sm leading-relaxed text-ink-muted">{domain.description}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="mt-14" aria-labelledby="studio-paths">
+      <h2 id="studio-paths" class="font-serif text-title text-ink">Paths</h2>
+      <ul class="mt-4 divide-y divide-line border-y border-line">
+        {
+          studioPaths.map((path) => (
+            <li>
+              <a href={`/studio/path/${path.id}`} class="grid gap-1 py-4 sm:grid-cols-[16rem_1fr] sm:items-baseline">
+                <span class="font-serif text-title text-ink">{path.title}</span>
+                <span class="text-sm leading-relaxed text-ink-muted">{path.description}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="mt-14" aria-labelledby="studio-featured">
+      <h2 id="studio-featured" class="font-serif text-title text-ink">Start with one of these</h2>
+      <Sequence steps={featured.map((module) => resolveStep(module.id))} />
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import { mountStudioHome } from '@/lib/studio-client';
+
+  const root = document.querySelector('[data-studio-home]');
+  if (root instanceof HTMLElement) mountStudioHome(root);
+</script>

@@ -1,0 +1,65 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Sequence from '@/components/studio/Sequence.astro';
+import { resolveStep, studioPaths, type StudioPath } from '@/data/studio';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+export const getStaticPaths = (() =>
+  studioPaths.map((path) => ({
+    params: { path: path.id },
+    props: { path },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  path: StudioPath;
+}
+
+const { path } = Astro.props;
+const steps = path.steps.map((id) => resolveStep(id, path.id));
+const firstLive = steps.find((step) => step.href);
+---
+
+<BaseLayout title={`${path.title} — Learning Studio`} description={path.description}>
+  <article class="mx-auto max-w-page px-gutter py-12">
+    <header class="max-w-prose">
+      <p class="mono-label text-ink-faint">
+        <a href="/studio" class="hover:text-ink">Studio</a>
+      </p>
+      <h1 class="mt-2 font-serif text-headline text-ink">{path.title}</h1>
+      <p class="mt-4 text-sm leading-relaxed text-ink-muted">{path.description}</p>
+      {
+        firstLive?.href && (
+          <p class="mt-6">
+            <a href={firstLive.href} class="text-sm text-ink hover:text-accent">
+              Start at {firstLive.title}
+            </a>
+          </p>
+        )
+      }
+    </header>
+
+    <section class="mt-12 max-w-prose" aria-labelledby="path-sequence">
+      <h2 id="path-sequence" class="font-serif text-title text-ink">Sequence</h2>
+      <div class="mt-4">
+        {steps.length > 0 ? <Sequence steps={steps} /> : <p class="text-sm text-ink-muted">No experiment in this path is built.</p>}
+      </div>
+    </section>
+
+    {
+      path.reading && path.reading.length > 0 && (
+        <section class="mt-12 max-w-prose" aria-labelledby="path-reading">
+          <h2 id="path-reading" class="font-serif text-title text-ink">While the missing experiments are unbuilt</h2>
+          <ul class="mt-4 divide-y divide-line border-y border-line">
+            {path.reading.map((item) => (
+              <li>
+                <a href={item.href} class="block py-3 text-sm text-ink hover:text-accent">
+                  {item.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>

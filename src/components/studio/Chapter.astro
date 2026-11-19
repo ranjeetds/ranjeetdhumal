@@ -1,0 +1,32 @@
+---
+/**
+ * One part of a studio lesson. The id is the progress key. Completion is explicit:
+ * the reader marks the part, or answers its checks. Time on the page does not count.
+ */
+interface Props {
+  id: string;
+  title: string;
+  /** What this part is for, in one sentence. */
+  objective: string;
+}
+
+const { id, title, objective } = Astro.props;
+---
+
+<section id={`chapter-${id}`} data-chapter={id} class="scroll-mt-32 border-t border-line pt-8">
+  <h2 class="font-serif text-title text-ink">{title}</h2>
+  <p class="mono-label not-prose mt-2 text-ink-faint">{objective}</p>
+  <div class="mt-4">
+    <slot />
+  </div>
+  <p class="not-prose mt-6">
+    <button
+      type="button"
+      data-mark-chapter={id}
+      aria-pressed="false"
+      class="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
+    >
+      Mark this part read
+    </button>
+  </p>
+</section>

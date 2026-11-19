@@ -1,0 +1,213 @@
+---
+title: Gradient Descent
+description: A step along the slope of a loss, and what the learning rate, momentum, and Adam change about that step.
+summary: The figure is a loss drawn over two parameters. Press Play and a point walks downhill. The learning rate is the size of the step, momentum keeps a fraction of the previous step, and Adam rescales the step by how large recent slopes have been. The surface is designed. It is not the loss of a trained model.
+domain: machine-learning
+difficulty: Intermediate
+estimatedTime: 25
+visualization: gradient-descent
+status: published
+prerequisites:
+  - sample-mean
+next: backpropagation
+experiments:
+  - Choose Convex bowl and press Play. One well. The walk settles near the cross.
+  - Choose Across the ridge, then Deeper valley. Same rule, different start, different cross.
+  - Choose Too steep, then move the learning rate to 1.5 with momentum near 0.9. The walk leaves the frame.
+  - Keep this trace, switch the optimizer, and run again from the same start.
+tags:
+  - learning rate
+  - momentum
+  - adam
+  - loss
+  - gradient
+---
+
+<Chapter id="intuition" title="Start from the hill" objective="Say what the update is for, before any symbol.">
+
+A model is a function with knobs. Turn the knobs and the predictions change. Training is the decision of which way to turn them.
+
+You need a number that says how wrong the current knobs are. Call that number the loss. If you can tell which way the loss increases, you can step the other way. That is the whole idea. The rest of this lesson is what “which way” and “how far” mean when the loss is a surface you can see.
+
+The picture worth keeping is a person on a hill at night, with a stick that finds the steepest upward direction under their feet. They step the other way. They do not see the valley. They only ever know the slope where they stand, and the size of the step they agreed to take.
+
+In a real training run the hill is a loss over millions of parameters, and the slope is estimated from a batch of examples. This figure uses two parameters and the exact slope of a drawn surface, so the walk can be watched. The rule is the same kind of rule.
+
+</Chapter>
+
+<Chapter id="mechanism" title="What one step does" objective="Follow a single update on the figure before the symbols.">
+
+The instrument repeats six moves.
+
+1. There is a position. On the figure it is a point, and the readout calls it θ.
+2. The loss at that point is the height. The wells on the two-valley surface go below zero, because the surface is a sum of dips. Lower is still better. Negative does not mean a mistake in the drawing.
+3. The gradient is the direction of steepest increase, in both parameters at once. Its length is how steep the surface is there. The readout |grad| is that length.
+4. The arrow drawn from the point is not the gradient. It points downhill, opposite the gradient, and its length on the screen is only a visual scale.
+5. The point moves by a step in that downhill direction. The learning rate multiplies the gradient before the move. A larger rate is a longer step.
+6. The loss and the gradient are computed again at the new point. Play walks this loop. Step performs it once. Reset returns to the start of the current run.
+
+The trace is the sequence of positions. It is not a drawing of the slope at every point. The contour lines are the loss. A cross marks a place a short descent from a well settles. On the two-valley surface there are two crosses, and the start decides which one the walk can reach. On the convex bowl there is one.
+
+Click the surface to set a new start. Random start walks through a fixed sequence of starts, so the button is repeatable.
+
+</Chapter>
+
+<Chapter id="mathematics" title="The update, and the three versions of it" objective="Read the update, name every symbol, and match each one to a control.">
+
+One step of gradient descent is
+
+<Equation tex="\theta_{t+1} = \theta_t - \eta \nabla_\theta J(\theta_t)" />
+
+- <Equation tex="\theta" display={false} /> is the parameters. Here it is the pair on the horizontal and vertical axes. In a network it is every weight.
+- <Equation tex="t" display={false} /> counts updates. The Step readout is this index.
+- <Equation tex="\eta" display={false} /> is the learning rate. It is the slider. It is a positive scale, not a direction.
+- <Equation tex="J(\theta)" display={false} /> is the loss at the current parameters. The figure’s loss readout is this number.
+- <Equation tex="\nabla_\theta J" display={false} /> is the gradient, the vector of partial derivatives. It points toward increase. Subtracting it is the whole trick. The |grad| readout is its length, not its direction.
+
+The control labelled SGD is this rule. On this figure the gradient is exact. Nothing is sampled. In a training loop the same subtraction is usually done with a noisy estimate from a batch, and that noise is the “stochastic” in the name. The label on the control is the update. The figure does not simulate a batch.
+
+Momentum keeps a velocity and mixes the new slope into it.
+
+<Equation tex="v_{t+1} = \mu v_t - \eta \nabla_\theta J(\theta_t), \qquad \theta_{t+1} = \theta_t + v_{t+1}" />
+
+<Equation tex="\mu" display={false} /> is the momentum slider. It is used only when the optimizer is Momentum. At <Equation tex="\mu = 0" display={false} /> the velocity is just the plain step, so SGD is this rule with the memory turned off. The slider is disabled in that case, and it is disabled for Adam, which does not read it.
+
+A large <Equation tex="\mu" display={false} /> keeps going after the slope has changed. That is useful in a long gentle slope and dangerous near a sharp well. The Too steep preset is learning rate 1.2 and momentum 0.9 on the two-valley surface, from the lower-left start. That run only grazes the edge of the frame and then falls into the nearer well. Push the learning rate to 1.5, which is as far as the slider goes, and the same momentum carries the walk outside. Status reads “Left the frame” while a position is outside the drawn window.
+
+Adam keeps a running average of the gradient and a running average of its square, then steps by the first divided by the square root of the second.
+
+<Equation tex="m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t" />
+
+<Equation tex="s_t = \beta_2 s_{t-1} + (1-\beta_2) g_t^2" />
+
+<Equation tex="\hat{m}_t = \frac{m_t}{1-\beta_1^t}, \qquad \hat{s}_t = \frac{s_t}{1-\beta_2^t}" />
+
+<Equation tex="\theta_{t+1} = \theta_t - \eta \frac{\hat{m}_t}{\sqrt{\hat{s}_t} + \epsilon}" />
+
+Here <Equation tex="g_t" display={false} /> is the gradient at the current point. The figure uses <Equation tex="\beta_1 = 0.9" display={false} />, <Equation tex="\beta_2 = 0.999" display={false} />, and <Equation tex="\epsilon = 10^{-8}" display={false} />. Those three are not sliders. The division by <Equation tex="1-\beta^t" display={false} /> corrects the averages for starting at zero, so the first steps are not tiny for that reason. The square in <Equation tex="s_t" display={false} /> is componentwise. A parameter that has recently had a large slope gets a smaller step. A parameter whose slope has been tiny can still move.
+
+The two surfaces are different functions, and the difference matters.
+
+The convex bowl is
+
+<Equation tex="J(x, y) = 0.15(x - 0.4)^2 + 0.25(y + 0.2)^2" />
+
+so the gradient is <Equation tex="(0.3(x-0.4),\; 0.5(y+0.2))" display={false} /> and the only minimum is <Equation tex="(0.4, -0.2)" display={false} />, where the loss is 0. Convex means the line between any two points on the surface stays above the surface. There is no second well and no ridge. A steep plain step still arrives. SGD with learning rate 1.2, from the bowl’s usual start, settles.
+
+The two-valley surface is not convex. It is two Gaussian wells of different depth, a bump between them, and a shallow bowl that keeps distant points from drifting forever. There is no need to memorise the formula. The fact to keep is that two honest runs of the same rule can end at different crosses, because a ridge separates the wells. The crosses themselves are where a short descent from each well centre stops. They are computed, not hand-placed.
+
+The walk stops early when the gradient length and the step length are both under <Equation tex="5 \times 10^{-4}" display={false} />, or when it hits the step limit: 120 on the valleys, 80 on the Convex bowl preset.
+
+</Chapter>
+
+<Chapter id="experiment" title="Use the figure while the definitions are fresh" objective="Change one control and say what the trace did.">
+
+The figure at the top of this page is the instrument these buttons drive. Switching between Learn and Explore does not rebuild it, so the sliders stay where you left them. The address bar stores the surface, the optimizer, the learning rate, the momentum, and the start.
+
+<Try preset="bowl">Use the convex bowl</Try>
+<Try preset="ridge">Start across the ridge</Try>
+<Try preset="deep">Start in the deeper valley</Try>
+<Try preset="steep">Use the steep preset</Try>
+
+After the bowl settles, the readout is step 67, the loss is about zero, and the parameters are near 0.40 and −0.20. That is the minimum written above, reached by the subtraction, not by being told where the minimum is.
+
+Then run the two valley starts and name which cross each trace reaches. Then raise the learning rate on Too steep until the status leaves the frame, and run the same learning rate as plain SGD. Momentum, not the rate alone, is what carries that start out.
+
+Keep this trace holds up to three earlier paths so two optimizers can be compared from one start.
+
+</Chapter>
+
+<Chapter id="implementation" title="The same update, written out" objective="See that the figure is this loop and not a different algorithm.">
+
+There is no separate notebook. This is the bowl, with the plain step, which is what the Convex bowl preset runs. Eighty iterations is the cap. The figure stops earlier, at step 67.
+
+```python
+x, y = -2.2, 1.4
+learning_rate = 0.35
+for _ in range(80):
+    gx = 0.3 * (x - 0.4)
+    gy = 0.5 * (y + 0.2)
+    x -= learning_rate * gx
+    y -= learning_rate * gy
+```
+
+Momentum, in the form the figure uses, replaces those two subtractions with a velocity.
+
+```python
+vx = momentum * vx - learning_rate * gx
+vy = momentum * vy - learning_rate * gy
+x += vx
+y += vy
+```
+
+Adam replaces them with the averages from the previous section, with β₁ = 0.9, β₂ = 0.999, and ε = 1e−8, and with the bias correction divided in before the step. A library call such as `torch.optim.Adam` is this update applied to a tensor of parameters, with a gradient that backprop filled in. The figure’s Adam is the same arithmetic on two numbers. It does not build a network.
+
+</Chapter>
+
+<Chapter id="applications" title="Where the step shows up, and where this picture lies" objective="Know what a practitioner is looking at when a loss curve misbehaves.">
+
+Every trained network, including a transformer, changes its parameters by a relative of this subtraction. The learning rate in a training config is <Equation tex="\eta" display={false} />. When a run diverges, the usual cause is a step larger than the curvature can absorb, which is the walk that leaves this frame. When a run crawls, the step is small, or the gradient itself is small. Momentum and Adam are attempts to keep moving in the first case and to rescale the second.
+
+A practitioner should hold three limits of this picture.
+
+The surface here is two-dimensional and exact. A real loss is a function of millions of parameters, and the gradient is a batch estimate. The noise of that estimate is absent, so this figure cannot show the jitter of a small batch.
+
+The two-valley surface has more than one minimum. A non-convex loss can too. The start, and every earlier choice that determined the start, decides which region you are in. Reaching a cross is not the same as reaching the deepest cross.
+
+The loss on the valleys is allowed to be negative. A training loss that is a mean of errors is not. “Down” means smaller, whatever the sign of the drawing.
+
+Backpropagation is how a network obtains <Equation tex="\nabla_\theta J" display={false} />. It is not a different way of stepping. The playground that would show a forward pass, and the one that would step the chain rule, are not built.
+
+</Chapter>
+
+<Chapter id="check" title="Check the mechanism" objective="Answer from the update, not from a definition you memorised.">
+
+<Check
+  id="subtract"
+  prompt="The arrow on the figure points downhill. The gradient points the other way. Why does the update subtract the gradient?"
+  choices={[
+    'Subtracting makes the learning rate positive.',
+    'The gradient is the direction of steepest increase, so subtracting it reduces the loss.',
+    'Subtracting keeps the parameters inside the frame.',
+  ]}
+  answer="The gradient is the direction of steepest increase, so subtracting it reduces the loss."
+  why="The gradient is defined as the direction of increase. The minus sign is the decision to go the other way. The learning rate only scales that decision. Nothing about the subtraction knows where the frame is."
+/>
+
+<Check
+  id="two-wells"
+  prompt="On the two-valley surface, two runs with the same learning rate and the same optimizer end at different crosses. What does that show?"
+  choices={[
+    'The update is random, so the end cannot be predicted.',
+    'The surface is not convex. A ridge separates two regions, and the start picks the region.',
+    'Momentum is required to reach either cross.',
+  ]}
+  answer="The surface is not convex. A ridge separates two regions, and the start picks the region."
+  why="The rule is deterministic. Change only the start and the trace changes which well it can fall into. The convex bowl has no second well, and the same kind of rule settles at the single minimum."
+/>
+
+<Check
+  id="steep"
+  prompt="At learning rate 1.5, plain SGD from the lower-left start stays in the frame, and momentum 0.9 does not. Why?"
+  choices={[
+    'SGD uses a different surface.',
+    'Momentum adds the new slope to a velocity that already points outward, so the step can be longer than η times the current gradient.',
+    'A learning rate above 1 is only legal for Adam.',
+  ]}
+  answer="Momentum adds the new slope to a velocity that already points outward, so the step can be longer than η times the current gradient."
+  why="The velocity keeps a fraction of the previous step. Once it points out of the well, the new slope has to overcome that memory. The plain step has no memory, and from that start it does not leave."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave with a true next step, including the one that is not built.">
+
+The live module before this one is the sample mean. A training loss is a mean of per-example mistakes. That lesson is the mean, not the slope.
+
+The written companion on this site is [Training Dynamics and Optimization](/knowledge/training-dynamics). The derivative this lesson uses is defined here. There is no separate derivatives experiment.
+
+A loss function deserves its own hour, and there is no loss-function instrument yet. What you have is the surface the loss became.
+
+The continuation is backpropagation: the chain rule that produces the gradient when the loss depends on a stack of functions. That instrument is not built. The lecture that actually builds it, slowly, is on the videos page: [The spelled-out intro to neural networks and backpropagation](/videos#building-micrograd). The note [How Neural Networks Learn](/knowledge/how-neural-networks-learn) is the written version of the stack this step would be applied to. Adam’s update, as used above, is the one in Kingma and Ba, “Adam: A Method for Stochastic Optimization”, [arXiv:1412.6980](https://arxiv.org/abs/1412.6980).
+
+</Chapter>

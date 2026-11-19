@@ -123,6 +123,28 @@ function pathOf(steps: readonly DescentStep[], count: number): string {
     .join(' ');
 }
 
+function readConfig(search: string): Config | undefined {
+  const params = new URLSearchParams(search);
+  const surface = params.get('surface');
+  const optimizer = params.get('opt');
+  if (surface !== 'valleys' && surface !== 'bowl') return undefined;
+  if (optimizer !== 'sgd' && optimizer !== 'momentum' && optimizer !== 'adam') return undefined;
+  const learningRate = Number(params.get('lr'));
+  const momentum = Number(params.get('mu'));
+  const x = Number(params.get('x'));
+  const y = Number(params.get('y'));
+  const maxSteps = Number(params.get('steps'));
+  if (![learningRate, momentum, x, y].every((value) => Number.isFinite(value))) return undefined;
+  return {
+    surface,
+    optimizer,
+    learningRate,
+    momentum,
+    maxSteps: Number.isFinite(maxSteps) && maxSteps >= 1 && maxSteps <= 400 ? maxSteps : surface === 'bowl' ? 80 : 120,
+    start: [x, y],
+  };
+}
+
 export default function GradientDescentStudio() {
   const titleId = useId();
   const [config, setConfig] = useState<Config>(INITIAL);
@@ -190,17 +212,40 @@ export default function GradientDescentStudio() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [steps, config.surface]);
 
+  const urlReady = useRef(false);
   useEffect(() => {
-    const params = new URLSearchParams({
-      surface: config.surface,
-      opt: config.optimizer,
-      lr: String(config.learningRate),
-      mu: String(config.momentum),
-      x: config.start[0].toFixed(2),
-      y: config.start[1].toFixed(2),
-    });
-    const next = `${window.location.pathname}?${params}`;
-    window.history.replaceState(null, '', next);
+    const onPreset = (event: Event) => {
+      if (!(event instanceof CustomEvent) || typeof event.detail !== 'string') return;
+      const preset = PRESETS.find((item) => item.id === event.detail);
+      if (!preset) return;
+      stop();
+      setConfig(preset.config);
+    };
+    window.addEventListener('studio-preset', onPreset);
+    return () => window.removeEventListener('studio-preset', onPreset);
+  }, []);
+
+  useEffect(() => {
+    if (!urlReady.current) {
+      urlReady.current = true;
+      const restored = readConfig(window.location.search);
+      if (restored) {
+        setConfig(restored);
+        return;
+      }
+    }
+    const params = new URLSearchParams(window.location.search);
+    params.set('surface', config.surface);
+    params.set('opt', config.optimizer);
+    params.set('lr', String(config.learningRate));
+    params.set('mu', String(config.momentum));
+    params.set('x', config.start[0].toFixed(2));
+    params.set('y', config.start[1].toFixed(2));
+    params.set('steps', String(config.maxSteps));
+    const next = `${window.location.pathname}?${params}${window.location.hash}`;
+    if (`${window.location.pathname}${window.location.search}${window.location.hash}` !== next) {
+      window.history.replaceState(null, '', next);
+    }
   }, [config]);
 
   const patch = (partial: Partial<Config>) => {

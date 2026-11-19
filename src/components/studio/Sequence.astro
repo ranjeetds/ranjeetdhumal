@@ -1,0 +1,35 @@
+---
+/**
+ * A recommended order. Live steps are links. Planned steps are labelled and are not links.
+ */
+import type { ResolvedStep } from '@/data/studio';
+
+interface Props {
+  steps: readonly ResolvedStep[];
+}
+
+const { steps } = Astro.props;
+---
+
+<ol class="border-b border-line">
+  {
+    steps.map((step, index) => (
+      <li class="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-4 border-t border-line py-4">
+        <span class="mono-label text-ink-faint">{String(index + 1).padStart(2, '0')}</span>
+        <div class="min-w-0">
+          {step.href ? (
+            <a href={step.href} class="font-serif text-title text-ink hover:text-accent">
+              {step.title}
+            </a>
+          ) : (
+            <p class="font-serif text-title text-ink">
+              {step.title}
+              <span class="mono-label ml-2 text-ink-faint">Not built</span>
+            </p>
+          )}
+          <p class="mt-1 text-sm leading-relaxed text-ink-muted">{step.subtitle}</p>
+        </div>
+      </li>
+    ))
+  }
+</ol>
