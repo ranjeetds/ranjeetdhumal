@@ -1,10 +1,13 @@
 # Publish the static build to Cloudflare Workers on every push to main.
+# Changes that only touch portal/ do not deploy this site.
 # Requires repository secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.
 name: Deploy
 
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "portal/**"
   workflow_dispatch:
 
 concurrency:

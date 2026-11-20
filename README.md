@@ -40,6 +40,10 @@ npm run dev      # http://localhost:4321
 | Hosting        | Cloudflare Workers static assets (`wrangler.jsonc`)                       |
 | Not yet added  | Pagefind (search), D3 and Three.js (folders and conventions are ready)    |
 
+The township portal in `portal/` is a separate authenticated application for
+`mg.ranjeetdhumal.com`. It is not part of this static site, and its hostname must not be
+added to this Worker. See `portal/README.md`.
+
 ## Architecture
 
 ### Principles
