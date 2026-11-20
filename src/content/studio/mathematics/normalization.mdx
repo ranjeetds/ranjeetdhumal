@@ -1,0 +1,70 @@
+---
+title: A centered vector
+description: Six numbers, their mean, and each one as a population z-score.
+summary: The bars are z-scores of six numbers. The line is the mean. The deviation divides by six, the count, not by five. Select a number and move it. The mean moves, the unit moves, and every bar changes. If all six numbers are equal, the deviation is 0 and every z-score is 0.
+domain: mathematics
+difficulty: Foundational
+estimatedTime: 10
+visualization: normalization
+status: published
+prerequisites:
+  - sample-mean
+next: dot-product
+experiments:
+  - Leave the defaults, 1, 2, 3, 4, 5, and 9. The mean is 4.00 and the deviation is 2.58. The 4 sits on the line.
+  - Select 9. It is about 1.94 deviations above the mean.
+  - Set all six numbers equal. The deviation reads 0.00 and every score is 0.
+  - Reset.
+tags:
+  - mean
+  - standard deviation
+  - z-score
+---
+
+<Chapter id="intuition" title="Distance in the list's own units" objective="Say what a bar is, before the formula.">
+
+A number by itself does not say whether it is large. Large compared with what? The mean of the list is the comparison, and the spread of the list is the unit.
+
+The figure starts at 1, 2, 3, 4, 5, and 9. The 4 is the mean, so its bar has no height. The 9 is far above the line. Move any one number and you move the mean and the unit, so the other bars move too. They were never independent facts.
+
+</Chapter>
+
+<Chapter id="formula" title="Mean, deviation, z-score" objective="Match the caption to the arithmetic.">
+
+For values <Equation tex="x_1, \ldots, x_n" display={false} />,
+
+<Equation tex="\bar{x} = \frac{1}{n}\sum_i x_i," />
+
+<Equation tex="s = \sqrt{\frac{1}{n}\sum_i (x_i - \bar{x})^2}," />
+
+<Equation tex="z_i = \frac{x_i - \bar{x}}{s}." />
+
+The square root divides by <Equation tex="n" display={false} />, the count. This is the population deviation of these six numbers. It is not the sample estimate that divides by <Equation tex="n - 1" display={false} />.
+
+The defaults sum to 24, so the mean is 4. The squared gaps sum to 40, and <Equation tex="s = \sqrt{40 / 6} \approx 2.58" display={false} />. The selected 9 has z-score <Equation tex="(9 - 4) / 2.58 \approx 1.94" display={false} />.
+
+If every value equals the mean, <Equation tex="s = 0" display={false} />. Division by zero is avoided: every z-score is reported as 0. There is no distance to express.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Use the figure, then answer.">
+
+<Check
+  id="constant"
+  prompt="All six numbers are equal. What does the figure do?"
+  choices={[
+    'The deviation is 0 and every z-score is 0.',
+    'The deviation is 1, because a constant list is the unit.',
+    'The z-scores stay at their previous values.',
+  ]}
+  answer="The deviation is 0 and every z-score is 0."
+  why="There is no spread, so there is no unit of distance. Set the six numbers equal and the caption reads 0.00."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave the list for a score between two vectors.">
+
+[Dot product](/studio/dot-product) is two arrows and one number. The mean here was a summary of one list. A dot product is a summary of how two lists point.
+
+</Chapter>

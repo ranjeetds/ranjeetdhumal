@@ -134,6 +134,60 @@ export const labEssays: Record<VisualizationId, LabEssay> = {
       'The output of this kind of model is not a word. It is a distribution, and the word you see in a product is one draw from it. Context changes which word is likely. Temperature changes how willing the draw is to be unlikely. A confident sentence can be a low-temperature sample, not evidence that the other words had probability zero.',
     concepts: ['A distribution over tokens', 'Temperature', 'Sampling is not lookup'],
   },
+  entropy: {
+    scene:
+      'A curve of binary entropy against a probability from just above 0 to just below 1. A marker sits at 0.50, where the caption reads 1.00 bits. The vertical axis runs from 0 to 1.',
+    interaction:
+      'Move the probability. The marker follows the curve. At 0.20 the entropy is about 0.72 bits, and at 0.80 it is the same, because the two outcomes have only swapped. Near either end the curve falls toward 0.',
+    insight:
+      'Entropy here is the uncertainty of one biased coin, in bits, with log base 2. A fair coin leaves a full bit. A nearly certain coin leaves almost none. The figure stops short of 0 and 1 because the log is undefined there; those endpoints are 0 bits.',
+    concepts: ['Binary entropy', 'Log base 2', 'A fair coin is one bit'],
+  },
+  normalization: {
+    scene:
+      'Six bars for the z-scores of 1, 2, 3, 4, 5, and 9. The line is the mean. The last bar, 9, is the one selected and drawn in the accent. The caption gives the mean, 4.00, and the population deviation, 2.58.',
+    interaction:
+      'Select any of the six numbers and move it. The mean, the deviation, and every bar change, including the ones you did not touch. Set all six equal. The deviation reads 0.00 and every z-score is 0. Reset restores the six starting numbers.',
+    insight:
+      'A z-score is a distance from the mean in units of the spread of this vector. The spread divides by the count, six, not by five. Changing one entry moves the origin and the unit, so the other scores move too.',
+    concepts: ['Mean', 'Population standard deviation', 'Z-score'],
+  },
+  confusion: {
+    scene:
+      'Four counts in a grid: 8 true positives, 2 false positives, 3 false negatives, 7 true negatives. Above them, precision 0.80, recall 0.73, F1 0.76, and accuracy 0.75.',
+    interaction:
+      'Move any count from 0 to 20. Raise the false negatives and recall falls while precision does not, because precision never looks at the false negatives. Set true positives and false positives both to 0. Precision becomes undefined rather than 0.',
+    insight:
+      'Accuracy mixes every cell. Precision asks how many of the predicted positives were right. Recall asks how many of the actual positives were found. A denominator of zero is left undefined, because there is no rate to report.',
+    concepts: ['True and false positives', 'Precision', 'Recall'],
+  },
+  neighbors: {
+    scene:
+      'Eight fixed points on a plane, four drawn in ink and four in the accent, and a query ring at the origin. Lines connect the query to its three nearest points. The caption says the vote is class 0.',
+    interaction:
+      'Move the query. Switch k among 1, 3, and 5. At the origin, k = 1 and k = 3 vote class 0, and k = 5 votes class 1. The points never move, and nothing is fitted.',
+    insight:
+      'The label is a majority of the k closest points under Euclidean distance. A larger k can change the vote without any new data. An equal distance keeps the earlier point in the fixed list. An equal number of votes is reported as a tie.',
+    concepts: ['Euclidean distance', 'k', 'A majority vote'],
+  },
+  convolution: {
+    scene:
+      'A 5×5 image of small integers, and a 3×3 output. The vertical-edge kernel is selected. The top-left output cell is selected and reads −1.00. The nine image cells in that window are shaded.',
+    interaction:
+      'Select another output cell and the shaded window moves with it. Switch to box blur: the same window’s raw sum is divided by 9. Switch to sharpen. The image itself never changes.',
+    insight:
+      'A convolution here is a local sum of products between a window and a kernel. The output is smaller than the image because the window has to fit. Blur is that sum divided by 9. There is no learned kernel and no channel.',
+    concepts: ['A sliding window', 'Element-wise products', 'A fixed kernel'],
+  },
+  'positional-encoding': {
+    scene:
+      'A sine wave across positions 0 to 32, with a marker at position 0, and eight numbers under it. At position 0 the sines read 0.00 and the cosines read 1.00.',
+    interaction:
+      'Move the position. The first sine completes waves. The later components move more slowly. At position 8 the first component is about 0.99 and the last sine is still about 0.01.',
+    insight:
+      'The encoding is the one in Vaswani et al.: even indices are sines and odd indices are cosines of the position divided by 10000 raised to a fraction of the width. The width here is 8 so the column can be read. The paper’s transformer uses 512. A position becomes a vector, and the slow frequencies barely change between neighbours.',
+    concepts: ['Sine and cosine features', 'Frequency by index', 'A position as a vector'],
+  },
   'agent-loop': {
     scene:
       'One task, a small explicit state, and four stages drawn in a circle: observe, decide, act, read the result. The observation the model would actually receive is shown as text at the observe stage, not implied. The decide stage shows the tool request and nothing else. The act stage shows the tool either running or refusing. The result stage shows what will be appended to the next observation.',

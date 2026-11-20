@@ -8,11 +8,17 @@ import { type LiveVisualizationId, engineLabels, getVisualization } from './regi
 import Activations from './svg/Activations';
 import AttentionPatterns from './svg/AttentionPatterns';
 import Backpropagation from './svg/Backpropagation';
+import Confusion from './svg/Confusion';
+import Convolution from './svg/Convolution';
 import DotProduct from './svg/DotProduct';
+import Entropy from './svg/Entropy';
 import GradientDescent from './svg/GradientDescent';
 import Losses from './svg/Losses';
+import Neighbors from './svg/Neighbors';
 import Neuron from './svg/Neuron';
 import NextToken from './svg/NextToken';
+import Normalization from './svg/Normalization';
+import PositionalEncoding from './svg/PositionalEncoding';
 import SampleMean from './svg/SampleMean';
 import Tokenization from './svg/Tokenization';
 import VizFrame from './VizFrame.astro';
@@ -45,5 +51,11 @@ const visualization = getVisualization(id);
   {id === 'attention-patterns' && <AttentionPatterns client:visible />}
   {id === 'next-token' && <NextToken client:visible />}
   {id === 'tokenization' && <Tokenization client:visible />}
+  {id === 'entropy' && <Entropy client:visible />}
+  {id === 'normalization' && <Normalization client:visible />}
+  {id === 'confusion' && <Confusion client:visible />}
+  {id === 'neighbors' && <Neighbors client:visible />}
+  {id === 'convolution' && <Convolution client:visible />}
+  {id === 'positional-encoding' && <PositionalEncoding client:visible />}
   {visualization.caption && <Fragment slot="caption">{visualization.caption}</Fragment>}
 </VizFrame>

@@ -14,7 +14,12 @@ const projects = [...(await getPublishedProjects())]
     return rank(a.data.status) - rank(b.data.status) || b.data.year - a.data.year || a.data.title.localeCompare(b.data.title);
   })
   .slice(0, 3);
-const research = (await getPublishedResearch()).filter((entry) => entry.data.stage === 'posted').slice(0, 2);
+const posted = (await getPublishedResearch()).filter((entry) => entry.data.stage === 'posted');
+const patent = posted.find((entry) => entry.data.kind === 'patent');
+const research = [
+  ...posted.filter((entry) => entry !== patent).slice(0, 2),
+  ...(patent ? [patent] : []),
+];
 ---
 
 <Section id="studio" label="Studio" title="Experiments you can change.">

@@ -147,8 +147,8 @@ export const resume: Resume = {
       organization: 'WO2019097412A1',
       period: '2019',
       summary:
-        'International patent publication, with Sanjay Singh, Aniruddha Pant and Anand Deshpande. Filed by Asquared IoT on 14 Nov 2018 and published on 23 May 2019.',
-      href: 'https://patents.google.com/patent/WO2019097412A1',
+        'International publication, with Sanjay Singh, Aniruddha Pant and Anand Deshpande. Asquared IoT filed it on 14 Nov 2018; it was published on 23 May 2019. It claims priority from Indian application 201721040616, filed 14 Nov 2017. Google Patents lists it as ceased. It did not enter the European national phase.',
+      href: 'https://patents.google.com/patent/WO2019097412A1/en',
     },
   ],
   skills: [

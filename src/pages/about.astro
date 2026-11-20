@@ -16,9 +16,13 @@ const colophon = [
 <PageLayout section="about">
   <Section id="author" label="Author" title={site.name}>
     <div class="grid items-start gap-10 lg:grid-cols-[11rem_1fr]">
-      <div class="flex aspect-[4/5] w-40 items-end border border-line bg-surface p-4 lg:w-full">
-        <p class="mono-label text-ink-faint">[PERSONAL CONTENT NEEDED] Portrait</p>
-      </div>
+      <img
+        src="/portrait.jpg"
+        alt="Ranjeet Dhumal"
+        width="768"
+        height="1024"
+        class="aspect-[4/5] w-40 border border-line object-cover object-[center_18%] lg:w-full"
+      />
       <div class="max-w-2xl space-y-5 text-lede text-ink-muted">
       <p>
         {site.name} is a {site.role} at {site.employer} in {site.location}. He works on document
@@ -29,7 +33,11 @@ const colophon = [
         He trained as a physicist. A BSc at Fergusson College was followed by an MSc in quantum
         mechanics at Savitribai Phule Pune University, and by research in computational physics at
         the university’s Center for Modeling and Simulation. The work since has been applied
-        machine learning — industrial sound at Asquared IoT, telematics at KPIT, language and
+        machine learning: industrial sound at Asquared IoT, published as{' '}
+        <a href="https://patents.google.com/patent/WO2019097412A1/en" class="link-underline text-ink hover:text-accent">
+          WO2019097412A1
+        </a>
+        , telematics at KPIT, language and
         platform models at Exadatum and Fractal, and client systems at Accenture.
       </p>
       <p>

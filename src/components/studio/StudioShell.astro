@@ -30,7 +30,13 @@ function isEmbeddedViz(id: string): id is Exclude<LiveVisualizationId, 'gradient
     id === 'backpropagation' ||
     id === 'attention-patterns' ||
     id === 'tokenization' ||
-    id === 'next-token'
+    id === 'next-token' ||
+    id === 'entropy' ||
+    id === 'normalization' ||
+    id === 'confusion' ||
+    id === 'neighbors' ||
+    id === 'convolution' ||
+    id === 'positional-encoding'
   );
 }
 

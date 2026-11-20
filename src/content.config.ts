@@ -93,7 +93,7 @@ const paths = defineCollection({
 const research = defineCollection({
   loader: folder('research'),
   schema: entry.extend({
-    kind: z.enum(['note', 'experiment', 'paper-note', 'open-question']),
+    kind: z.enum(['note', 'experiment', 'paper-note', 'patent', 'open-question']),
     /** `planned` entries are the queue. They are not findings. */
     stage: z.enum(['planned', 'posted']).default('posted'),
     publishedAt: z.coerce.date(),
@@ -118,6 +118,19 @@ const projects = defineCollection({
     outcome: z.string(),
     repository: z.url().optional(),
     url: z.url().optional(),
+    /** Label for `url`. Live products use the default. */
+    linkLabel: z.string().default('Live site'),
+    /** Sample pages produced by the project, each with a static preview. */
+    samples: z
+      .array(
+        z.object({
+          title: z.string(),
+          place: z.string().optional(),
+          url: z.url(),
+          image: z.string(),
+        }),
+      )
+      .default([]),
   }),
 });
 

@@ -1,0 +1,64 @@
+---
+title: Nearest neighbours
+description: A query point labeled by a vote of the k closest points. Nothing is trained.
+summary: Eight fixed points, four in each class. The query starts at the origin. Distance is Euclidean. k is 1, 3, or 5. At the origin, k = 1 and k = 3 vote class 0, and k = 5 votes class 1. An equal distance keeps the earlier point in the list. An equal vote is a tie.
+domain: machine-learning
+difficulty: Foundational
+estimatedTime: 12
+visualization: neighbors
+status: published
+prerequisites:
+  - dot-product
+next: gradient-descent
+experiments:
+  - Leave the query at the origin and k at 3. The vote is class 0.
+  - Switch to k = 1. The vote is still class 0. The single neighbour is the ink point just left of the origin.
+  - Switch to k = 5. The vote becomes class 1.
+  - Move the query into the accent cluster. The vote becomes class 1 at every k.
+tags:
+  - neighbours
+  - distance
+  - classification
+---
+
+<Chapter id="intuition" title="Ask the nearest examples" objective="Say what the lines are for.">
+
+There is no equation being fitted. The labeled points are the whole model. A new point is given the label that wins a vote among the points closest to it.
+
+Ink points are class 0. Accent points are class 1. The ring is the query. The lines are the neighbours allowed to vote. Change k and the set of lines changes. The points do not.
+
+</Chapter>
+
+<Chapter id="distance" title="Distance, then a count" objective="See why k = 5 disagrees with k = 3 at the origin.">
+
+The distance from the query <Equation tex="(x, y)" display={false} /> to a point <Equation tex="(x_i, y_i)" display={false} /> is
+
+<Equation tex="\sqrt{(x - x_i)^2 + (y - y_i)^2}." />
+
+The k smallest distances vote. If two distances are equal, the point earlier in the fixed list is kept. If the vote splits evenly, the caption says the classes tie. It does not pick one.
+
+At the origin the three nearest are class 0, class 1, and class 0, in that order. k = 1 sees only the first, class 0. k = 3 sees two of class 0 and one of class 1. k = 5 takes two more class-1 points, and the vote becomes class 1. Same points, same query, different k.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Use the origin, then answer.">
+
+<Check
+  id="k"
+  prompt="The query is at the origin. You change k from 3 to 5. What happens?"
+  choices={[
+    'The vote stays class 0, because the nearest point did not move.',
+    'The vote becomes class 1.',
+    'The figure retrains and the points move.',
+  ]}
+  answer="The vote becomes class 1."
+  why="The two extra neighbours are class 1, and they outvote the class-0 points. Nothing is fitted. Only the size of the vote changed."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave a stored vote for a step on a loss.">
+
+[Gradient descent](/studio/gradient-descent) is a different kind of classifier's training: the points are not stored, and a loss is walked downhill. This page stored every example and never took a step.
+
+</Chapter>

@@ -28,6 +28,12 @@ export const liveVisualizationIds = [
   'attention-patterns',
   'tokenization',
   'next-token',
+  'entropy',
+  'normalization',
+  'confusion',
+  'neighbors',
+  'convolution',
+  'positional-encoding',
 ] as const;
 
 export type LiveVisualizationId = (typeof liveVisualizationIds)[number];
@@ -149,6 +155,48 @@ export const studioModules = [
     status: 'live',
   },
   {
+    id: 'entropy',
+    title: 'Binary entropy',
+    subtitle: 'How many bits a coin with probability p still leaves undecided.',
+    domainId: 'mathematics',
+    status: 'live',
+  },
+  {
+    id: 'normalization',
+    title: 'A centered vector',
+    subtitle: 'Six numbers, recentered, in units of their own spread.',
+    domainId: 'mathematics',
+    status: 'live',
+  },
+  {
+    id: 'confusion',
+    title: 'Precision and recall',
+    subtitle: 'Four counts, and the rates a classifier is usually quoted by.',
+    domainId: 'machine-learning',
+    status: 'live',
+  },
+  {
+    id: 'neighbors',
+    title: 'Nearest neighbours',
+    subtitle: 'A query, and a vote among the k closest labeled points.',
+    domainId: 'machine-learning',
+    status: 'live',
+  },
+  {
+    id: 'convolution',
+    title: 'A convolution',
+    subtitle: 'One 3×3 kernel on a fixed 5×5 image.',
+    domainId: 'deep-learning',
+    status: 'live',
+  },
+  {
+    id: 'positional-encoding',
+    title: 'Positional encoding',
+    subtitle: 'A position written as sines and cosines.',
+    domainId: 'transformers',
+    status: 'live',
+  },
+  {
     id: 'decision-boundaries',
     title: 'Decision boundaries',
     subtitle: 'A linear cut, a tree, and a small network on the same points.',
@@ -181,12 +229,17 @@ export const studioDomains = [
     why: 'A loss is an average of mistakes. A similarity is a dot product. Both are pictures before they are slogans.',
     prerequisites: 'None. This is a starting point. The derivative a descent needs is taught inside the gradient descent lesson.',
     related: ['machine-learning'],
-    sequence: ['sample-mean', 'dot-product', 'gradient-descent'],
+    sequence: ['sample-mean', 'entropy', 'normalization', 'dot-product', 'gradient-descent'],
     groups: [
       {
         title: 'Estimation',
         lede: 'One population, many draws, and a mean that moves less as the draw grows.',
         modules: ['sample-mean'],
+      },
+      {
+        title: 'Spread and uncertainty',
+        lede: 'A vector recentered by its own spread, and the bits left in a coin flip.',
+        modules: ['entropy', 'normalization'],
       },
       {
         title: 'Scores',
@@ -203,12 +256,17 @@ export const studioDomains = [
     why: 'Almost every trained system is a search for parameters that make a loss smaller. The search is the thing worth seeing.',
     prerequisites: 'A mean, from the mathematics domain. The slope itself is defined in the lesson.',
     related: ['mathematics', 'deep-learning'],
-    sequence: ['loss-functions', 'gradient-descent', 'decision-boundaries'],
+    sequence: ['loss-functions', 'confusion', 'neighbors', 'gradient-descent', 'decision-boundaries'],
     groups: [
       {
+        title: 'A prediction and its score',
+        lede: 'A loss for one number, the counts behind precision and recall, and a vote among neighbours.',
+        modules: ['loss-functions', 'confusion', 'neighbors'],
+      },
+      {
         title: 'Optimization',
-        lede: 'A number for how wrong a prediction is, then a walk that makes that number smaller.',
-        modules: ['loss-functions', 'gradient-descent'],
+        lede: 'A walk that makes a loss smaller.',
+        modules: ['gradient-descent'],
       },
       {
         title: 'Decisions',
@@ -225,12 +283,12 @@ export const studioDomains = [
     why: 'Depth is composition. The update is still a step along a gradient. Seeing the step first makes the stack legible.',
     prerequisites: 'Gradient descent. A network does not introduce a new kind of learning. It introduces a function the learning is applied to.',
     related: ['machine-learning', 'transformers'],
-    sequence: ['neuron', 'activations', 'backpropagation'],
+    sequence: ['neuron', 'activations', 'convolution', 'backpropagation'],
     groups: [
       {
         title: 'Foundations',
         lede: 'One unit, then the bend it applies.',
-        modules: ['neuron', 'activations'],
+        modules: ['neuron', 'activations', 'convolution'],
       },
       {
         title: 'Learning',
@@ -254,8 +312,13 @@ export const studioDomains = [
     why: 'The public object is a chatbot. The mechanism is a distribution over pieces, conditioned on other pieces.',
     prerequisites: 'A vector as a list of numbers, and a dot product as a score. The lessons define both before they use them.',
     related: ['deep-learning', 'generative'],
-    sequence: ['dot-product', 'tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
+    sequence: ['dot-product', 'positional-encoding', 'tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
     groups: [
+      {
+        title: 'Where a position goes',
+        lede: 'A position written as sines and cosines, before the pieces are mixed.',
+        modules: ['positional-encoding'],
+      },
       {
         title: 'The pieces a model sees',
         lede: 'A word on the page is not the unit the model receives.',
@@ -326,7 +389,7 @@ export const studioPaths = [
     id: 'neural-networks',
     title: 'Understand Neural Networks',
     description: 'A step on a surface, one neuron, the bend, and the chain rule through that neuron.',
-    steps: ['gradient-descent', 'neuron', 'activations', 'backpropagation'],
+    steps: ['gradient-descent', 'neuron', 'activations', 'convolution', 'backpropagation'],
     reading: [
       { href: '/knowledge/how-neural-networks-learn', title: 'How Neural Networks Learn' },
       { href: '/videos#building-micrograd', title: 'The spelled-out intro to neural networks and backpropagation' },
@@ -342,7 +405,7 @@ export const studioPaths = [
     id: 'transformers',
     title: 'How Transformers Work',
     description: 'Cut a string, mix the pieces, and read the distribution the next piece is drawn from.',
-    steps: ['dot-product', 'tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
+    steps: ['dot-product', 'positional-encoding', 'tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
     reading: [{ href: '/knowledge/attention-and-transformers', title: 'Attention Mechanisms and Transformers' }],
   },
   {

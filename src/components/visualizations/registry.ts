@@ -236,6 +236,102 @@ export const visualizations = [
     status: 'live',
   },
   {
+    id: 'entropy',
+    title: 'Binary entropy',
+    summary: 'How many bits a coin with probability p still leaves undecided.',
+    caption:
+      'One slider, the probability of heads. The curve is binary entropy in bits, using log base 2. It peaks at one bit when the coin is fair.',
+    objective: 'See that uncertainty is highest at an even chance and falls as the outcome becomes lopsided.',
+    interactions: [
+      'Move the probability from near 0 to near 1',
+      'Stop at 0.5 and read one bit',
+      'Compare 0.2 with 0.8',
+    ],
+    engine: 'svg',
+    topic: 'mathematics',
+    status: 'live',
+  },
+  {
+    id: 'normalization',
+    title: 'A centered vector',
+    summary: 'Six numbers, their mean, and each value in units of the population standard deviation.',
+    caption:
+      'The bars are z-scores. The deviation divides by the count of the six numbers, not by five. A constant vector has deviation 0, and every z-score is then 0.',
+    objective: 'See that changing one number moves the mean and every other score.',
+    interactions: [
+      'Select a number and move it',
+      'Make all six numbers equal and read a deviation of 0',
+      'Reset to 1, 2, 3, 4, 5, 9',
+    ],
+    engine: 'svg',
+    topic: 'mathematics',
+    status: 'live',
+  },
+  {
+    id: 'confusion',
+    title: 'Precision and recall',
+    summary: 'Four counts, and the rates they define.',
+    caption:
+      'True positives, false positives, false negatives, and true negatives. Precision is true positives over predicted positives. Recall is true positives over actual positives. A rate with a zero denominator is left undefined.',
+    objective: 'See that a high accuracy can hide a miss, and that precision and recall answer different questions.',
+    interactions: [
+      'Move each of the four counts',
+      'Set predicted positives to zero and read that precision is undefined',
+      'Raise false negatives and watch recall fall while precision stays',
+    ],
+    engine: 'svg',
+    topic: 'machine-learning',
+    status: 'live',
+  },
+  {
+    id: 'neighbors',
+    title: 'Nearest neighbours',
+    summary: 'A query point and a vote among the k closest labeled points.',
+    caption:
+      'Eight fixed points, four in each class. Distance is Euclidean. The lines are the neighbours in the vote. An equal distance keeps the earlier point in the list. An equal vote is a tie.',
+    objective: 'See the label change with k, without any training step.',
+    interactions: [
+      'Move the query',
+      'Switch k among 1, 3, and 5',
+      'From the origin, compare k = 3 with k = 5',
+    ],
+    engine: 'svg',
+    topic: 'machine-learning',
+    status: 'live',
+  },
+  {
+    id: 'convolution',
+    title: 'A convolution',
+    summary: 'One 3×3 kernel slid across a fixed 5×5 image.',
+    caption:
+      'Pick an output cell. The shaded window is what that cell sees. The value is the sum of element-wise products. Box blur then divides by 9. The image does not change.',
+    objective: 'Read a convolution as a local sum of products, not as a layer diagram.',
+    interactions: [
+      'Select an output cell',
+      'Switch among a vertical edge, a box blur, and a sharpen kernel',
+      'Read the raw sum beside the scaled value',
+    ],
+    engine: 'svg',
+    topic: 'deep-learning',
+    status: 'live',
+  },
+  {
+    id: 'positional-encoding',
+    title: 'Positional encoding',
+    summary: 'Sine and cosine of a position, at eight frequencies.',
+    caption:
+      'The formula is the one in Vaswani et al. Even columns are sines, odd columns are cosines. The width is 8 so the column fits on the page. At position 0 every sine is 0 and every cosine is 1.',
+    objective: 'See a position become a vector, and see nearby positions stay similar on the slow frequencies.',
+    interactions: [
+      'Move the position from 0 to 32',
+      'Read the eight components',
+      'Watch the first sine complete a wave while the last components barely move',
+    ],
+    engine: 'svg',
+    topic: 'generative-ai',
+    status: 'live',
+  },
+  {
     id: 'agent-loop',
     title: 'An agent loop',
     summary: 'One decision cycle of a tool-using agent, paused on the state rather than the prose.',

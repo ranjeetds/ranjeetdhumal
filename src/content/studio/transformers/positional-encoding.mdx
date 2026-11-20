@@ -1,0 +1,65 @@
+---
+title: Positional encoding
+description: A position written as eight sines and cosines, using the formula from Vaswani et al.
+summary: The position slider runs from 0 to 32. Even columns are sines and odd columns are cosines. The width is 8. At position 0 every sine is 0 and every cosine is 1. The first sine completes waves while the last components barely move. The paper's transformer uses width 512. This column is the same formula, short enough to read.
+domain: transformers
+difficulty: Intermediate
+estimatedTime: 12
+visualization: positional-encoding
+status: published
+prerequisites:
+  - dot-product
+next: tokenization
+experiments:
+  - Leave the position at 0. Every sine reads 0.00 and every cosine reads 1.00.
+  - Move to position 8. The first sine is about 0.99. The last sine is about 0.01.
+  - Sweep from 0 to 32 and watch the first curve complete waves while the right-hand columns stay near their starting values.
+tags:
+  - position
+  - sine
+  - transformer
+---
+
+<Chapter id="intuition" title="A position has to become a vector" objective="Say why a count is not enough.">
+
+Attention mixes positions, but the mixer does not know that position 8 comes after position 7 unless someone writes that order down. One way to write it is a vector of sines and cosines of the position, at several speeds.
+
+The curve on the figure is the fastest of those sines. The eight numbers are the whole vector for the position you chose. A real model adds this vector to a token's embedding. There is no embedding on this page. There is only the position.
+
+</Chapter>
+
+<Chapter id="formula" title="The formula, at width 8" objective="Check position 0 by hand.">
+
+Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, and Polosukhin, “Attention Is All You Need”, [arXiv:1706.03762](https://arxiv.org/abs/1706.03762), define
+
+<Equation tex="PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d}}\right), \qquad PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d}}\right)." />
+
+Here <Equation tex="d = 8" display={false} /> and <Equation tex="i" display={false} /> runs from 0 to 3. In the paper <Equation tex="d" display={false} /> is 512. The angles are the same kind of angles.
+
+At position 0 every angle is 0. Sine of 0 is 0 and cosine of 0 is 1, on every pair. That is the column the figure opens on.
+
+A small <Equation tex="i" display={false} /> makes a large angle as the position grows, so the first sine moves quickly. A large <Equation tex="i" display={false} /> makes a tiny angle, so the last components almost sit still between neighbouring positions. Sweep the slider and the left of the table races while the right barely leaves 0 and 1.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Use position 0, then answer.">
+
+<Check
+  id="zero"
+  prompt="The position is 0. What is in the column?"
+  choices={[
+    'Every entry is 0.',
+    'Every sine is 0 and every cosine is 1.',
+    'Every entry is 1.',
+  ]}
+  answer="Every sine is 0 and every cosine is 1."
+  why="Every angle is 0. Sine of 0 is 0 and cosine of 0 is 1, whichever frequency the column uses."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave the position vector for the pieces it would be added to.">
+
+[Tokenization](/studio/tokenization) is how a string becomes the pieces a model sees. A positional vector is added per piece. This page is the vector. That page is the cut.
+
+</Chapter>

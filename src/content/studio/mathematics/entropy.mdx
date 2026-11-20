@@ -1,0 +1,64 @@
+---
+title: Binary entropy
+description: The uncertainty, in bits, of a coin whose probability of heads you choose.
+summary: One slider is the probability of heads. The curve is binary entropy with log base 2. A fair coin is 1 bit. A probability and its complement have the same entropy. The slider stops just short of 0 and 1, where the logarithm is undefined and the entropy is 0.
+domain: mathematics
+difficulty: Foundational
+estimatedTime: 10
+visualization: entropy
+status: published
+next: normalization
+experiments:
+  - Leave the slider at 0.50. The caption reads 1.00 bits.
+  - Move it to 0.20. The entropy is about 0.72 bits.
+  - Move it to 0.80. The entropy matches 0.20, because the two outcomes have swapped.
+  - Push the slider to either end. The curve falls toward 0.
+tags:
+  - entropy
+  - bits
+  - probability
+---
+
+<Chapter id="intuition" title="What is still undecided" objective="Say what the height of the curve is for.">
+
+A coin is about to be flipped. If you already know it will land heads, the flip tells you nothing. If you think heads and tails are equally likely, the flip tells you as much as a flip can tell you. Entropy is that gap, measured in bits.
+
+This figure is one coin. The slider is your probability of heads. The curve is how many bits the flip still carries.
+
+</Chapter>
+
+<Chapter id="formula" title="The formula" objective="Compute the number on the caption.">
+
+Write <Equation tex="p" display={false} /> for the probability of heads. Binary entropy, in bits, is
+
+<Equation tex="H(p) = -p \log_2 p - (1 - p) \log_2 (1 - p)." />
+
+At <Equation tex="p = 0.5" display={false} /> both terms are <Equation tex="-0.5 \log_2 0.5 = 0.5" display={false} />, and <Equation tex="H" display={false} /> is 1. That is the top of the curve.
+
+At <Equation tex="p = 0.2" display={false} /> the same formula gives about 0.72 bits. At <Equation tex="p = 0.8" display={false} /> the two terms have swapped places, so the value is the same. The curve is symmetric around one half.
+
+The logarithm is undefined at 0 and at 1. Those endpoints are defined by continuity to be 0 bits: a certain outcome carries no information. The slider runs from 0.01 to 0.99 so the caption never asks for the log of zero.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Read the curve, then answer.">
+
+<Check
+  id="peak"
+  prompt="Where is binary entropy largest?"
+  choices={[
+    'When the probability is near 0.',
+    'When the probability is 0.5.',
+    'When the probability is near 1.',
+  ]}
+  answer="When the probability is 0.5."
+  why="The curve peaks at one bit when the coin is fair. Toward either end it falls."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Take a list of numbers and recenter it.">
+
+[A centered vector](/studio/normalization) is six numbers, their mean, and each number in units of the spread. Entropy was one probability. That figure is a whole list.
+
+</Chapter>

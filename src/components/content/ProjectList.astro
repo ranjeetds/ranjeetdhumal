@@ -1,7 +1,8 @@
 ---
 /**
- * Project cards. Each one states the problem, the approach in the public repository,
- * and what that repository demonstrates. The title links to the source.
+ * Project cards. Each one states the problem, how the work was put together,
+ * and what it demonstrates. The title links to a public repository when there is one.
+ * A project that produced sample sites renders those previews across the row.
  */
 import type { Project } from '@/lib/content';
 
@@ -23,7 +24,10 @@ const parts = [
 <ul class="grid gap-px border border-line bg-line sm:grid-cols-2">
   {
     projects.map((project) => (
-      <li id={project.id} class="scroll-mt-28 bg-canvas">
+      <li
+        id={project.id}
+        class:list={['scroll-mt-28 bg-canvas', project.data.samples.length > 0 && 'sm:col-span-2']}
+      >
         <article class="flex h-full flex-col p-6">
           <p class="mono-label text-ink-faint">
             {statusLabel[project.data.status]}
@@ -56,6 +60,27 @@ const parts = [
           {project.data.stack.length > 0 && (
             <p class="mt-5 text-sm leading-relaxed text-ink-faint">{project.data.stack.join(' · ')}</p>
           )}
+          {project.data.samples.length > 0 && (
+            <ul class="mt-6 grid gap-px border border-line bg-line sm:grid-cols-2">
+              {project.data.samples.map((sample) => (
+                <li class="bg-surface">
+                  <a href={sample.url} class="group block" rel="noopener noreferrer" target="_blank">
+                    <img
+                      src={sample.image}
+                      alt={`Preview of ${sample.title}${sample.place ? `, ${sample.place}` : ''}`}
+                      width="960"
+                      height="600"
+                      class="aspect-[16/10] w-full object-cover object-top"
+                    />
+                    <span class="block px-4 py-3">
+                      <span class="text-sm text-ink group-hover:text-accent">{sample.title}</span>
+                      {sample.place && <span class="mt-1 block text-sm text-ink-faint">{sample.place}</span>}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
           {project.data.url && (
             <a
               href={project.data.url}
@@ -63,7 +88,7 @@ const parts = [
               rel="noopener noreferrer"
               target="_blank"
             >
-              Live site
+              {project.data.linkLabel}
             </a>
           )}
         </article>

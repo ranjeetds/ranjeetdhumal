@@ -1,0 +1,76 @@
+---
+title: A convolution
+description: One 3×3 kernel on a fixed 5×5 image. Each output cell is a sum of products.
+summary: The image does not change. You pick a kernel and an output cell. The shaded window is the part of the image that cell sees. The value is the sum of the element-wise products. Box blur divides that sum by 9. The vertical-edge kernel at the top-left cell is −1.
+domain: deep-learning
+difficulty: Foundational
+estimatedTime: 12
+visualization: convolution
+status: published
+prerequisites:
+  - neuron
+next: backpropagation
+experiments:
+  - Leave Vertical edge on the top-left cell. The raw sum is −1.00, and the cell is −1.00.
+  - Select the other output cells. The window moves. The image does not.
+  - Switch to Box blur on the same top-left window. The raw sum is 7, and the cell is 7/9, about 0.78.
+  - Switch to Sharpen and read a different sum on the same window.
+tags:
+  - convolution
+  - kernel
+  - image
+---
+
+<Chapter id="intuition" title="The same small sum, slid across" objective="Say what one output cell is looking at.">
+
+A convolution here is not a diagram of a layer. It is a window and a kernel, both 3 by 3, and one number made from them.
+
+The image is 5 by 5 and fixed. The output is 3 by 3, because a 3 by 3 window only fits in three positions across and three down. Select a cell and the window that produced it is shaded. The rest of the image is not in that sum.
+
+</Chapter>
+
+<Chapter id="sum" title="The sum of products" objective="Recompute the top-left cell.">
+
+Number the window rows and columns from 0. The raw sum is
+
+<Equation tex="\sum_{i=0}^{2}\sum_{j=0}^{2} K_{ij}\, I_{r+i,\, c+j}." />
+
+The cell on the figure is that sum times the kernel's scale.
+
+Vertical edge has scale 1 and weights
+
+<Equation tex="\begin{bmatrix}-1 & 0 & 1 \\ -1 & 0 & 1 \\ -1 & 0 & 1\end{bmatrix}." />
+
+The top-left window of the image is
+
+<Equation tex="\begin{bmatrix}1 & 0 & 2 \\ 0 & 1 & 0 \\ 2 & 1 & 0\end{bmatrix}." />
+
+The products are −1, 0, 2, 0, 0, 0, −2, 0, 0. They sum to −1, which is the cell.
+
+Box blur uses a kernel of ones and a scale of <Equation tex="1/9" display={false} />. The same window sums to 7, and the cell is <Equation tex="7/9 \approx 0.78" display={false} />. Sharpen keeps the scale at 1 and puts a 5 in the center, so the center pixel dominates and the neighbours are subtracted.
+
+Nothing here is learned. The three kernels are typed in.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Use the top-left cell, then answer.">
+
+<Check
+  id="blur"
+  prompt="Box blur is selected on a window whose pixels sum to 7. What is the output cell?"
+  choices={[
+    '7. The kernel of ones copies the sum.',
+    'About 0.78. The sum is divided by 9.',
+    '1. A blur always returns 1.',
+  ]}
+  answer="About 0.78. The sum is divided by 9."
+  why="The weights are ones, so the raw sum is the sum of the pixels. The scale is 1/9. On the top-left window that is 7/9."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave the local sum for a gradient through a unit.">
+
+[Backpropagation](/studio/backpropagation) is a different composition: one ReLU and a squared error. A convolutional layer would be many of these windows, with a kernel those gradients could move. This page holds the kernel still.
+
+</Chapter>

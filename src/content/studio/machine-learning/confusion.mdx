@@ -1,0 +1,72 @@
+---
+title: Precision and recall
+description: Four counts, and the three rates people quote from them.
+summary: True positives, false positives, false negatives, and true negatives. Precision divides true positives by everything the classifier called positive. Recall divides true positives by everything that was actually positive. Accuracy mixes all four cells. A rate whose denominator is zero is left undefined.
+domain: machine-learning
+difficulty: Foundational
+estimatedTime: 12
+visualization: confusion
+status: published
+next: neighbors
+experiments:
+  - Leave the defaults, 8, 2, 3, and 7. Precision is 0.80, recall is 0.73, accuracy is 0.75.
+  - Raise false negatives and do not touch the top row. Recall falls. Precision does not.
+  - Set true positives and false positives to 0. Precision reads undefined.
+  - Set true positives and false negatives to 0. Recall reads undefined.
+tags:
+  - precision
+  - recall
+  - accuracy
+---
+
+<Chapter id="intuition" title="Four ways to be right or wrong" objective="Name the cells before the rates.">
+
+A classifier says yes or no. The truth is yes or no. That is four counts, not one score.
+
+A true positive was yes, and the classifier said yes. A false positive was no, and it said yes. A false negative was yes, and it said no. A true negative was no, and it said no.
+
+Accuracy adds the two diagonal cells and divides by everything. It can look fine while one of the off-diagonal cells is the whole story. Precision and recall refuse to mix those cells.
+
+</Chapter>
+
+<Chapter id="rates" title="The three rates" objective="See which cells each rate is allowed to see.">
+
+Write <Equation tex="TP, FP, FN, TN" display={false} /> for the four counts.
+
+<Equation tex="\mathrm{precision} = \frac{TP}{TP + FP}, \qquad \mathrm{recall} = \frac{TP}{TP + FN}." />
+
+<Equation tex="\mathrm{accuracy} = \frac{TP + TN}{TP + FP + FN + TN}." />
+
+The defaults are 8, 2, 3, and 7. Precision is <Equation tex="8 / 10 = 0.80" display={false} />. Recall is <Equation tex="8 / 11 \approx 0.73" display={false} />. Accuracy is <Equation tex="15 / 20 = 0.75" display={false} />.
+
+F1 is the harmonic mean of precision and recall,
+
+<Equation tex="F_1 = \frac{2 \cdot \mathrm{precision} \cdot \mathrm{recall}}{\mathrm{precision} + \mathrm{recall}}." />
+
+On the defaults that is about 0.76. It is a compromise, not a fifth fact about the counts.
+
+Raise the false negatives. Recall falls, because those misses are in its denominator. Precision does not move, because a false negative was never predicted positive. Set both predicted-positive counts to 0. There is no precision to compute, and the figure says undefined rather than 0.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Move one count, then answer.">
+
+<Check
+  id="recall"
+  prompt="You increase only the false negatives. What changes?"
+  choices={[
+    'Precision falls and recall stays.',
+    'Recall falls and precision stays.',
+    'Both fall by the same amount.',
+  ]}
+  answer="Recall falls and precision stays."
+  why="Recall's denominator is the actual positives, which include the false negatives. Precision's denominator is the predicted positives, which do not."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave the counts for a vote among neighbours.">
+
+[Nearest neighbours](/studio/neighbors) assigns a label by a vote of the closest points. The counts on this page are what you would fill in after many such votes, once you knew the true labels.
+
+</Chapter>
