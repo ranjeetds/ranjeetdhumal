@@ -1,0 +1,66 @@
+---
+import CardGrid from '@/components/ui/CardGrid.astro';
+import Section from '@/components/ui/Section.astro';
+import { guideFields } from '@/data/guides';
+import PageLayout from '@/layouts/PageLayout.astro';
+import { getPublishedGuides, guideHref } from '@/lib/content';
+
+const guides = await getPublishedGuides();
+const fields = guideFields
+  .map((field) => ({
+    ...field,
+    guides: guides.filter((guide) => guide.data.field === field.id),
+  }))
+  .filter((field) => field.guides.length > 0);
+---
+
+<PageLayout section="guides">
+  <Section id="shape" label="Shape" title="Every guide answers the same four questions.">
+    <ol class="grid gap-px border border-line bg-line sm:grid-cols-2">
+      <li class="bg-canvas p-6">
+        <p class="mono-label text-ink-faint">01</p>
+        <h3 class="mt-3 font-serif text-title text-ink">The claim</h3>
+        <p class="mt-3 text-sm leading-relaxed text-ink-muted">
+          What the idea is, in a form you could disagree with. A guide that cannot be wrong is a slogan.
+        </p>
+      </li>
+      <li class="bg-canvas p-6">
+        <p class="mono-label text-ink-faint">02</p>
+        <h3 class="mt-3 font-serif text-title text-ink">When, and when not</h3>
+        <p class="mt-3 text-sm leading-relaxed text-ink-muted">
+          The situation that earns the idea, and the situation where a simpler object is enough.
+        </p>
+      </li>
+      <li class="bg-canvas p-6">
+        <p class="mono-label text-ink-faint">03</p>
+        <h3 class="mt-3 font-serif text-title text-ink">The move</h3>
+        <p class="mt-3 text-sm leading-relaxed text-ink-muted">
+          The operation the idea licenses: a drawing, a split, a loop, a comparison. Named, and small.
+        </p>
+      </li>
+      <li class="bg-canvas p-6">
+        <p class="mono-label text-ink-faint">04</p>
+        <h3 class="mt-3 font-serif text-title text-ink">A check</h3>
+        <p class="mt-3 text-sm leading-relaxed text-ink-muted">
+          Something you can do by hand afterwards. If the check cannot fail, the guide did not teach a distinction.
+        </p>
+      </li>
+    </ol>
+  </Section>
+
+  {
+    fields.map((field, index) => (
+      <Section id={field.id} index={String(index + 1).padStart(2, '0')} label={field.title} title={field.title} lede={field.description}>
+        <CardGrid
+          heading="h3"
+          items={field.guides.map((guide) => ({
+            href: guideHref(guide),
+            label: String(guide.data.order).padStart(2, '0'),
+            title: guide.data.title,
+            description: guide.data.description,
+          }))}
+        />
+      </Section>
+    ))
+  }
+</PageLayout>

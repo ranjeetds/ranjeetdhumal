@@ -5,7 +5,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 const query = Astro.url.searchParams.get('q') ?? '';
 ---
 
-<BaseLayout title="Search" description="Search lessons, domains, paths, figures, videos, projects, and research.">
+<BaseLayout title="Search" description="Search guides, lessons, domains, paths, figures, videos, projects, and research.">
   <PageHeader eyebrow="Search" title="Search the notebook.">
     <form action="/search" method="get" role="search" class="rise mt-8 max-w-xl" style="--i:3">
       <label for="q" class="mono-label text-ink-faint">Query</label>
@@ -28,7 +28,7 @@ const query = Astro.url.searchParams.get('q') ?? '';
   <div class="mx-auto max-w-page px-gutter pb-section">
     <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by kind">
       {
-        ['all', 'lesson', 'domain', 'path', 'figure', 'video', 'project', 'research'].map((kind) => (
+        ['all', 'guide', 'lesson', 'domain', 'path', 'figure', 'video', 'project', 'research'].map((kind) => (
           <button
             type="button"
             data-kind={kind}

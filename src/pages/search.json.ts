@@ -2,11 +2,13 @@ import type { APIRoute } from 'astro';
 import { domains } from '@/data/domains';
 import { visualizations } from '@/components/visualizations/registry';
 import {
+  getPublishedGuides,
   getPublishedNotes,
   getPublishedPaths,
   getPublishedProjects,
   getPublishedResearch,
   getPublishedVideos,
+  guideHref,
   noteHref,
 } from '@/lib/content';
 
@@ -14,15 +16,16 @@ export interface SearchRecord {
   title: string;
   href: string;
   description: string;
-  kind: 'lesson' | 'domain' | 'path' | 'figure' | 'video' | 'project' | 'research';
+  kind: 'lesson' | 'guide' | 'domain' | 'path' | 'figure' | 'video' | 'project' | 'research';
   /** False when the entry is a plan, not a recording or a result. */
   available: boolean;
 }
 
 /** Static index. The search page filters it in the browser, so a query needs no server. */
 export const GET: APIRoute = async () => {
-  const [notes, paths, projects, research, videos] = await Promise.all([
+  const [notes, guides, paths, projects, research, videos] = await Promise.all([
     getPublishedNotes(),
+    getPublishedGuides(),
     getPublishedPaths(),
     getPublishedProjects(),
     getPublishedResearch(),
@@ -35,6 +38,13 @@ export const GET: APIRoute = async () => {
       href: `/explore/${domain.id}`,
       description: domain.description,
       kind: 'domain' as const,
+      available: true,
+    })),
+    ...guides.map((guide) => ({
+      title: guide.data.title,
+      href: guideHref(guide),
+      description: guide.data.description,
+      kind: 'guide' as const,
       available: true,
     })),
     ...notes.map((note) => ({

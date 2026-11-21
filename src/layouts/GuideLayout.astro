@@ -1,0 +1,115 @@
+---
+/**
+ * Layout for one practical guide. The rail carries the three decisions the body
+ * assumes: when to use the idea, when not to, and the check.
+ */
+import GuideDiagram from '@/components/content/GuideDiagram.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Viz from '@/components/visualizations/Viz.astro';
+import { getSection } from '@/config/site';
+import { getGuideField } from '@/data/guides';
+import { type Guide, formatDate, guideHref } from '@/lib/content';
+import { articleSchema, breadcrumbSchema } from '@/lib/seo';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  guide: Guide;
+  previous?: Guide;
+  next?: Guide;
+}
+
+const { guide, previous, next } = Astro.props;
+const { title, description, publishedAt, useWhen, avoidWhen, check, figure, diagram } =
+  guide.data;
+const field = getGuideField(guide.data.field);
+const section = getSection('guides');
+const path = guideHref(guide);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  structuredData={[
+    articleSchema({ title, description, path, publishedAt }),
+    breadcrumbSchema([
+      { name: section.title, path: section.href },
+      { name: title, path },
+    ]),
+  ]}
+>
+  <article data-pagefind-body>
+    <header class="mx-auto max-w-page px-gutter pt-12 pb-12 sm:pt-16 lg:pt-20 lg:pb-16">
+      <a
+        href={`${section.href}#${field.id}`}
+        class="rise mono-label inline-flex items-center gap-2 text-ink-faint transition-colors duration-200 hover:text-ink"
+        style="--i:0"
+      >
+        <Icon name="arrow-right" class="size-3.5 rotate-180" />
+        {field.title}
+      </a>
+      <h1 class="rise mt-8 max-w-4xl font-serif text-display text-ink" style="--i:1">{title}</h1>
+      <p class="rise mt-6 max-w-2xl text-lede text-ink-muted" style="--i:2">{description}</p>
+    </header>
+
+    <div class="border-t border-line">
+      <div class="mx-auto grid max-w-page gap-x-8 gap-y-10 px-gutter py-12 lg:grid-cols-12 lg:py-16">
+        <aside aria-label="How to use this guide" class="lg:col-span-3" data-pagefind-ignore>
+          <dl class="grid gap-y-5 text-sm lg:sticky lg:top-24">
+            <div>
+              <dt class="mono-label text-ink-faint">Use when</dt>
+              <dd class="mt-1.5 text-ink-muted">{useWhen}</dd>
+            </div>
+            <div>
+              <dt class="mono-label text-ink-faint">Leave it aside when</dt>
+              <dd class="mt-1.5 text-ink-muted">{avoidWhen}</dd>
+            </div>
+            <div>
+              <dt class="mono-label text-ink-faint">Check</dt>
+              <dd class="mt-1.5 text-ink-muted">{check}</dd>
+            </div>
+            <div>
+              <dt class="mono-label text-ink-faint">Published</dt>
+              <dd class="mt-1.5 text-ink-muted">
+                <time datetime={publishedAt.toISOString()}>{formatDate(publishedAt)}</time>
+              </dd>
+            </div>
+          </dl>
+        </aside>
+        <div class="min-w-0 lg:col-span-9">
+          {
+            (figure || diagram) && (
+              <div class="mb-10">
+                {figure && <Viz id={figure} number="01" />}
+                {diagram && <GuideDiagram id={diagram} number="01" />}
+              </div>
+            )
+          }
+          <div class="prose">
+            <slot />
+          </div>
+          {
+            (previous || next) && (
+              <nav aria-label="Guide order" class="mt-12 grid gap-4 border-t border-line pt-8 sm:grid-cols-2">
+                {previous ? (
+                  <a href={guideHref(previous)} class="block">
+                    <span class="mono-label text-ink-faint">Previous</span>
+                    <span class="mt-2 block font-serif text-title text-ink">{previous.data.title}</span>
+                  </a>
+                ) : (
+                  <span></span>
+                )}
+                {next && (
+                  <a href={guideHref(next)} class="block sm:text-right">
+                    <span class="mono-label text-ink-faint">Next</span>
+                    <span class="mt-2 block font-serif text-title text-ink">{next.data.title}</span>
+                  </a>
+                )}
+              </nav>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

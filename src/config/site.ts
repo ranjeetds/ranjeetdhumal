@@ -111,6 +111,15 @@ export const sections = [
     group: 'reference',
   },
   {
+    id: 'guides',
+    href: '/guides',
+    label: 'Guides',
+    title: 'Guides',
+    description:
+      'Practical guides in one shape: the claim, when to use the idea, when not to, the move, and a check. Mathematics, statistics, learning, generation, retrieval, agents, weight space, and recursive improvement.',
+    group: 'reference',
+  },
+  {
     id: 'videos',
     href: '/videos',
     label: 'Videos',

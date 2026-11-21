@@ -1,0 +1,25 @@
+---
+import { render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import GuideLayout from '@/layouts/GuideLayout.astro';
+import { getPublishedGuides } from '@/lib/content';
+
+export const getStaticPaths = (async () => {
+  const guides = await getPublishedGuides();
+  return guides.map((guide, index) => ({
+    params: { slug: guide.id },
+    props: {
+      guide,
+      previous: index > 0 ? guides[index - 1] : undefined,
+      next: guides[index + 1],
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { guide, previous, next } = Astro.props;
+const { Content } = await render(guide);
+---
+
+<GuideLayout guide={guide} previous={previous} next={next}>
+  <Content />
+</GuideLayout>

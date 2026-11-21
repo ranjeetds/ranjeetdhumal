@@ -1,4 +1,5 @@
 import { type CollectionEntry, getCollection } from 'astro:content';
+import { guideFields } from '@/data/guides';
 import { liveVisualizationIds } from '@/data/studio';
 
 export type Note = CollectionEntry<'notes'>;
@@ -11,6 +12,22 @@ export async function getPublishedNotes(): Promise<Note[]> {
 
 export function noteHref(note: Note): string {
   return `/knowledge/${note.id}`;
+}
+
+export type Guide = CollectionEntry<'guides'>;
+
+/** Guides in curriculum order: field order, then the order inside the field. */
+export async function getPublishedGuides(): Promise<Guide[]> {
+  const guides = await getCollection('guides', ({ data }) => import.meta.env.DEV || !data.draft);
+  const fieldOrder = new Map(guideFields.map((field, index) => [field.id, index]));
+  return guides.sort((a, b) => {
+    const fields = (fieldOrder.get(a.data.field) ?? 0) - (fieldOrder.get(b.data.field) ?? 0);
+    return fields || a.data.order - b.data.order;
+  });
+}
+
+export function guideHref(guide: Guide): string {
+  return `/guides/${guide.id}`;
 }
 
 export type Path = CollectionEntry<'paths'>;

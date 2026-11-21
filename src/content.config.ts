@@ -12,6 +12,8 @@ import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { liveVisualizationIds, studioDomainIds, studioModules } from './data/studio';
+import { guideDiagramIds } from './data/guide-diagrams';
+import { guideFieldIds } from './data/guides';
 import { topicIds } from './data/topics';
 
 const pattern = ['**/*.{md,mdx}', '!**/_*', '!**/_*/**'];
@@ -45,6 +47,30 @@ const notes = defineCollection({
     furtherReading: z
       .array(z.object({ title: z.string(), href: z.string() }))
       .default([]),
+  }),
+});
+
+/**
+ * Practical guides. One shape throughout: a claim, when the idea applies, when it
+ * does not, the move, and a check. Published at /guides/<file>.
+ */
+const guides = defineCollection({
+  loader: folder('guides'),
+  schema: entry.extend({
+    field: z.enum(guideFieldIds),
+    /** Order within the field, then across the index. */
+    order: z.number().int(),
+    publishedAt: z.coerce.date(),
+    /** The situation in which the idea is the right tool. */
+    useWhen: z.string(),
+    /** The situation in which a simpler object will do, or the idea does not apply. */
+    avoidWhen: z.string(),
+    /** One thing the reader can check by hand after the guide. */
+    check: z.string(),
+    /** A live studio instrument drawn on this page. */
+    figure: z.enum(liveVisualizationIds).optional(),
+    /** A static diagram drawn on this page when no live instrument matches. */
+    diagram: z.enum(guideDiagramIds).optional(),
   }),
 });
 
@@ -131,6 +157,19 @@ const projects = defineCollection({
         }),
       )
       .default([]),
+    /** A separate set of template sites, each with a loaded snapshot and a price. */
+    templates: z
+      .array(
+        z.object({
+          title: z.string(),
+          place: z.string().optional(),
+          url: z.url(),
+          image: z.string(),
+          price: z.string().optional(),
+          note: z.string().optional(),
+        }),
+      )
+      .default([]),
   }),
 });
 
@@ -203,4 +242,4 @@ const studio = defineCollection({
     }),
 });
 
-export const collections = { notes, paths, research, projects, videos, studio };
+export const collections = { notes, guides, paths, research, projects, videos, studio };

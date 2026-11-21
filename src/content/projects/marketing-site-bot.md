@@ -10,10 +10,11 @@ problem: >
   A neighbourhood business is findable on a listing, and often has no single
   page that says what it does and how to visit.
 approach: >
-  An automated bot drafts that page. The ten sites below are samples it
+  An automated bot drafts that page. The Samples section is ten sites it
   produced for places in Pune. Each page says it is a sample concept and not
   the business's official site. Photographs on the pages are marked as
-  illustrative.
+  illustrative. The Templates section is a separate set of five sites, each
+  with the price on the card.
 outcome: >
   A portfolio of generated marketing sites. These are samples, not
   engagements. The ratings and phone numbers printed on the pages are left
@@ -58,4 +59,31 @@ samples:
     place: Wanowrie
     url: https://samples.ranjeetdhumal.com/noble-bake-food-wanowrie/
     image: /samples/noble-bake-food-wanowrie.jpg
+templates:
+  - title: Okimasu
+    place: Dubai
+    price: AED 3,500
+    url: https://samples.ranjeetdhumal.com/okimasu-dubai/
+    image: /samples/okimasu-dubai.jpg
+  - title: Juan Romero Salon
+    place: Austin
+    price: USD 750
+    note: English and Spanish
+    url: https://samples.ranjeetdhumal.com/juan-romero-salon-austin/
+    image: /samples/juan-romero-salon-austin.jpg
+  - title: Golosa
+    place: Sydney
+    price: AUD 1,200
+    url: https://samples.ranjeetdhumal.com/golosa-surry-hills/
+    image: /samples/golosa-surry-hills.jpg
+  - title: Crema BK
+    place: Brooklyn
+    price: USD 600
+    url: https://samples.ranjeetdhumal.com/crema-bk-greenpoint/
+    image: /samples/crema-bk-greenpoint.jpg
+  - title: La Luce Cafe
+    place: Vancouver
+    price: CAD 1,100
+    url: https://samples.ranjeetdhumal.com/la-luce-cafe-vancouver/
+    image: /samples/la-luce-cafe-vancouver.jpg
 ---

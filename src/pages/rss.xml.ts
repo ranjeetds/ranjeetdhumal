@@ -1,22 +1,36 @@
 import type { APIRoute } from 'astro';
 import { site } from '@/config/site';
-import { getPublishedNotes, noteHref } from '@/lib/content';
+import { getPublishedGuides, getPublishedNotes, guideHref, noteHref } from '@/lib/content';
 
 const escapeXml = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /** Published lessons only. Planned videos and queued research are not feed items. */
 export const GET: APIRoute = async () => {
-  const notes = await getPublishedNotes();
-  const items = notes
-    .map((note) => {
-      const link = new URL(noteHref(note), site.url).href;
+  const [notes, guides] = await Promise.all([getPublishedNotes(), getPublishedGuides()]);
+  const entries = [
+    ...notes.map((note) => ({
+      title: note.data.title,
+      href: noteHref(note),
+      publishedAt: note.data.publishedAt,
+      description: note.data.description,
+    })),
+    ...guides.map((guide) => ({
+      title: guide.data.title,
+      href: guideHref(guide),
+      publishedAt: guide.data.publishedAt,
+      description: guide.data.description,
+    })),
+  ].sort((a, b) => b.publishedAt.valueOf() - a.publishedAt.valueOf());
+  const items = entries
+    .map((entry) => {
+      const link = new URL(entry.href, site.url).href;
       return `<item>
-        <title>${escapeXml(note.data.title)}</title>
+        <title>${escapeXml(entry.title)}</title>
         <link>${link}</link>
         <guid>${link}</guid>
-        <pubDate>${note.data.publishedAt.toUTCString()}</pubDate>
-        <description>${escapeXml(note.data.description)}</description>
+        <pubDate>${entry.publishedAt.toUTCString()}</pubDate>
+        <description>${escapeXml(entry.description)}</description>
       </item>`;
     })
     .join('');
