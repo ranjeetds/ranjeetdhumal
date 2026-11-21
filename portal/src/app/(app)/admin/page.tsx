@@ -4,7 +4,7 @@ import { Empty, Notice, PageHeader, Section, buttonClass, fieldClass } from "@/c
 import { ROLE_LABEL, formatWhen, label, one } from "@/lib/format"
 import { can, canAny, requireUser } from "@/lib/session"
 import { bool, message, records, rethrowRedirect, str, strNull } from "@/lib/rows"
-import { addCategory, inviteMember, updateMember } from "@/server/actions"
+import { addCategory, inviteMember, resetMemberLink, updateMember } from "@/server/actions"
 
 export const metadata: Metadata = { title: "Administration" }
 
@@ -45,6 +45,7 @@ export default async function AdminPage({
         ) : null}
         {can(permissions, "users.manage") ? (
           <Section title="Accounts">
+            <p className="mb-3 max-w-xl text-xs text-muted">A reset link is shown once. Copy it to the member. Mail cannot deliver it, and the two-email hourly limit cannot be raised without a separate mail provider.</p>
             {records(members.data).length === 0 ? <Empty>No accounts yet.</Empty> : (
               <ul className="space-y-3">
                 {records(members.data).map((member) => (
@@ -62,6 +63,10 @@ export default async function AdminPage({
                       <input name="plot" className={fieldClass} defaultValue={strNull(member, "plot") ?? ""} aria-label="Plot" placeholder="Plot, visible only to administrators" />
                       <input name="phase" className={fieldClass} defaultValue={strNull(member, "phase") ?? ""} aria-label="Phase" placeholder="Phase" />
                       <button className={buttonClass} type="submit">Save</button>
+                    </form>
+                    <form action={resetMemberLink} className="mt-3">
+                      <input type="hidden" name="user_id" value={str(member, "id")} />
+                      <button className="text-sm text-accent" type="submit">Create a reset link</button>
                     </form>
                   </li>
                 ))}

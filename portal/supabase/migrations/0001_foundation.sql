@@ -3,7 +3,8 @@
 -- Reads are enforced with row level security. Writes go through the functions below.
 -- Activity and audit rows cannot be updated or deleted.
 
-create extension if not exists pgcrypto;
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;
 
 -- ---------------------------------------------------------------------------
 -- Types
@@ -1933,7 +1934,7 @@ begin
   if p_email !~* '^[^@\s]+@[^@\s]+\.[^@\s]+$' then
     raise exception 'Enter a valid email address.';
   end if;
-  token := encode(gen_random_bytes(32), 'hex');
+  token := encode(extensions.gen_random_bytes(32), 'hex');
   insert into public.invitations (email, full_name, role, token, expires_at, invited_by)
   values (
     lower(trim(p_email)), nullif(trim(coalesce(p_full_name, '')), ''), p_role,

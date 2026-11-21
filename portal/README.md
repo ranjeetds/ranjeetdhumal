@@ -18,13 +18,15 @@ Without the environment variables, the app shows a setup page and no records.
 ## Database
 
 1. Create a Supabase project.
-2. In Authentication, turn off public sign-up before creating any account.
-3. Run `supabase/migrations/0001_foundation.sql` in the SQL editor.
-4. Put the project URL and anon key in `.env.local`. Put the service role key in
+2. Run `supabase/migrations/0001_foundation.sql` in the SQL editor.
+3. Put the project URL and anon key in `.env.local`. Put the service role key in
    `SUPABASE_SERVICE_ROLE_KEY` on the server only.
-5. Create the first user in the Supabase dashboard. That first account becomes the
-   platform administrator. Invite everyone else from Administration. Invitation links
-   expire after seven days.
+4. Create the first user before anyone else signs up. That account becomes the
+   platform administrator.
+5. Society members create a resident account at `/signup` and are signed in. The
+   hosted mail service only sends two messages an hour, so signup does not wait for a
+   confirmation email. Invite committee and Paranjape representatives from Administration.
+   Invitation links expire after seven days.
 
 The migration seeds categories, development areas, electricity milestone names, and three
 empty correspondence records. It does not create issues, dates, or developer responses.
@@ -38,8 +40,9 @@ that check a permission, not only the role name. Residents do not receive commit
 comments or their activity. Developer representatives see issues assigned to their team.
 Plot, phase, and email are not in the member directory.
 
-In-app notifications are stored. Email delivery is not connected yet; password reset uses
-Supabase’s own mail.
+In-app notifications are stored. Email delivery is not connected. An administrator creates a
+one-time password reset link. The built-in mail service cannot send more than two messages
+an hour, and it will not deliver them to member addresses.
 
 ## Deploy
 

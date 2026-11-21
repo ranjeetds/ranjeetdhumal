@@ -1,10 +1,11 @@
 "use server"
 
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 import { createAdmin } from "@/lib/supabase/admin"
 import { isRecord, str } from "@/lib/rows"
-import { requireUser } from "@/lib/session"
+import { can, requireUser } from "@/lib/session"
 
 function clean(message: string): string {
   return message.replace(/^.*ERROR:\s*/i, "").slice(0, 280)
@@ -398,6 +399,32 @@ export async function inviteMember(formData: FormData) {
   })
   const link = token ? `/invite/${token}` : ""
   redirect(`/admin?notice=${encodeURIComponent(link ? `Invitation link: ${link}` : "Invitation created.")}`)
+}
+
+export async function resetMemberLink(formData: FormData) {
+  const { permissions } = await requireUser()
+  if (!can(permissions, "users.manage")) redirect("/admin?error=You%20cannot%20create%20a%20reset%20link.")
+  const userId = optionalUuid(formData.get("user_id"))
+  if (!userId) redirect("/admin?error=Choose%20an%20account.")
+  const admin = createAdmin()
+  if (!admin) redirect("/admin?error=The%20portal%20is%20not%20configured.")
+  const user = await admin.auth.admin.getUserById(userId)
+  const email = user.data.user?.email
+  if (user.error || !email) {
+    redirect(`/admin?error=${encodeURIComponent(clean(user.error?.message ?? "That account has no email."))}`)
+  }
+  const origin = (await headers()).get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "https://mg.ranjeetdhumal.com"
+  const generated = await admin.auth.admin.generateLink({
+    type: "recovery",
+    email,
+    options: { redirectTo: `${origin}/auth/confirm?type=recovery` },
+  })
+  const token = generated.data.properties?.hashed_token
+  if (generated.error || !token) {
+    redirect(`/admin?error=${encodeURIComponent(clean(generated.error?.message ?? "The reset link could not be created."))}`)
+  }
+  const link = `${origin}/auth/confirm?token_hash=${encodeURIComponent(token)}&type=recovery`
+  redirect(`/admin?notice=${encodeURIComponent(`Reset link, shown once: ${link}`)}`)
 }
 
 export async function updateMember(formData: FormData) {

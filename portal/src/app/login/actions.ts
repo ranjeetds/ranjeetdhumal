@@ -1,6 +1,5 @@
 "use server"
 
-import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 import { allowAttempt } from "@/lib/rate-limit"
@@ -28,19 +27,6 @@ export async function signIn(formData: FormData) {
   })
   if (error) redirect("/login?error=The%20email%20or%20password%20is%20not%20correct.")
   redirect(safeNext(formData.get("next")))
-}
-
-export async function sendReset(formData: FormData) {
-  const parsed = z.email().safeParse(formData.get("email"))
-  if (!parsed.success) redirect("/login?error=Enter%20the%20email%20address.")
-  const email = parsed.data.toLowerCase()
-  if (!(await allowAttempt(email, "reset", 5, 15 * 60))) {
-    redirect("/login?error=Too%20many%20reset%20requests.%20Wait%20and%20try%20again.")
-  }
-  const origin = (await headers()).get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-  const supabase = await createClient()
-  await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${origin}/auth/confirm` })
-  redirect("/login?notice=If%20that%20account%20exists%2C%20a%20reset%20link%20has%20been%20sent.")
 }
 
 export async function updatePassword(formData: FormData) {

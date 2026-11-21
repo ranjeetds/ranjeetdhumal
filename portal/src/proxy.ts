@@ -29,6 +29,7 @@ export async function proxy(request: NextRequest) {
   const { data } = await supabase.auth.getUser()
   const isPublic =
     path === "/login" ||
+    path === "/signup" ||
     path.startsWith("/auth/") ||
     path.startsWith("/invite/") ||
     path === "/setup"
@@ -38,7 +39,7 @@ export async function proxy(request: NextRequest) {
     if (path !== "/") next.searchParams.set("next", path)
     return NextResponse.redirect(next)
   }
-  if (data.user && path === "/login") {
+  if (data.user && (path === "/login" || path === "/signup")) {
     return NextResponse.redirect(new URL("/dashboard", request.url))
   }
   return response

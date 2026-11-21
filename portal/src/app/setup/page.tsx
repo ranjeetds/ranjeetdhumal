@@ -18,7 +18,7 @@ export default function SetupPage() {
           the SQL editor. That creates the tables, permissions, categories, development areas, and the
           three correspondence records. It does not create issues or progress figures.
         </li>
-        <li>In Authentication, turn off public sign-up. Keep email and password, and the reset email.</li>
+        <li>Keep email and password sign-in. An administrator creates password reset links; the built-in mail service cannot deliver them.</li>
         <li>
           Copy <code className="font-mono text-xs">portal/.env.example</code> to{" "}
           <code className="font-mono text-xs">portal/.env.local</code>. Set the project URL, the anon key,
