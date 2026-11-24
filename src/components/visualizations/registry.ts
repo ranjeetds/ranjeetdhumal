@@ -68,16 +68,18 @@ export const visualizations = [
   {
     id: 'decision-boundaries',
     title: 'Decision boundaries',
-    summary: 'See how a classifier carves up the plane as it trains.',
+    summary: 'A straight cut, a tree, and a product score on one exclusive-or.',
     objective: 'Connect a model class to the shapes of boundary it is able to draw.',
     interactions: [
-      'Add and move labeled points',
-      'Switch between a linear model, a tree, and a small network',
-      'Scrub training epoch by epoch',
+      'Switch among a linear cut, a tree, and a small network',
+      'Move Fit from the starting rule to the designed rule',
+      'Move the probe and read which class the rule calls it',
     ],
-    engine: 'd3',
+    caption:
+      'Eight fixed points in opposite corners. Switch the rule, then move Fit from 0 to 1. The path is designed. It is not a training run. A dashed ring is a point the rule gets wrong.',
+    engine: 'svg',
     topic: 'machine-learning',
-    status: 'planned',
+    status: 'live',
   },
   {
     id: 'attention-patterns',
@@ -98,30 +100,34 @@ export const visualizations = [
   {
     id: 'transformer-block',
     title: 'One transformer block',
-    summary: 'Residual stream, attention, and the feed-forward step, as three operations on one vector.',
-    objective: 'Read a block as a sequence of operations, not as a logo.',
+    summary: 'Five stops on one designed block: input, mix, add, feed-forward, add.',
+    objective: 'Read a block as a sequence of operations on a vector, and see a coordinate that one token writes and the other does not.',
     interactions: [
-      'Step through the block and stop on each operation',
-      'Highlight the residual path against the sublayer',
-      'Swap in a second token and see what changes',
+      'Step through the five stops',
+      'Switch from token A to token B',
+      'Read the third coordinate at the last stop',
     ],
+    caption:
+      'Two tokens, three coordinates, five stops. The weights are written by hand. The third coordinate changes only when the residual’s first coordinate is above 1.',
     engine: 'svg',
     topic: 'generative-ai',
-    status: 'planned',
+    status: 'live',
   },
   {
     id: 'embedding-space',
     title: 'Embedding space',
-    summary: 'A three-dimensional projection of vectors, with clusters you can turn around.',
+    summary: 'Eight tokens in two hand-placed planes, and the neighbours that change with the plane.',
     objective: 'Treat distance in the projection as a picture of similarity, and notice what the projection hides.',
+    caption:
+      'Eight tokens placed by hand in two planes. Usage keeps king near queen. Spelling does not. Select a token, then switch planes.',
     interactions: [
-      'Drag to rotate the projection',
-      'Search for a token and mark its neighbours',
-      'Switch the projection and see which clusters survive',
+      'Select a token and read its two nearest neighbours',
+      'Switch between the usage plane and the spelling plane',
+      'Notice which pair survives the switch',
     ],
-    engine: 'three',
+    engine: 'svg',
     topic: 'generative-ai',
-    status: 'planned',
+    status: 'live',
   },
   {
     id: 'next-token',
@@ -339,11 +345,13 @@ export const visualizations = [
     interactions: [
       'Step the loop one stage at a time',
       'Inspect the state the model is given at each stage',
-      'Fail a tool call and watch the next step',
+      'Fail the tool and read the result state',
     ],
+    caption:
+      'One question, one accepted call, and a tool that returns either a balance or an error. Step through the state. Fail the tool and compare that state with the sentence a transcript could still say.',
     engine: 'svg',
     topic: 'agentic-ai',
-    status: 'planned',
+    status: 'live',
   },
 ] as const satisfies readonly Visualization[];
 

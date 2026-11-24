@@ -5,4 +5,6 @@ tags: [agents]
 draft: false
 series: Agents
 duration: 12 min
+why: The film is not cut. The same four stops are on the agent lesson, with the failure as a control.
+companion: /studio/agent-loop
 ---

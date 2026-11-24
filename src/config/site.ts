@@ -49,8 +49,8 @@ export interface SiteSection {
   /** One or two sentences; doubles as the page lede and meta description. */
   description: string;
   /**
-   * `primary` is the learning navigation. `secondary` is the author.
-   * `reference` stays on the site and out of the header, so older hubs keep their URLs.
+   * `primary` is the learning navigation, including the library.
+   * `secondary` is the author. `reference` is reserved for a hub that should stay out of the header.
    */
   group: 'primary' | 'secondary' | 'reference';
 }
@@ -108,7 +108,7 @@ export const sections = [
     title: 'Knowledge Hub',
     description:
       'Eight fields, written as essays. Each one explains why it matters, then the ideas it is responsible for. Notes are linked from the field they belong to.',
-    group: 'reference',
+    group: 'primary',
   },
   {
     id: 'guides',
@@ -117,7 +117,7 @@ export const sections = [
     title: 'Guides',
     description:
       'Practical guides in one shape: the claim, when to use the idea, when not to, the move, and a check. Mathematics, statistics, learning, generation, retrieval, agents, weight space, and recursive improvement.',
-    group: 'reference',
+    group: 'primary',
   },
   {
     id: 'videos',
@@ -126,7 +126,7 @@ export const sections = [
     title: 'Videos',
     description:
       'Lectures placed on the path, with a note on what to watch for, and films this notebook has not made yet.',
-    group: 'reference',
+    group: 'primary',
   },
   {
     id: 'contact',
@@ -159,7 +159,13 @@ export type SectionId = (typeof sections)[number]['id'];
 
 export const primaryNav = sections.filter((section) => section.group === 'primary');
 export const secondaryNav = sections.filter((section) => section.group === 'secondary');
-export const referenceNav = sections.filter((section) => section.group === 'reference');
+
+/** Hubs kept out of the header. Empty until a section uses `group: 'reference'`. */
+export function sectionsInGroup(group: SiteSection['group']) {
+  return sections.filter((section) => section.group === group);
+}
+
+export const referenceNav = sectionsInGroup('reference');
 
 export function getSection(id: SectionId) {
   const section = sections.find((candidate) => candidate.id === id);

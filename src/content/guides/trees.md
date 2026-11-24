@@ -7,7 +7,7 @@ publishedAt: 2026-11-21
 useWhen: Interactions and thresholds matter, and you would rather read a split than invent coordinates for a linear model.
 avoidWhen: The signal really is a smooth weighted sum, and a tree will approximate it with a staircase.
 check: Look at the first split. It should be a feature a domain reader recognizes, on a threshold they can interpret.
-diagram: tree
+figure: decision-boundaries
 ---
 
 A decision tree asks one yes-or-no question about one feature, then another, and puts a prediction in each leaf. The boundary it draws is a stack of axis-aligned cuts. That is a different family from a weighted sum. A relationship that depends on "this feature is high only when that one is low" is natural for a tree and awkward for a line.

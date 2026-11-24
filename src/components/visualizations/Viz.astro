@@ -6,8 +6,11 @@
  */
 import { type LiveVisualizationId, engineLabels, getVisualization } from './registry';
 import Activations from './svg/Activations';
+import AgentLoop from './svg/AgentLoop';
 import AttentionPatterns from './svg/AttentionPatterns';
 import Backpropagation from './svg/Backpropagation';
+import DecisionBoundaries from './svg/DecisionBoundaries';
+import EmbeddingSpace from './svg/EmbeddingSpace';
 import Confusion from './svg/Confusion';
 import Convolution from './svg/Convolution';
 import DotProduct from './svg/DotProduct';
@@ -21,6 +24,7 @@ import Normalization from './svg/Normalization';
 import PositionalEncoding from './svg/PositionalEncoding';
 import SampleMean from './svg/SampleMean';
 import Tokenization from './svg/Tokenization';
+import TransformerBlock from './svg/TransformerBlock';
 import VizFrame from './VizFrame.astro';
 
 interface Props {
@@ -57,5 +61,9 @@ const visualization = getVisualization(id);
   {id === 'neighbors' && <Neighbors client:visible />}
   {id === 'convolution' && <Convolution client:visible />}
   {id === 'positional-encoding' && <PositionalEncoding client:visible />}
+  {id === 'decision-boundaries' && <DecisionBoundaries client:visible />}
+  {id === 'transformer-block' && <TransformerBlock client:visible />}
+  {id === 'embedding-space' && <EmbeddingSpace client:visible />}
+  {id === 'agent-loop' && <AgentLoop client:visible />}
   {visualization.caption && <Fragment slot="caption">{visualization.caption}</Fragment>}
 </VizFrame>

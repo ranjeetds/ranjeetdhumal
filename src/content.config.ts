@@ -186,6 +186,8 @@ const videos = defineCollection({
     duration: z.string().optional(),
     /** The written note this video accompanies, if any. */
     note: reference('notes').optional(),
+    /** A page on this site that covers the same idea. Used when the film is not cut yet. */
+    companion: z.string().optional(),
     /** What to watch for. Curated lectures need this; planned films may omit it. */
     why: z.string().optional(),
     /** Chapter of the primary path this video belongs with. */

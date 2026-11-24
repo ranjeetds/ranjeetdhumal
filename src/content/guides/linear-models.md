@@ -7,7 +7,7 @@ publishedAt: 2026-11-21
 useWhen: The first model on a new table, or any time you need to say which inputs moved the prediction.
 avoidWhen: You already know the classes are intertwined and no flat cut will separate them.
 check: Read the largest weights against the units of the inputs. A large weight on an unscaled feature may be a unit, not a cause.
-diagram: linear
+figure: decision-boundaries
 ---
 
 A linear model predicts a weighted sum of its inputs, plus a constant. Logistic regression passes that sum through a sigmoid and treats the result as a probability of a label. Softmax does the same for several labels. In every case the weights are the model. You can list them, argue with them, and notice when one of them is a leak.

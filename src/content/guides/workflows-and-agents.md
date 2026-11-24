@@ -7,7 +7,7 @@ publishedAt: 2026-11-21
 useWhen: The number of steps depends on the input, and you can check the resulting state after each step.
 avoidWhen: The task decomposes into a fixed sequence. Write the sequence. A loop that rediscovers it is an extra way to drift.
 check: Name the steps you could have written down. If you can name them, the system you want is a workflow.
-diagram: workflow
+figure: agent-loop
 ---
 
 An agentic system is a model allowed to affect a state, inside a program that observes the result. Inside that description there is a split worth keeping. A workflow is a path through model calls and tools that your code chooses: first this, then that, and a check between them. An agent is a loop in which the model chooses the next call, including the choice to stop. The words get used for both. The cost is not the same.

@@ -1,0 +1,65 @@
+---
+title: Agent loop
+description: One accepted tool call, and the difference between the state it returns and the sentence a transcript can still say.
+summary: The question asks for the balance of account 14. The proposal is get_balance with that account. The schema accepts it. The tool returns either balance 40 or the error unknown account. Fail the tool and read the result. The commentary can still mention 40. The state cannot.
+domain: agents
+difficulty: Intermediate
+estimatedTime: 12
+visualization: agent-loop
+status: published
+prerequisites:
+  - next-token
+related: []
+experiments:
+  - Step from Observe to Result with the tool succeeding. The result state contains balance 40.
+  - Press Fail the tool and stay on Result. The state says unknown account, and the commentary still mentions 40.
+  - Go back to Act. The schema line does not change when the tool fails. The failure is in the result, not in the acceptance.
+tags:
+  - agents
+  - tools
+  - evaluation
+---
+
+<Chapter id="stages" title="Four lines of state" objective="Name the object each stop is holding.">
+
+Observe holds the question and an empty tool result. Decide holds a proposal: get_balance, account 14. Act holds the schema’s verdict. The account is required and it is a number, so the call is accepted. Result holds what the tool returned.
+
+The buttons move you along that list. They do not call a model. The proposal was written with the page.
+
+</Chapter>
+
+<Chapter id="fail" title="The failure is a value, not a tone" objective="Separate the record from the sentence about it.">
+
+Fail the tool. The result state becomes “error: unknown account”, and the loop stops because the account was not read. The sentence underneath can still say that the model mentioned 40. That sentence is what a transcript grader sees. The error is what the account balance actually is: unknown.
+
+A check that reads the sentence passes. A check that reads the state fails. They are grading different objects.
+
+</Chapter>
+
+<Chapter id="schema" title="Acceptance is not success" objective="See that the schema and the tool answer different questions.">
+
+Go back to Act after the failure. The schema line is unchanged. It asked whether the call was shaped correctly. It did not ask whether account 14 exists. A schema can refuse a string in a numeric field. It cannot, by itself, know that the account is missing. That fact arrives only as the tool’s result.
+
+</Chapter>
+
+<Chapter id="check" title="Check the failed result" objective="Read the state, not the commentary.">
+
+<Check
+  id="fail"
+  prompt="The tool has failed. Which sentence is about the state?"
+  choices={[
+    'The commentary mentions 40, so the balance was read.',
+    'The state says unknown account, so the balance was not read.',
+    'The schema rejected the call, so the tool never ran.',
+  ]}
+  answer="The state says unknown account, so the balance was not read."
+  why="Fail the tool and read Result. The schema had already accepted the call. The error is the tool’s return value. The mention of 40 is only in the commentary."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What this is for" objective="Use the same split on a system you are reading about.">
+
+[Next-token distribution](/studio/next-token) is a draw from a fixed list of words. This page is the loop around a draw that is allowed to change a record. The note is [Agentic AI Systems](/knowledge/agentic-systems). The guide is [The tool is the interface](/guides/the-tool-is-the-interface).
+
+</Chapter>

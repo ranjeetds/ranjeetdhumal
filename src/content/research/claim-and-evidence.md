@@ -1,14 +1,20 @@
 ---
 title: Separating a paper's claim from its evidence
-description: A planned note on a reading method. One page for the claim, one for the experiment that is supposed to support it, and a list of what would have falsified it.
+description: One sentence that could be false, the comparison that is supposed to support it, and the observation that would have falsified it. Demonstrated on Vaswani et al.
 tags: [reading, method]
 draft: false
 kind: note
-stage: planned
-publishedAt: 2026-11-19
+stage: posted
+publishedAt: 2026-11-24
 authors: []
 ---
 
-A paper is easier to admire than to use. The method this note will set down is a separation, done on a page each. The first page states the claim in a sentence that could be false. The second states the experiment that is supposed to support it: the data, the comparison, the metric, and the things that were held fixed. A shorter third list says what observation would have falsified the claim, including observations the paper did not collect.
+A summary glues three objects into one paragraph, and then none of them can be checked. The separation is a page each.
 
-The point of the separation is that most summaries glue the three together, so a reader cannot tell a result from a hope the result was asked to carry. The note will demonstrate the method on one paper already in this log, rather than describe the method and stop. Until that demonstration is written, this entry is the procedure. It is not an example of the procedure, and it should not be cited as one.
+The claim is a sentence that could be false. For [Attention Is All You Need](/research#attention-is-all-you-need) the sentence is: a sequence model can drop recurrence and convolution and still translate, by comparing every position with every other in parallel.
+
+The evidence is the comparison that is supposed to support that sentence. Name the data, the metric, the systems in the table, and what was held fixed. Here the data are WMT 2014 English–German and English–French. The metric is BLEU. The systems are whole models. The task and the metric are held fixed. The optimizer, the regularization, and the training budget are not. So the table supports “these systems did well at this task.” It does not support “attention, and only attention, produced the gain.”
+
+The falsifier is an observation that would have made the claim fail, including one the paper did not collect. A recurrent system with the same training budget and the same regularization, beating the attention system on the same test set, would have falsified the practical claim. A gain that disappeared once those were matched would have falsified the attribution. The paper does not report that matched run. The absence belongs on this page, not in a footnote that pretends the attribution was shown.
+
+The method stops there. It does not award the paper a moral score, and it does not require a new experiment before you are allowed to use the architecture. It requires that the sentence you repeat is the sentence the comparison can carry.

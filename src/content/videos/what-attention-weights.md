@@ -5,4 +5,6 @@ tags: [transformers]
 draft: false
 series: Inside a transformer
 duration: 12 min
+why: The film is not cut. The attention lesson is one sentence, two designed heads, and a causal mask.
+companion: /studio/attention-patterns
 ---

@@ -1,0 +1,73 @@
+---
+title: One transformer block
+description: Attention mixes two tokens, the residual adds that mix back, and a feed-forward writes one coordinate only when a threshold is crossed.
+summary: Token A is (1, 0, 0). Token B is (0, 1, 0). A attends 0.75 to itself. After the residual its first coordinate is 1.75, so the feed-forward writes 0.75 into the third. B’s residual stays below the threshold, and the third coordinate stays 0. The weights are written by hand.
+domain: transformers
+difficulty: Intermediate
+estimatedTime: 18
+visualization: transformer-block
+status: published
+prerequisites:
+  - attention-patterns
+related:
+  - next-token
+next: next-token
+experiments:
+  - Stay on token A. Step from Input to Add again. The coordinates end at (1.75, 0.25, 0.75).
+  - Switch to token B and stop on Add again. The coordinates are (0.25, 1.75, 0.00).
+  - On token B, stop on Feed-forward. The vector is (0, 0, 0).
+tags:
+  - transformer
+  - residual
+  - feed-forward
+---
+
+<Chapter id="tokens" title="Two tokens, three coordinates" objective="Keep the block inside the numbers on the page.">
+
+Token A starts at <Equation tex="(1, 0, 0)" display={false} />. Token B starts at <Equation tex="(0, 1, 0)" display={false} />. There is no sentence and no trained matrix. The attention weights are fixed: A puts 0.75 on itself and 0.25 on B. B puts 0.25 on A and 0.75 on itself.
+
+The mix is a weighted average of those two vectors. For A it is <Equation tex="(0.75, 0.25, 0)" display={false} />. For B it is <Equation tex="(0.25, 0.75, 0)" display={false} />.
+
+</Chapter>
+
+<Chapter id="residual" title="The add is the block" objective="See the mix land on top of the input, not instead of it.">
+
+The next stop adds the input back. A becomes <Equation tex="(1, 0, 0) + (0.75, 0.25, 0) = (1.75, 0.25, 0)" display={false} />. B becomes <Equation tex="(0.25, 1.75, 0)" display={false} />.
+
+That add is the residual. The block does not replace the token with the mix. It keeps the token and writes the mix beside it. If the mix were zero, the token would leave this stop unchanged.
+
+</Chapter>
+
+<Chapter id="forward" title="The feed-forward has a threshold" objective="Say why one token grows a third coordinate and the other does not.">
+
+The feed-forward on this page is one rule. If the first coordinate is above 1, write the excess into the third coordinate. Otherwise write nothing.
+
+A’s first coordinate is 1.75, so the excess is 0.75. The feed-forward vector is <Equation tex="(0, 0, 0.75)" display={false} />, and the last add makes <Equation tex="(1.75, 0.25, 0.75)" display={false} />.
+
+B’s first coordinate is 0.25. The excess is 0. The feed-forward vector is <Equation tex="(0, 0, 0)" display={false} />, and the last add changes nothing: <Equation tex="(0.25, 1.75, 0)" display={false} />.
+
+A real feed-forward is a learned matrix, a bend, and another matrix. This one is a threshold you can check with a subtraction. The shape of the block is the same shape: mix, add, transform, add.
+
+</Chapter>
+
+<Chapter id="check" title="Check token B" objective="Use the last stop.">
+
+<Check
+  id="third"
+  prompt="Token B, last stop. What is the third coordinate?"
+  choices={[
+    '0.75, the same write token A received.',
+    '0. The residual never crossed the threshold.',
+    '1. The input’s second coordinate was copied there.',
+  ]}
+  answer="0. The residual never crossed the threshold."
+  why="B’s residual first coordinate is 0.25. The feed-forward writes max(0, 0.25 − 1) = 0 into the third coordinate, and the last add keeps it."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave the block for the distribution over words.">
+
+[Attention patterns](/studio/attention-patterns) is the mix, drawn as a row of weights. This page uses two of those weights and then does the adds. [Next-token distribution](/studio/next-token) is a different softmax: over a vocabulary, not over positions.
+
+</Chapter>

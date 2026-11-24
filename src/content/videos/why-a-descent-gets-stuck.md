@@ -5,4 +5,6 @@ tags: [optimization]
 draft: false
 series: Seeing optimization
 duration: 8 min
+why: The film is not cut. On the descent lesson, where a run starts chooses the valley.
+companion: /studio/gradient-descent
 ---

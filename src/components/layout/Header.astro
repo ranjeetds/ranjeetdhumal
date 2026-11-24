@@ -14,9 +14,9 @@ const { pathname } = Astro.url;
 // The active link draws an accent rule exactly on top of the header's bottom hairline;
 // hovering any other link previews the same rule.
 const primaryLink = [
-  'relative flex h-16 items-center px-3 text-sm text-ink-muted transition-colors duration-200',
+  'relative flex h-16 items-center px-2 text-[0.8125rem] text-ink-muted transition-colors duration-200',
   'hover:text-ink aria-[current=page]:text-ink',
-  'after:absolute after:inset-x-3 after:-bottom-px after:h-px after:origin-left after:scale-x-0 after:bg-accent',
+  'after:absolute after:inset-x-2 after:-bottom-px after:h-px after:origin-left after:scale-x-0 after:bg-accent',
   'after:transition-transform after:duration-300 after:ease-swift',
   'hover:after:scale-x-100 aria-[current=page]:after:scale-x-100',
 ];
@@ -54,7 +54,7 @@ const primaryLink = [
     </nav>
 
     <div class="flex items-center gap-1">
-      <ul class="mr-2 hidden items-center gap-5 lg:flex">
+      <ul class="mr-2 hidden items-center gap-4 xl:flex">
         {
           secondaryNav.map((item) => (
             <li>

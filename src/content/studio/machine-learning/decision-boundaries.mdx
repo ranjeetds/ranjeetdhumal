@@ -1,0 +1,75 @@
+---
+title: Decision boundaries
+description: A straight cut, an axis-aligned tree, and a product score, on eight points a line cannot separate.
+summary: Opposite corners share a label. The linear rule is a rotating line and still misses points at the end of the slider. The tree and the product score reach zero misses. Fit walks a designed path between two rules. It does not train.
+domain: machine-learning
+difficulty: Foundational
+estimatedTime: 18
+visualization: decision-boundaries
+status: published
+prerequisites:
+  - neighbors
+related:
+  - loss-functions
+experiments:
+  - Leave Fit at 0. Every rule misses 4 of the 8 fixed points.
+  - Move Fit to 1 on Linear cut. It still misses 3.
+  - Switch to Tree at Fit 1, then to Small network. Both miss 0.
+  - Leave the probe at (0.40, 0.40) and Fit at 1. Linear calls it class 1. Tree and Small network call it class 0.
+tags:
+  - decision boundary
+  - linear model
+  - tree
+---
+
+<Chapter id="points" title="The points are an exclusive-or" objective="See why one straight cut is the wrong family.">
+
+Ink circles are class 0. Accent squares are class 1. Class 0 sits in the lower left and the upper right. Class 1 sits in the upper left and the lower right. A straight line has one side and the other. Any line leaves at least one of those corners on the wrong side.
+
+The eight points do not move. The probe does. A dashed ring marks a fixed point the current rule gets wrong.
+
+</Chapter>
+
+<Chapter id="rules" title="Three rules, one slider" objective="Say what Fit changes, and what it does not.">
+
+Fit runs from 0 to 1. At 0, each rule is a blunt version that misses 4 points. At 1, the rule is the one drawn for this page.
+
+The linear rule is a line. Its angle moves a short way as Fit increases. At Fit 1 it still misses 3 of the 8 points. More angle would not finish the job. The family is the limitation.
+
+The tree draws a vertical cut and a horizontal cut. At Fit 1 both cuts sit on the axes. Left and below, or right and above, is class 0. The other two quadrants are class 1. That is an exclusive-or written as two thresholds. It misses 0.
+
+The small network is not a trained net. Its score interpolates from the horizontal coordinate to the product <Equation tex="-xy" display={false} />. The product is positive when the coordinates have opposite signs, which is class 1. At Fit 1 it also misses 0. The shading is that score, sampled on a grid.
+
+Nothing on the page takes a gradient step. The slider is a path between two formulas.
+
+</Chapter>
+
+<Chapter id="probe" title="The probe is not in the training set" objective="Read one new point under each rule.">
+
+The probe starts at <Equation tex="(0.40, 0.40)" display={false} />. At Fit 1 the linear rule calls it class 1, because it falls on the positive side of the line. The tree calls it class 0, because it is right of the vertical cut and above the horizontal cut. The network calls it class 0, because <Equation tex="-xy" display={false} /> is negative there.
+
+Same point, three answers. The answer you wanted was never a property of the point alone.
+
+</Chapter>
+
+<Chapter id="check" title="Check the family" objective="Use Fit at 1.">
+
+<Check
+  id="line"
+  prompt="Fit is 1. You stay on Linear cut. What is the mistake count?"
+  choices={[
+    '0. The line has finished separating the corners.',
+    '3. A straight cut cannot label this pattern.',
+    '8. The line ignores the points.',
+  ]}
+  answer="3. A straight cut cannot label this pattern."
+  why="Opposite corners share a label. One line has only two sides, so at least one corner stays wrong. On this page the count at the end of the slider is 3."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave the stored points for a step on a loss.">
+
+[Nearest neighbours](/studio/neighbors) also stores points and votes. This page stores points and applies a formula. [Gradient descent](/studio/gradient-descent) does neither of those drawings. It walks a loss.
+
+</Chapter>

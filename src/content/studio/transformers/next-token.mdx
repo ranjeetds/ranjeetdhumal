@@ -72,7 +72,7 @@ Greedy decoding prints the tallest bar, every time. It is repeatable and dull, a
 
 Temperature does not add knowledge. It redistributes the mass the scores already implied. If the scores are bad, a low temperature makes the model confidently bad. If the vocabulary is the wrong cut, the distribution is over the wrong pieces. That is the tokenization lesson, one step upstream.
 
-Attention is a different distribution. Its softmax is over positions in a sequence. This softmax is over the vocabulary. Sharing a function does not make them the same object. The next instrument people usually want here is an embedding space, where the ids would be vectors. It is not built.
+Attention is a different distribution. Its softmax is over positions in a sequence. This softmax is over the vocabulary. Sharing a function does not make them the same object. The [embedding space](/studio/embedding-space) is where eight ids sit in two planes. Those planes are drawn by hand. They are not this distribution.
 
 A lecture that builds a real next-token model, as opposed to this toy, is [Let's build GPT from scratch](/videos#lets-build-gpt). The survey lecture is [Intro to Large Language Models](/videos#intro-to-large-language-models). The note is [Large Language Models](/knowledge/large-language-models).
 
@@ -112,6 +112,6 @@ Tokenization is the prerequisite. The distribution is over ids, and an id is onl
 
 Attention is the related live module. It is a softmax over positions. This is a softmax over words. Reading them against each other is the point of having both.
 
-The continuation in the catalogue is an embedding space, where a dot product between pieces could produce a score like the ones attention uses. That instrument is not built. Until it is, the handwritten scores are the honest substitute, and they are labelled as such.
+The continuation in the catalogue is the [embedding space](/studio/embedding-space). A dot product between pieces could produce a score like the ones attention uses. The planes on that page are labelled as hand-placed, and the scores on the attention page stay handwritten.
 
 </Chapter>

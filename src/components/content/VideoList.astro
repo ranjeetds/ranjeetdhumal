@@ -72,6 +72,14 @@ const youtubeId = (url: string | undefined): string | undefined => {
                       )}
                     </h4>
                     <p class="mt-3 text-sm leading-relaxed text-ink-muted">{video.data.description}</p>
+                    {video.data.why && <p class="mt-3 text-sm leading-relaxed text-ink-muted">{video.data.why}</p>}
+                    {video.data.companion && (
+                      <p class="mt-4">
+                        <a href={video.data.companion} class="link-underline text-sm text-ink hover:text-accent">
+                          Open the lesson
+                        </a>
+                      </p>
+                    )}
                     {embed && (
                       <div class="mt-5">
                         <iframe

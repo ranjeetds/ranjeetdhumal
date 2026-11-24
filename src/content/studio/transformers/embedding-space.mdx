@@ -1,0 +1,68 @@
+---
+title: Embedding space
+description: Two planes drawn by hand. A neighbour in one plane is not a neighbour in the other.
+summary: Eight tokens. On the usage plane, king sits by queen and man. On the spelling plane, king sits by man, and queen sits by london. Select a token and switch the plane. The coordinates were chosen to make that swap visible. They were not taken from a model.
+domain: transformers
+difficulty: Intermediate
+estimatedTime: 14
+visualization: embedding-space
+status: published
+prerequisites:
+  - tokenization
+related:
+  - dot-product
+next: attention-patterns
+experiments:
+  - Select king on the usage plane. The two nearest are queen and woman.
+  - Switch to the spelling plane and do not change the token. The two nearest are man and queen.
+  - Select cat. Usage puts dog beside it. Spelling puts woman beside it.
+tags:
+  - embeddings
+  - projection
+---
+
+<Chapter id="planes" title="A plane is a choice" objective="Name what this figure is not.">
+
+An embedding in a model is a long vector. A plot keeps two directions and throws the rest away. This page does not have those long vectors. It has two planes, and a token has a position in each, chosen so the neighbours change.
+
+Usage is the plane where a meaning you would expect is nearby. Spelling is the plane where a different accident is nearby. Switching planes is not a rotation. The tokens are placed again.
+
+</Chapter>
+
+<Chapter id="neighbours" title="King has two neighbourhoods" objective="Read the lines before you name a cluster.">
+
+Select king. On the usage plane the lines go to queen and woman. On the spelling plane the lines go to man and queen. Queen is in both lists. Woman is not. A sentence that says “king clusters with royalty” is true of one drawing and false of the other.
+
+Cat makes the same point with a different pair. Usage draws the line to dog. Spelling draws it to woman. The token did not move in a hidden space. The drawing changed.
+
+</Chapter>
+
+<Chapter id="use" title="What you are allowed to say" objective="Keep a claim attached to the plane that supports it.">
+
+Distance here is ordinary distance in the plane you are looking at. It is not a cosine in a trained space, and it is not evidence about a model. The discipline transfers. If a plot of real embeddings shows a cluster, the cluster is a property of that projection until you have seen it survive another one.
+
+[Dot product](/studio/dot-product) is the score a later attention head computes between two vectors. This page never computes it. It only shows that “nearby” depends on which coordinates you kept.
+
+</Chapter>
+
+<Chapter id="check" title="Check the switch" objective="Use king.">
+
+<Check
+  id="king"
+  prompt="You select king and switch from the usage plane to the spelling plane. Which neighbour is new?"
+  choices={[
+    'Queen. The usage plane had not drawn that line.',
+    'Man. Woman drops out of the two nearest.',
+    'Dog. Spelling groups the animals.',
+  ]}
+  answer="Man. Woman drops out of the two nearest."
+  why="Usage draws queen and woman. Spelling draws man and queen. Queen stays. Woman is replaced by man."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Leave the plane for a score between positions.">
+
+[Tokenization](/studio/tokenization) is where an id comes from. This page is one possible place those ids could sit, drawn twice. [Attention patterns](/studio/attention-patterns) uses scores between positions. A dot product of embeddings is one way a model builds those scores. It is not drawn here.
+
+</Chapter>

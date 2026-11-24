@@ -36,7 +36,11 @@ function isEmbeddedViz(id: string): id is Exclude<LiveVisualizationId, 'gradient
     id === 'confusion' ||
     id === 'neighbors' ||
     id === 'convolution' ||
-    id === 'positional-encoding'
+    id === 'positional-encoding' ||
+    id === 'decision-boundaries' ||
+    id === 'transformer-block' ||
+    id === 'embedding-space' ||
+    id === 'agent-loop'
   );
 }
 

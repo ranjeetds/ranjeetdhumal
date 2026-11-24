@@ -11,7 +11,7 @@ prerequisites:
   - tokenization
 related:
   - next-token
-next: embedding-space
+next: transformer-block
 experiments:
   - Select the row “sat” under Who acted. Most of that row sits on “cat”.
   - Switch to Nearby. The same row sits on the neighbours instead.
@@ -145,6 +145,6 @@ Tokenization is the prerequisite that is live. The pieces attention would mix ar
 
 The related live module is the next-token distribution. Attention mixes positions. That figure is the distribution over what comes next, with temperature. They are not the same softmax. One is over positions. The other is over a vocabulary.
 
-An embedding space, where those ids would be vectors a dot product could compare, is not built. Multi-head attention as a set of learned projections is the formula in this lesson. It is not a separate instrument.
+The [embedding space](/studio/embedding-space) is two planes for eight tokens, not the vectors this attention would score. The [transformer block](/studio/transformer-block) is the mix added back onto one token. Multi-head attention as a set of learned projections remains the formula in this lesson. It is not a third instrument.
 
 </Chapter>

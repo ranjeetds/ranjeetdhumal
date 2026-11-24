@@ -34,6 +34,10 @@ export const liveVisualizationIds = [
   'neighbors',
   'convolution',
   'positional-encoding',
+  'decision-boundaries',
+  'transformer-block',
+  'embedding-space',
+  'agent-loop',
 ] as const;
 
 export type LiveVisualizationId = (typeof liveVisualizationIds)[number];
@@ -134,6 +138,13 @@ export const studioModules = [
     status: 'live',
   },
   {
+    id: 'transformer-block',
+    title: 'One transformer block',
+    subtitle: 'Input, a handwritten mix, a residual, and a feed-forward that writes one coordinate.',
+    domainId: 'transformers',
+    status: 'live',
+  },
+  {
     id: 'attention-patterns',
     title: 'Attention patterns',
     subtitle: 'A designed pair of heads. The weights are written by hand, not taken from a trained model.',
@@ -201,21 +212,21 @@ export const studioModules = [
     title: 'Decision boundaries',
     subtitle: 'A linear cut, a tree, and a small network on the same points.',
     domainId: 'machine-learning',
-    status: 'planned',
+    status: 'live',
   },
   {
     id: 'embedding-space',
     title: 'Embedding space',
     subtitle: 'Neighbours in a projection, and what the projection hides.',
     domainId: 'transformers',
-    status: 'planned',
+    status: 'live',
   },
   {
     id: 'agent-loop',
     title: 'Agent loop',
     subtitle: 'Observe, decide, act, and the failure of a tool.',
     domainId: 'agents',
-    status: 'planned',
+    status: 'live',
   },
 ] as const satisfies readonly StudioModule[];
 
@@ -270,7 +281,7 @@ export const studioDomains = [
       },
       {
         title: 'Decisions',
-        lede: 'How a fitted model cuts a space of examples. The instrument is not built.',
+        lede: 'A straight cut, a tree, and a bent score on the same exclusive-or.',
         modules: ['decision-boundaries'],
       },
     ],
@@ -312,7 +323,7 @@ export const studioDomains = [
     why: 'The public object is a chatbot. The mechanism is a distribution over pieces, conditioned on other pieces.',
     prerequisites: 'A vector as a list of numbers, and a dot product as a score. The lessons define both before they use them.',
     related: ['deep-learning', 'generative'],
-    sequence: ['dot-product', 'positional-encoding', 'tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
+    sequence: ['dot-product', 'positional-encoding', 'tokenization', 'attention-patterns', 'transformer-block', 'next-token', 'embedding-space'],
     groups: [
       {
         title: 'Where a position goes',
@@ -326,8 +337,8 @@ export const studioDomains = [
       },
       {
         title: 'Mixing positions',
-        lede: 'Attention turns scores between positions into a weighted average.',
-        modules: ['attention-patterns'],
+        lede: 'Attention turns scores between positions into a weighted average, then a block adds that mix back.',
+        modules: ['attention-patterns', 'transformer-block'],
       },
       {
         title: 'Choosing a continuation',
@@ -336,7 +347,7 @@ export const studioDomains = [
       },
       {
         title: 'Where the pieces live',
-        lede: 'An embedding is a position in a learned space. The projection is not built.',
+        lede: 'Two hand-placed planes. A neighbour in one is not a neighbour in the other.',
         modules: ['embedding-space'],
       },
     ],
@@ -376,7 +387,7 @@ export const studioDomains = [
     groups: [
       {
         title: 'The loop',
-        lede: 'Observe, decide, act. The instrument is not built.',
+        lede: 'Observe, decide, act, and a tool that can fail.',
         modules: ['agent-loop'],
       },
     ],
@@ -405,7 +416,7 @@ export const studioPaths = [
     id: 'transformers',
     title: 'How Transformers Work',
     description: 'Cut a string, mix the pieces, and read the distribution the next piece is drawn from.',
-    steps: ['dot-product', 'positional-encoding', 'tokenization', 'attention-patterns', 'next-token', 'embedding-space'],
+    steps: ['dot-product', 'positional-encoding', 'tokenization', 'attention-patterns', 'transformer-block', 'next-token', 'embedding-space'],
     reading: [{ href: '/knowledge/attention-and-transformers', title: 'Attention Mechanisms and Transformers' }],
   },
   {
@@ -421,7 +432,7 @@ export const studioPaths = [
   {
     id: 'agents',
     title: 'Explore Agentic Systems',
-    description: 'The loop is named. The experiment is not built. The note is the written account.',
+    description: 'One call, paused on the state the tool returned, including the call that fails.',
     steps: ['agent-loop'],
     reading: [{ href: '/knowledge/agentic-systems', title: 'Agentic AI Systems' }],
   },
