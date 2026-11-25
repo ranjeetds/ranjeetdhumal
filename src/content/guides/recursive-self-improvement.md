@@ -1,27 +1,33 @@
 ---
 title: Recursive self-improvement
-description: The claim is that a system can improve the system that produces the next improvement. A closed loop of that kind is a research claim, not a product pattern, and it is not established.
+description: Four published articles, and what each one actually changes. A proof, a research programme, a frozen model rewriting its scaffold, and a population of coding agents scored on benchmarks the authors chose.
 field: improvement
 order: 26
-publishedAt: 2026-11-21
-useWhen: You are reading a claim that a model improved itself, and you need to separate a measured gain from a story about an unbounded loop.
-avoidWhen: You are building a product. A workflow with a check is the tool. An autonomous self-modifying loop is not a feature.
-check: Name what changed, what was held fixed, what data judged the change, and what would have forced the change to be rejected.
+publishedAt: 2026-11-25
+useWhen: You are reading a claim that a system improved itself, and you need the paper that the claim is borrowing from.
+avoidWhen: You want a design for a product. None of these papers is a product pattern. The Gödel machine was not run. The later systems leave the model weights fixed.
+check: Name the paper, the object it rewrote, the object it left fixed, and the number or theorem it reports. If you cannot name them, you are not reading the article.
 diagram: improvement
 ---
 
-Recursive self-improvement is a claim about a loop. A system produces a change to its own machinery — its weights, its training procedure, its tools, or the code that builds the next system — and the changed system is better at producing the following change. "Better" has to be a stated task, judged on data the change was not fit to. Without that, the loop is a description of activity.
+The phrase covers four different articles. They do not report one phenomenon.
 
-People use the same words for very different loops. A human researcher uses a model to draft an experiment and then decides what to run. A training job proposes new hyperparameters and a fixed harness accepts or rejects them. A model edits its own weights or its own evaluator with no check that the evaluator still measures the task. The first two have a part that does not get rewritten by the proposal. The last one can move the target. Those are not one result.
+[Gödel machines](/research#godel-machines) (Schmidhuber, arXiv:cs/0309048, 2003) are a proof. The program may rewrite any part of itself, including the proof searcher, only after it has proved that the rewrite raises expected utility. The optimality claim is relative to that utility, those axioms, and the limits of proof. The paper does not contain a measured run.
 
-Nothing in the public record establishes that a closed loop of self-modification yields reliable, compounding gains on a task the loop does not also get to redefine. Gains that do show up are usually of the first kinds: a person, or a frozen test, remains outside the thing being edited. Extrapolating from a helpful coding assistant to an autonomous explosion is a different sentence from the evidence.
+[AI-generating algorithms](/research#ai-generating-algorithms) (Clune, arXiv:1905.10985, 2019) are a proposal. Learn the architecture, learn the learning rule, and generate the environments. No system in the paper does all three. The article’s job is to say which research was missing.
+
+[Self-Taught Optimizer](/research#self-taught-optimizer) (Zelikman, Lorch, Mackey, and Kalai, arXiv:2310.02304, COLM 2024) is an experiment with a frozen model. GPT-4 rewrites the program that calls it. On a small set of algorithmic tasks the rewritten program scores higher than the seed. The authors write that this is not full recursive self-improvement, because the weights never change. In a check of 10,000 proposed rewrites, 0.42 percent of the GPT-4 proposals contained a string that would leave the sandbox.
+
+[The Darwin Gödel Machine](/research#darwin-godel-machine) (Zhang, Hu, Lu, Lange, and Clune, arXiv:2505.22954, 2025) drops the proof and keeps an archive. Coding agents rewrite their own scaffolding. A frozen pretrained model stays frozen. The authors report SWE-bench moving from 20.0 percent to 50.0 percent, and the full Polyglot benchmark from 14.2 percent to 30.7 percent. Removing the archive drops the SWE-bench figure to 23.0 percent. The benchmark, the sandbox, and the decision to stop at 80 iterations are outside the code the agent rewrites.
+
+I. J. Good’s “Speculations Concerning the First Ultraintelligent Machine” (Advances in Computers, 1966) is the essay the STOP paper cites for the older idea of a machine that improves the machine that builds the next one. It is a speculation. It is not one of the measurements above.
 
 ## The move
 
-When you meet the claim, write four lines. What object was allowed to change. What object was held fixed, especially the evaluation. Which data judged the change, and whether the proposer could see that data. What stop rule rejected a change that looked good and was not. If the proposer can edit the test, a rising score means the test moved. If there is no stop rule, the loop is not an experiment.
+Read the article for four objects, in its words. What was rewritten: a proof-bearing program, a scaffold, or an agent’s tools. What was not rewritten: the utility function, the model weights, or the benchmark. What the article counts as success: a theorem, or a percentage on a named test. What the article itself says the result is not. Schmidhuber does not report a run. STOP says the model is unchanged. The Darwin Gödel Machine says it did not train a new foundation model.
 
-For a system you are actually building, keep the proposer and the change it may make on opposite sides of a schema, as in [the tool interface](/guides/the-tool-is-the-interface). Let it propose a patch, a hyperparameter, or a question. Let fixed code apply the patch on a branch, run a test that the proposal cannot rewrite, and throw the branch away when the test fails. That is an evaluator-optimizer workflow with a person or a harness as the optimizer's constraint. It is not a license to let a model rewrite the harness.
+A rising score on a test the proposer can edit is not the result any of these papers claim. STOP keeps the model fixed and reports how often a proposal tried to leave the sandbox. The Darwin Gödel Machine keeps the model fixed, scores agents on benchmarks the authors chose, and says the edits it inspected stayed on those benchmarks.
 
 ## What this stops
 
-A product plan, or a fear, built from the slogan rather than from the four lines. Improvement is a comparison. Recursive improvement is a sequence of comparisons in which the comparator stays put. If you cannot point at the comparator, you do not have the phenomenon the words suggest. You have a system changing itself, which is easy, and a story about the direction, which is the part that has to be measured.
+Using “recursive self-improvement” as one result. A proof that a rewrite is globally optimal relative to a utility is not a 30-point gain on a coding benchmark, and that gain is not an update of the model’s weights. Quote the article you mean. The other three will not support the sentence.

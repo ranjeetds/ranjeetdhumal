@@ -47,7 +47,7 @@ export const guideFields = [
   {
     id: 'improvement',
     title: 'Recursive improvement',
-    description: 'The claim that a system can improve the system that improves it, and the checks that claim requires.',
+    description: 'The published articles on a system that improves the system that improves it, and what each article actually rewrote.',
   },
 ] as const;
 
