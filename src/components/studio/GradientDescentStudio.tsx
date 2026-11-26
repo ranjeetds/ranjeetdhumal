@@ -168,10 +168,28 @@ export default function GradientDescentStudio() {
   const headRef = useRef<SVGGElement>(null);
   const arrowRef = useRef<SVGLineElement>(null);
   const stepRef = useRef<HTMLElement>(null);
+  const scrubCountRef = useRef<HTMLElement>(null);
   const lossRef = useRef<HTMLElement>(null);
   const gradRef = useRef<HTMLElement>(null);
   const thetaRef = useRef<HTMLElement>(null);
   const statusRef = useRef<HTMLElement>(null);
+  const scrubRef = useRef<HTMLInputElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const playAfter = useRef(false);
+  const [plot, setPlot] = useState<{ width: number; height: number } | null>(null);
+
+  const describe = (index: number, running: boolean) => {
+    const current = steps[index];
+    if (!current || !statusRef.current) return;
+    const outside =
+      current.x < DOMAIN.x[0] || current.x > DOMAIN.x[1] || current.y < DOMAIN.y[0] || current.y > DOMAIN.y[1];
+    if (outside) statusRef.current.textContent = 'Left the frame';
+    else if (running) statusRef.current.textContent = 'Walking';
+    else if (index <= 0) statusRef.current.textContent = 'Ready';
+    else if (index === steps.length - 1 && current.gradient < 0.02) statusRef.current.textContent = 'Settled';
+    else if (index === steps.length - 1) statusRef.current.textContent = 'Step cap';
+    else statusRef.current.textContent = 'Paused';
+  };
 
   const draw = (index: number) => {
     const clamped = Math.min(Math.max(index, 0), steps.length - 1);
@@ -189,24 +207,48 @@ export default function GradientDescentStudio() {
     arrowRef.current?.setAttribute('x2', String(round(ax)));
     arrowRef.current?.setAttribute('y2', String(round(ay)));
     if (stepRef.current) stepRef.current.textContent = String(clamped);
+    if (scrubCountRef.current) scrubCountRef.current.textContent = String(clamped);
+    if (scrubRef.current) {
+      scrubRef.current.value = String(clamped);
+      scrubRef.current.setAttribute('aria-valuetext', `Step ${clamped} of ${steps.length - 1}`);
+    }
     if (lossRef.current) lossRef.current.textContent = formatSigned(current.loss);
     if (gradRef.current) gradRef.current.textContent = current.gradient.toFixed(3);
     if (thetaRef.current) thetaRef.current.textContent = `${current.x.toFixed(2)}, ${current.y.toFixed(2)}`;
-    if (statusRef.current) {
-      const outside = current.x < DOMAIN.x[0] || current.x > DOMAIN.x[1] || current.y < DOMAIN.y[0] || current.y > DOMAIN.y[1];
-      const settled = clamped === steps.length - 1 && current.gradient < 0.02;
-      statusRef.current.textContent = outside ? 'Left the frame' : settled ? 'Settled' : 'Walking';
-    }
+    describe(clamped, playing.current !== 0);
   };
 
   const stop = () => {
     window.clearInterval(playing.current);
     playing.current = 0;
+    describe(cursor.current, false);
   };
 
   useEffect(() => {
-    const motion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    draw(motion ? steps.length - 1 : steps.length - 1);
+    const node = frameRef.current;
+    if (!node) return;
+    const measure = () => {
+      const rect = node.getBoundingClientRect();
+      const width = Math.max(0, Math.min(rect.width, rect.height * 1.5));
+      const height = width / 1.5;
+      setPlot((current) =>
+        current && Math.abs(current.width - width) < 0.5 && Math.abs(current.height - height) < 0.5
+          ? current
+          : { width, height },
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    draw(steps.length - 1);
+    if (playAfter.current) {
+      playAfter.current = false;
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) play();
+    }
     return stop;
     // draw closes over the latest steps. Re-running when the path changes is the point.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -218,6 +260,7 @@ export default function GradientDescentStudio() {
       if (!(event instanceof CustomEvent) || typeof event.detail !== 'string') return;
       const preset = PRESETS.find((item) => item.id === event.detail);
       if (!preset) return;
+      playAfter.current = true;
       stop();
       setConfig(preset.config);
     };
@@ -254,12 +297,15 @@ export default function GradientDescentStudio() {
   };
 
   const play = () => {
-    stop();
+    window.clearInterval(playing.current);
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      playing.current = 0;
       draw(steps.length - 1);
       return;
     }
+    playing.current = -1;
     if (cursor.current >= steps.length - 1) draw(0);
+    else describe(cursor.current, true);
     playing.current = window.setInterval(() => {
       if (cursor.current >= steps.length - 1) {
         stop();
@@ -276,34 +322,114 @@ export default function GradientDescentStudio() {
     const b = Math.sin(next * 78.233) * 24634.6345;
     const u = a - Math.floor(a);
     const v = b - Math.floor(b);
+    playAfter.current = true;
     patch({
-      start: [DOMAIN.x[0] + 0.12 * X_SPAN + u * 0.76 * X_SPAN, DOMAIN.y[0] + 0.12 * Y_SPAN + v * 0.76 * Y_SPAN],
+      start: [
+        Math.round((DOMAIN.x[0] + 0.12 * X_SPAN + u * 0.76 * X_SPAN) * 100) / 100,
+        Math.round((DOMAIN.y[0] + 0.12 * Y_SPAN + v * 0.76 * Y_SPAN) * 100) / 100,
+      ],
     });
   };
 
   const onSurfaceClick = (event: MouseEvent<SVGSVGElement>) => {
     const bounds = event.currentTarget.getBoundingClientRect();
+    if (bounds.width === 0 || bounds.height === 0) return;
+    playAfter.current = true;
     patch({
       start: [
-        DOMAIN.x[0] + ((event.clientX - bounds.left) / bounds.width) * X_SPAN,
-        DOMAIN.y[1] - ((event.clientY - bounds.top) / bounds.height) * Y_SPAN,
+        Math.round((DOMAIN.x[0] + ((event.clientX - bounds.left) / bounds.width) * X_SPAN) * 100) / 100,
+        Math.round((DOMAIN.y[1] - ((event.clientY - bounds.top) / bounds.height) * Y_SPAN) * 100) / 100,
       ],
     });
   };
 
+  useEffect(() => {
+    const typing = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) return false;
+      const tag = target.tagName;
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable;
+    };
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (typing(target) || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (document.querySelector('dialog[open]')) return;
+      const tag = target.tagName;
+      const inLesson = Boolean(target.closest('#lesson-panel'));
+      if (event.key === ' ') {
+        if (tag === 'BUTTON' || tag === 'A' || tag === 'LABEL' || tag === 'SUMMARY') return;
+        event.preventDefault();
+        if (playing.current) stop();
+        else play();
+      } else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+        if (inLesson) return;
+        event.preventDefault();
+        stop();
+        draw(cursor.current + (event.key === 'ArrowRight' ? 1 : -1));
+      } else if (event.key === 'r' || event.key === 'R') {
+        event.preventDefault();
+        stop();
+        draw(0);
+      } else if (event.key === 'k' || event.key === 'K') {
+        event.preventDefault();
+        setCompared((current) => [pathOf(steps, steps.length), ...current].slice(0, 3));
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
   const settled = steps.at(-1);
   const fullPath = pathOf(steps, steps.length);
   const head = settled ? toSvg(settled.x, settled.y) : toSvg(INITIAL.start[0], INITIAL.start[1]);
+  const matches = (preset: Config) =>
+    preset.surface === config.surface &&
+    preset.optimizer === config.optimizer &&
+    preset.learningRate === config.learningRate &&
+    preset.momentum === config.momentum &&
+    preset.maxSteps === config.maxSteps &&
+    preset.start[0] === config.start[0] &&
+    preset.start[1] === config.start[1];
+
+  const choice =
+    'h-9 border border-line px-2 text-sm text-ink-muted hover:text-ink aria-pressed:border-line-strong aria-pressed:bg-raised aria-pressed:text-ink';
 
   return (
-    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-start">
-      <div className="min-w-0 border-b border-line lg:border-r lg:border-b-0">
+    <div className="flex h-full min-h-0 flex-col lg:flex-row">
+      <div className="@container order-1 flex min-h-0 min-w-0 flex-1 flex-col lg:order-2">
+        <dl className="grid grid-cols-2 gap-px bg-line @min-[42rem]:grid-cols-5">
+          <div className="bg-canvas px-3 py-2.5">
+            <dt className="mono-label text-ink-faint">Step</dt>
+            <dd className="num whitespace-nowrap text-ink">
+              <span ref={stepRef}>{steps.length - 1}</span>
+              <span className="text-ink-faint"> / {steps.length - 1}</span>
+            </dd>
+          </div>
+          <div className="bg-canvas px-3 py-2.5">
+            <dt className="mono-label text-ink-faint">Loss</dt>
+            <dd ref={lossRef} className="num whitespace-nowrap text-ink">{settled ? formatSigned(settled.loss) : '—'}</dd>
+          </div>
+          <div className="bg-canvas px-3 py-2.5">
+            <dt className="mono-label text-ink-faint">|grad|</dt>
+            <dd ref={gradRef} className="num whitespace-nowrap text-ink">{settled ? settled.gradient.toFixed(3) : '—'}</dd>
+          </div>
+          <div className="bg-canvas px-3 py-2.5">
+            <dt className="mono-label text-ink-faint">θ</dt>
+            <dd ref={thetaRef} className="num whitespace-nowrap text-ink">{settled ? `${settled.x.toFixed(2)}, ${settled.y.toFixed(2)}` : '—'}</dd>
+          </div>
+          <div className="col-span-2 bg-canvas px-3 py-2.5 @min-[42rem]:col-span-1">
+            <dt className="mono-label text-ink-faint">Status</dt>
+            <dd ref={statusRef} className="whitespace-nowrap text-sm text-ink">Settled</dd>
+          </div>
+        </dl>
+        <div ref={frameRef} className="flex min-h-[16rem] flex-1 items-center justify-center">
         <svg
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           role="img"
           aria-labelledby={titleId}
           onClick={onSurfaceClick}
-          className="block h-auto w-full cursor-crosshair touch-manipulation"
+          className="block cursor-crosshair touch-manipulation"
+          style={plot && plot.width > 0 ? { width: plot.width, height: plot.height } : { width: '100%', height: 'auto' }}
         >
           <title id={titleId}>Loss surface with an optimization trace</title>
           <g className="stroke-ink" fill="none" strokeWidth={1}>
@@ -340,61 +466,101 @@ export default function GradientDescentStudio() {
             <circle r={4} className="fill-accent" />
           </g>
         </svg>
-        <dl className="mono-label grid grid-cols-2 gap-x-4 gap-y-1 border-t border-line px-4 py-3 text-ink-faint sm:grid-cols-5">
-          <div><dt>Step</dt><dd ref={stepRef} className="text-ink">{steps.length - 1}</dd></div>
-          <div><dt>Loss</dt><dd ref={lossRef} className="text-ink">{settled ? formatSigned(settled.loss) : '—'}</dd></div>
-          <div><dt>|grad|</dt><dd ref={gradRef} className="text-ink">{settled ? settled.gradient.toFixed(3) : '—'}</dd></div>
-          <div><dt>θ</dt><dd ref={thetaRef} className="text-ink">{settled ? `${settled.x.toFixed(2)}, ${settled.y.toFixed(2)}` : '—'}</dd></div>
-          <div><dt>Status</dt><dd ref={statusRef} className="text-ink">Settled</dd></div>
-        </dl>
+        </div>
+        <label className="flex items-center gap-3 border-t border-line px-4 py-2.5">
+          <span className="mono-label shrink-0 text-ink-faint">Scrub</span>
+          <input
+            ref={scrubRef}
+            type="range"
+            min={0}
+            max={Math.max(steps.length - 1, 1)}
+            defaultValue={steps.length - 1}
+            aria-label="Step"
+            onChange={(event) => {
+              stop();
+              draw(Number(event.currentTarget.value));
+            }}
+            style={{ accentColor: 'var(--accent)' }}
+            className="h-1 w-full"
+          />
+          <span className="num w-16 shrink-0 text-right text-xs text-ink-muted">
+            <span ref={scrubCountRef}>{steps.length - 1}</span>/{steps.length - 1}
+          </span>
+        </label>
+        <p className="border-t border-line px-4 py-3 text-sm leading-relaxed text-ink-muted">
+          The surface is designed. It is not the loss of a trained model. Click the surface to move the start. The arrow points downhill; its length is only a visual scale.
+        </p>
       </div>
 
       <form
-        className="grid gap-4 p-4"
+        className="order-2 grid content-start gap-5 overflow-y-auto border-t border-line p-4 lg:order-1 lg:w-[17.5rem] lg:shrink-0 lg:border-t-0 lg:border-r"
         onSubmit={(event) => {
           event.preventDefault();
           play();
         }}
       >
-        <div className="flex flex-wrap gap-2">
-          <button type="submit" className="mono-label rounded-sm bg-ink px-3 py-2 text-canvas">Play</button>
-          <button type="button" onClick={stop} className="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink">Pause</button>
-          <button type="button" onClick={() => { stop(); draw(cursor.current + 1); }} className="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink">Step</button>
-          <button type="button" onClick={() => { stop(); draw(0); }} className="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink">Reset</button>
+        <div>
+          <p className="mono-label text-ink-faint">Run</p>
+          <div className="mt-2 grid grid-cols-4 gap-1">
+            <button type="submit" className="h-9 rounded-sm bg-accent text-sm font-medium text-accent-ink">
+              Play
+            </button>
+            <button type="button" onClick={stop} className="h-9 rounded-sm text-sm text-ink-muted hover:bg-raised hover:text-ink">
+              Pause
+            </button>
+            <button type="button" onClick={() => { stop(); draw(cursor.current + 1); }} className="h-9 rounded-sm text-sm text-ink-muted hover:bg-raised hover:text-ink">
+              Step
+            </button>
+            <button type="button" onClick={() => { stop(); draw(0); }} className="h-9 rounded-sm text-sm text-ink-muted hover:bg-raised hover:text-ink">
+              Reset
+            </button>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button type="button" onClick={randomStart} className="text-sm text-ink-muted hover:text-ink">
+              Random start
+            </button>
+            <button
+              type="button"
+              onClick={() => setCompared((current) => [fullPath, ...current].slice(0, 3))}
+              className="text-sm text-ink-muted hover:text-ink"
+            >
+              Keep trace
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <p className="mono-label text-ink-faint">Surface</p>
+          <div className="mt-2 grid grid-cols-2" role="group" aria-label="Surface">
+            <button type="button" aria-pressed={config.surface === 'valleys'} onClick={() => patch({ surface: 'valleys' })} className={choice}>
+              Two valleys
+            </button>
+            <button type="button" aria-pressed={config.surface === 'bowl'} onClick={() => patch({ surface: 'bowl' })} className={choice}>
+              Convex bowl
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <p className="mono-label text-ink-faint">Optimizer</p>
+          <div className="mt-2 grid grid-cols-3" role="group" aria-label="Optimizer">
+            {(['sgd', 'momentum', 'adam'] as const).map((optimizer) => (
+              <button
+                key={optimizer}
+                type="button"
+                aria-pressed={config.optimizer === optimizer}
+                onClick={() => patch({ optimizer })}
+                className={choice}
+              >
+                {optimizer === 'sgd' ? 'SGD' : optimizer === 'adam' ? 'Adam' : 'Momentum'}
+              </button>
+            ))}
+          </div>
         </div>
 
         <label className="grid gap-1.5">
-          <span className="mono-label text-ink-faint">Surface</span>
-          <select
-            value={config.surface}
-            onChange={(event) => patch({ surface: event.currentTarget.value === 'bowl' ? 'bowl' : 'valleys' })}
-            className="h-10 border border-line-strong bg-canvas px-2 text-sm text-ink"
-          >
-            <option value="valleys">Two valleys</option>
-            <option value="bowl">Convex bowl</option>
-          </select>
-        </label>
-
-        <label className="grid gap-1.5">
-          <span className="mono-label text-ink-faint">Optimizer</span>
-          <select
-            value={config.optimizer}
-            onChange={(event) => {
-              const value = event.currentTarget.value;
-              const optimizer: OptimizerId = value === 'adam' || value === 'sgd' ? value : 'momentum';
-              patch({ optimizer });
-            }}
-            className="h-10 border border-line-strong bg-canvas px-2 text-sm text-ink"
-          >
-            <option value="sgd">SGD</option>
-            <option value="momentum">Momentum</option>
-            <option value="adam">Adam</option>
-          </select>
-        </label>
-
-        <label className="grid gap-1.5">
           <span className="mono-label flex justify-between text-ink-faint">
-            Learning rate <span className="text-ink">{config.learningRate.toFixed(3)}</span>
+            Learning rate <span className="num normal-case tracking-normal text-ink">{config.learningRate.toFixed(3)}</span>
           </span>
           <input
             type="range"
@@ -402,6 +568,7 @@ export default function GradientDescentStudio() {
             max={1.5}
             step={0.005}
             value={config.learningRate}
+            aria-valuetext={config.learningRate.toFixed(3)}
             onChange={(event) => patch({ learningRate: Number(event.currentTarget.value) })}
             style={{ accentColor: 'var(--accent)' }}
           />
@@ -409,7 +576,10 @@ export default function GradientDescentStudio() {
 
         <label className="grid gap-1.5">
           <span className="mono-label flex justify-between text-ink-faint">
-            Momentum <span className="text-ink">{config.optimizer === 'momentum' ? config.momentum.toFixed(2) : 'unused'}</span>
+            Momentum{' '}
+            <span className="num normal-case tracking-normal text-ink">
+              {config.optimizer === 'momentum' ? config.momentum.toFixed(2) : 'unused'}
+            </span>
           </span>
           <input
             type="range"
@@ -420,42 +590,39 @@ export default function GradientDescentStudio() {
             disabled={config.optimizer !== 'momentum'}
             onChange={(event) => patch({ momentum: Number(event.currentTarget.value) })}
             style={{ accentColor: 'var(--accent)' }}
+            className="disabled:opacity-40"
           />
         </label>
 
-        <div className="grid gap-2">
-          <span className="mono-label text-ink-faint">Presets</span>
-          <div className="flex flex-wrap gap-2">
+        <div>
+          <p className="mono-label text-ink-faint">Presets</p>
+          <div className="mt-2 grid grid-cols-2 gap-2">
             {PRESETS.map((preset) => (
               <button
                 key={preset.id}
                 type="button"
+                aria-pressed={matches(preset.config)}
                 onClick={() => {
+                  if (matches(preset.config)) {
+                    play();
+                    return;
+                  }
+                  playAfter.current = true;
                   stop();
                   setConfig(preset.config);
                 }}
-                className="mono-label rounded-sm border border-line px-2 py-1.5 text-ink-muted hover:border-line-strong hover:text-ink"
+                className="rounded-sm border border-line px-2 py-2 text-left text-sm text-ink-muted hover:border-line-strong hover:text-ink aria-pressed:border-accent aria-pressed:text-ink"
               >
                 {preset.label}
               </button>
             ))}
           </div>
         </div>
-
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={randomStart} className="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink">
-            Random start
-          </button>
-          <button
-            type="button"
-            onClick={() => setCompared((current) => [fullPath, ...current].slice(0, 3))}
-            className="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink"
-          >
-            Keep this trace
-          </button>
-        </div>
-        <p className="text-sm leading-relaxed text-ink-muted">
-          Click the surface to move the start. The arrow is the downhill direction at the current point. A kept trace stays while you change the settings.
+        <p className="mono-label flex flex-wrap gap-x-3 gap-y-1 text-ink-faint">
+          <span>Space play</span>
+          <span>Arrows step</span>
+          <span>R reset</span>
+          <span>K keep</span>
         </p>
       </form>
     </div>

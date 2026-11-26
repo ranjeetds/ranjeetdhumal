@@ -5,6 +5,8 @@
  */
 import BaseLayout from './BaseLayout.astro';
 import Icon from '@/components/ui/Icon.astro';
+import OnThisPage from '@/components/ui/OnThisPage.astro';
+import ReadingProgress from '@/components/ui/ReadingProgress.astro';
 import Status from '@/components/ui/Status.astro';
 import { getSection } from '@/config/site';
 import { getTopic } from '@/data/topics';
@@ -12,11 +14,18 @@ import CardGrid from '@/components/ui/CardGrid.astro';
 import { type Note, formatDate, getPublishedNotes, getPublishedPaths, noteHref } from '@/lib/content';
 import { articleSchema, breadcrumbSchema } from '@/lib/seo';
 
-interface Props {
-  note: Note;
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
 }
 
-const { note } = Astro.props;
+interface Props {
+  note: Note;
+  headings: Heading[];
+}
+
+const { note, headings } = Astro.props;
 const { title, description, publishedAt, updatedAt, maturity, tags, prerequisites, objectives, furtherReading } =
   note.data;
 const topic = note.data.topic && getTopic(note.data.topic);
@@ -64,7 +73,8 @@ const related = notes
     <div class="border-t border-line">
       <div class="mx-auto grid max-w-page gap-x-8 gap-y-10 px-gutter py-12 lg:grid-cols-12 lg:py-16">
         <aside aria-label="About this note" class="lg:col-span-3" data-pagefind-ignore>
-          <dl class="grid grid-cols-2 gap-x-6 gap-y-5 text-sm lg:sticky lg:top-24 lg:grid-cols-1">
+          <div class="lg:sticky lg:top-24 lg:max-h-[calc(100dvh-8rem)] lg:overflow-y-auto">
+          <dl class="grid grid-cols-2 gap-x-6 gap-y-5 text-sm lg:grid-cols-1">
             <div>
               <dt class="mono-label text-ink-faint">Maturity</dt>
               <dd class="mt-1.5">
@@ -116,7 +126,8 @@ const related = notes
               )
             }
           </dl>
-          <nav id="note-toc" aria-label="On this page" class="mt-8 hidden lg:block" hidden></nav>
+          <OnThisPage headings={headings} />
+          </div>
         </aside>
 
         <div class="min-w-0 lg:col-span-9">
@@ -194,46 +205,5 @@ const related = notes
       </div>
     </div>
   </article>
-  <div id="reading-progress" class="pointer-events-none fixed inset-x-0 top-16 z-30 h-px origin-left scale-x-0 bg-accent"></div>
+  <ReadingProgress />
 </BaseLayout>
-
-<script>
-  const progress = document.querySelector<HTMLElement>('#reading-progress');
-  const article = document.querySelector('article .prose');
-  const toc = document.querySelector<HTMLElement>('#note-toc');
-
-  const onScroll = () => {
-    if (!progress || !article) return;
-    const rect = article.getBoundingClientRect();
-    const total = rect.height - window.innerHeight;
-    const seen = Math.min(1, Math.max(0, -rect.top / (total || 1)));
-    progress.style.transform = `scaleX(${seen})`;
-  };
-  document.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-
-  if (article && toc) {
-    const headings = [...article.querySelectorAll<HTMLHeadingElement>('h2')];
-    if (headings.length > 1) {
-      const list = document.createElement('ol');
-      list.className = 'mt-3 space-y-2 text-sm';
-      const label = document.createElement('p');
-      label.className = 'mono-label text-ink-faint';
-      label.textContent = 'On this page';
-      for (const heading of headings) {
-        if (!heading.id) {
-          heading.id = heading.textContent?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ?? '';
-        }
-        const item = document.createElement('li');
-        const link = document.createElement('a');
-        link.href = `#${heading.id}`;
-        link.className = 'text-ink-muted hover:text-ink';
-        link.textContent = heading.textContent;
-        item.append(link);
-        list.append(item);
-      }
-      toc.append(label, list);
-      toc.hidden = false;
-    }
-  }
-</script>

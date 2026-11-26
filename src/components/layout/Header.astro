@@ -72,10 +72,15 @@ const primaryLink = [
 
       <a
         href="/search"
+        data-command-open
         aria-label="Search"
-        class="grid size-10 place-items-center rounded-sm text-ink-muted transition-colors duration-200 hover:bg-raised hover:text-ink"
+        aria-haspopup="dialog"
+        aria-controls="command-palette"
+        aria-keyshortcuts="Meta+K Control+K"
+        class="flex h-10 items-center gap-2 rounded-sm px-2 text-ink-muted transition-colors duration-200 hover:bg-raised hover:text-ink"
       >
         <Icon name="search" class="size-5" />
+        <kbd class="hidden font-mono text-[0.65rem] tracking-wide text-ink-faint xl:inline">⌘K</kbd>
       </a>
 
       <ThemeToggle />

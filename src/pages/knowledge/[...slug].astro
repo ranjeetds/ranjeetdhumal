@@ -11,12 +11,12 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 const { note } = Astro.props;
-const { Content } = await render(note);
+const { Content, headings } = await render(note);
 
 // Components available in every note without an import statement.
 const components = { Viz };
 ---
 
-<NoteLayout note={note}>
+<NoteLayout note={note} headings={headings}>
   <Content components={components} />
 </NoteLayout>

@@ -26,12 +26,39 @@ const kindLabel = {
   patent: 'Patent',
   'open-question': 'Direction',
 } as const;
+
+const kindOrder = ['paper-note', 'note', 'experiment', 'open-question', 'patent'] as const;
+const presentKinds = kindOrder.filter((kind) => rendered.some(({ entry }) => entry.data.kind === kind));
 ---
+
+<div data-research-log>
+  <div class="mb-6 flex flex-wrap gap-2" role="group" aria-label="Filter the log">
+    <button
+      type="button"
+      data-research-filter="all"
+      aria-pressed="true"
+      class="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
+    >
+      All
+    </button>
+    {
+      presentKinds.map((kind) => (
+        <button
+          type="button"
+          data-research-filter={kind}
+          aria-pressed="false"
+          class="mono-label rounded-sm px-3 py-2 text-ink-muted hover:bg-raised hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
+        >
+          {kindLabel[kind]}
+        </button>
+      ))
+    }
+  </div>
 
 <ul class="grid gap-px border border-line bg-line">
   {
     rendered.map(({ entry, Content }) => (
-      <li id={entry.id} class="scroll-mt-28 bg-canvas">
+      <li id={entry.id} data-research-kind={entry.data.kind} class="scroll-mt-28 bg-canvas">
         <article class="p-6 sm:p-8">
           <p class="mono-label text-ink-faint">
             {entry.data.stage === 'posted' ? formatDate(entry.data.publishedAt) : 'Planned'}
@@ -65,3 +92,23 @@ const kindLabel = {
     ))
   }
 </ul>
+</div>
+
+<script>
+  const root = document.querySelector('[data-research-log]');
+  if (root) {
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-research-filter]')];
+    const items = [...root.querySelectorAll<HTMLElement>('[data-research-kind]')];
+    for (const button of buttons) {
+      button.addEventListener('click', () => {
+        const kind = button.dataset.researchFilter ?? 'all';
+        for (const candidate of buttons) {
+          candidate.setAttribute('aria-pressed', candidate === button ? 'true' : 'false');
+        }
+        for (const item of items) {
+          item.hidden = kind !== 'all' && item.dataset.researchKind !== kind;
+        }
+      });
+    }
+  }
+</script>

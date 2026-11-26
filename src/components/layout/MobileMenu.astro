@@ -32,6 +32,15 @@ const { pathname } = Astro.url;
 
     {/* Titles only, so the whole menu fits on one phone screen without scrolling. */}
     <nav aria-label="Menu" class="flex-1 overflow-y-auto px-gutter pt-2 pb-8 [--rise-step:40ms]">
+      <a
+        href="/search"
+        data-command-open
+        class="rise flex items-baseline gap-5 border-b border-line py-4"
+        style="--i:0"
+      >
+        <span class="mono-label w-5 text-ink-faint">⌘K</span>
+        <span class="font-serif text-[1.75rem] leading-tight tracking-tight">Search</span>
+      </a>
       <ul>
         {
           primaryNav.map((item, i) => (

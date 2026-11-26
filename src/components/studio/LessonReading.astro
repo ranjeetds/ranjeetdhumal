@@ -1,0 +1,140 @@
+---
+/**
+ * The reading column of a studio lesson: the experiments, the parts, and where
+ * the lesson leads. In the bench it scrolls beside the figure.
+ */
+interface Step {
+  href?: string;
+  title: string;
+}
+
+interface Relation {
+  label: string;
+  step: Step;
+}
+
+interface Sibling {
+  id: string;
+  title: string;
+}
+
+interface Props {
+  title?: string;
+  summary?: string;
+  experiments: readonly string[];
+  relations: readonly Relation[];
+  siblings: readonly Sibling[];
+  domainTitle?: string;
+  panel?: boolean;
+}
+
+const { title, summary, experiments, relations, siblings, domainTitle, panel = false } = Astro.props;
+---
+
+<div class:list={[panel && 'px-6 py-6', !panel && 'max-w-prose']}>
+  {
+    panel && (
+      <div class="sticky top-0 z-10 -mx-6 mb-6 border-b border-line bg-canvas px-6 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <p class="mono-label text-ink-faint">Lesson</p>
+          <p class="mono-label text-ink-faint" data-progress aria-live="polite">
+            Nothing marked yet
+          </p>
+        </div>
+        <div class="mt-2 h-px bg-line" aria-hidden="true">
+          <div data-progress-bar class="h-px bg-accent" style="width: 0%"></div>
+        </div>
+      </div>
+    )
+  }
+
+  {
+    panel && title && (
+      <p id="lesson-title" class="font-serif text-title text-ink">
+        {title}
+      </p>
+    )
+  }
+  {panel && summary && <p class="mt-2 text-sm leading-relaxed text-ink-muted">{summary}</p>}
+  {panel && <ol data-toc class="mt-4 mb-8"></ol>}
+
+  {
+    experiments.length > 0 && (
+      <div>
+        <h2 class="font-serif text-title text-ink">On this figure</h2>
+        <ol class="mt-4 space-y-3">
+          {experiments.map((item, index) => (
+            <li class="grid grid-cols-[2rem_1fr] gap-3 text-sm leading-relaxed text-ink-muted">
+              <span class="mono-label text-ink-faint">{String(index + 1).padStart(2, '0')}</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    )
+  }
+
+  <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+    <button type="button" data-chapter-prev class="text-sm text-ink-muted hover:text-ink">
+      Previous part
+    </button>
+    <button type="button" data-chapter-next class="text-sm text-ink-muted hover:text-ink">
+      Next part
+    </button>
+  </div>
+
+  <div class="prose mt-2">
+    <slot />
+  </div>
+
+  {
+    relations.length > 0 && (
+      <div class="mt-10 border-t border-line pt-6">
+        <h2 class="font-serif text-title text-ink">Where this leads</h2>
+        <ul class="mt-4 divide-y divide-line border-y border-line">
+          {relations.map((relation) => (
+            <li class="grid gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:items-baseline">
+              <span class="mono-label text-ink-faint">{relation.label}</span>
+              {relation.step.href ? (
+                <a href={relation.step.href} class="text-ink hover:text-accent">
+                  {relation.step.title}
+                </a>
+              ) : (
+                <p class="text-ink">
+                  {relation.step.title}
+                  <span class="mono-label ml-2 text-ink-faint">Not built</span>
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+
+  {
+    siblings.length > 0 && (
+      <div class="mt-10">
+        <h2 class="font-serif text-title text-ink">
+          {domainTitle ? `Also in ${domainTitle}` : 'Other experiments'}
+        </h2>
+        <ul class="mt-3 divide-y divide-line border-y border-line">
+          {siblings.map((item) => (
+            <li>
+              <a href={`/studio/${item.id}`} class="block py-2 text-sm text-ink-muted hover:text-ink">
+                {item.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+
+  <p class="mt-10">
+    <button type="button" data-clear-progress class="mono-label text-ink-faint hover:text-ink">
+      Clear learning progress on this browser
+    </button>
+  </p>
+  <p data-cleared hidden class="mt-2 text-sm text-ink-muted" role="status"></p>
+</div>

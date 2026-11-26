@@ -1,0 +1,300 @@
+---
+/**
+ * Search from any page. ⌘K, Ctrl+K, or / opens it. Without JavaScript the
+ * header link still goes to /search. The index is the same /search.json
+ * the search page uses.
+ */
+import { primaryNav } from '@/config/site';
+---
+
+<dialog id="command-palette" aria-labelledby="command-palette-label" class="command-palette bg-canvas text-ink">
+  <form role="search" data-command-form class="flex items-center gap-2 border-b border-line px-4">
+    <label id="command-palette-label" for="command-q" class="sr-only">Search the notebook</label>
+    <input
+      id="command-q"
+      type="search"
+      role="combobox"
+      autocomplete="off"
+      spellcheck="false"
+      placeholder="Search guides, lessons, papers"
+      aria-autocomplete="list"
+      aria-controls="command-list"
+      aria-expanded="true"
+      class="h-14 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink-faint"
+    />
+    <button type="button" data-command-close class="mono-label px-2 py-2 text-ink-faint hover:text-ink">
+      Close
+    </button>
+  </form>
+  <p id="command-status" class="mono-label px-4 pt-3 text-ink-faint" aria-live="polite"></p>
+  <ul id="command-list" role="listbox" class="max-h-[min(24rem,50vh)] overflow-y-auto px-2 py-2"></ul>
+  <p class="hidden border-t border-line px-4 py-3 text-xs text-ink-faint sm:block">
+    <kbd class="font-mono">↑</kbd>
+    <kbd class="font-mono">↓</kbd>
+    to move
+    <span class="mx-2" aria-hidden="true">·</span>
+    <kbd class="font-mono">Enter</kbd>
+    to open
+    <span class="mx-2" aria-hidden="true">·</span>
+    <kbd class="font-mono">Esc</kbd>
+    to close
+  </p>
+  <template id="command-home">
+    {
+      primaryNav.map((item) => (
+          <a href={item.href} data-kind="Go to">
+          {item.label}
+        </a>
+      ))
+    }
+  </template>
+</dialog>
+
+<style>
+  .command-palette {
+    width: min(36rem, calc(100vw - 2rem));
+    max-height: min(36rem, 80vh);
+    margin: 12vh auto auto;
+    border: 1px solid var(--line-strong);
+    padding: 0;
+  }
+
+  .command-palette::backdrop {
+    background: color-mix(in oklab, var(--ink) 28%, transparent);
+  }
+</style>
+
+<script>
+  import { foldSearch } from '@/lib/search';
+
+  interface RecordItem {
+    title: string;
+    href: string;
+    description: string;
+    kind: string;
+    available: boolean;
+  }
+
+  const dialog = document.querySelector<HTMLDialogElement>('#command-palette');
+  const form = dialog?.querySelector<HTMLFormElement>('[data-command-form]');
+  const input = dialog?.querySelector<HTMLInputElement>('#command-q');
+  const list = dialog?.querySelector<HTMLUListElement>('#command-list');
+  const status = dialog?.querySelector<HTMLParagraphElement>('#command-status');
+  const home = dialog?.querySelector<HTMLTemplateElement>('#command-home');
+
+  const isRecord = (value: unknown): value is RecordItem => {
+    if (typeof value !== 'object' || value === null) return false;
+    const title = Reflect.get(value, 'title');
+    const href = Reflect.get(value, 'href');
+    const description = Reflect.get(value, 'description');
+    const kind = Reflect.get(value, 'kind');
+    const available = Reflect.get(value, 'available');
+    return (
+      typeof title === 'string' &&
+      typeof href === 'string' &&
+      typeof description === 'string' &&
+      typeof kind === 'string' &&
+      typeof available === 'boolean'
+    );
+  };
+
+  let records: RecordItem[] | null = null;
+  let loading: Promise<void> | null = null;
+  let active = 0;
+
+  const isTyping = (target: EventTarget | null) => {
+    if (!(target instanceof HTMLElement)) return false;
+    const tag = target.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable;
+  };
+
+  const options = () => [...(list?.querySelectorAll<HTMLAnchorElement>('a[role="option"]') ?? [])];
+
+  const markActive = () => {
+    const links = options();
+    if (links.length === 0) {
+      input?.removeAttribute('aria-activedescendant');
+      return;
+    }
+    if (active >= links.length) active = 0;
+    for (const [index, link] of links.entries()) {
+      const selected = index === active;
+      link.setAttribute('aria-selected', selected ? 'true' : 'false');
+      link.classList.toggle('bg-raised', selected);
+      if (selected) {
+        link.id = 'command-active';
+        input?.setAttribute('aria-activedescendant', 'command-active');
+        if (dialog?.open) link.scrollIntoView({ block: 'nearest' });
+      } else if (link.id === 'command-active') {
+        link.removeAttribute('id');
+      }
+    }
+  };
+
+  const appendOption = (href: string, kind: string, title: string, description: string) => {
+    if (!list) return;
+    const item = document.createElement('li');
+    item.setAttribute('role', 'presentation');
+    const link = document.createElement('a');
+    link.href = href;
+    link.setAttribute('role', 'option');
+    link.className = 'block px-2 py-2 outline-none';
+    const meta = document.createElement('span');
+    meta.className = 'mono-label block text-ink-faint';
+    meta.textContent = kind;
+    const name = document.createElement('span');
+    name.className = 'mt-1 block font-serif text-lg text-ink';
+    name.textContent = title;
+    link.append(meta, name);
+    if (description) {
+      const copy = document.createElement('span');
+      copy.className = 'mt-1 block text-sm leading-relaxed text-ink-muted';
+      copy.textContent = description;
+      link.append(copy);
+    }
+    item.append(link);
+    list.append(item);
+  };
+
+  const showHome = () => {
+    if (!list || !status || !home) return;
+    list.replaceChildren();
+    const fragment = home.content.cloneNode(true);
+    if (!(fragment instanceof DocumentFragment)) return;
+    for (const node of fragment.querySelectorAll('a')) {
+      const kind = node.dataset.kind ?? 'section';
+      const title = node.textContent?.trim() ?? '';
+      const href = node.getAttribute('href') ?? '/';
+      appendOption(href, kind, title, '');
+    }
+    active = 0;
+    status.textContent = 'Sections. Type to search the notebook.';
+    markActive();
+  };
+
+  const showMatches = (query: string) => {
+    if (!list || !status || !records) return;
+    const terms = foldSearch(query).split(/\s+/).filter(Boolean);
+    const matched = records.filter((record) => {
+      const haystack = foldSearch(`${record.title} ${record.description} ${record.kind}`);
+      return terms.every((term) => haystack.includes(term));
+    });
+    const shown = matched.slice(0, 8);
+    list.replaceChildren();
+    for (const record of shown) {
+      const kind = record.available ? record.kind : `${record.kind} · not available yet`;
+      appendOption(record.href, kind, record.title, record.description);
+    }
+    active = 0;
+    if (matched.length === 0) status.textContent = 'No matches.';
+    else if (matched.length > shown.length) status.textContent = `${shown.length} of ${matched.length} matches.`;
+    else status.textContent = `${matched.length} ${matched.length === 1 ? 'match' : 'matches'}.`;
+    markActive();
+  };
+
+  const render = () => {
+    const query = input?.value.trim() ?? '';
+    if (query.length === 0 || !records) showHome();
+    else showMatches(query);
+  };
+
+  const load = () => {
+    if (records || loading) return loading ?? Promise.resolve();
+    loading = fetch('/search.json')
+      .then((response) => response.json())
+      .then((payload: unknown) => {
+        records = Array.isArray(payload) ? payload.filter(isRecord) : [];
+        render();
+      })
+      .catch(() => {
+        if (status) status.textContent = 'Search could not load. The search page is still available.';
+      });
+    return loading;
+  };
+
+  const open = () => {
+    if (!dialog || !input) return;
+    const menu = document.querySelector('#site-menu');
+    if (menu instanceof HTMLDialogElement && menu.open) menu.close();
+    if (!dialog.open) dialog.showModal();
+    input.focus();
+    input.select();
+    void load();
+    render();
+  };
+
+  const close = () => {
+    dialog?.close();
+  };
+
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest('[data-command-open]')) {
+      event.preventDefault();
+      open();
+      return;
+    }
+    if (target.closest('[data-command-close]')) close();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    const meta = event.metaKey || event.ctrlKey;
+    if (meta && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      if (dialog?.open) close();
+      else open();
+      return;
+    }
+    if (event.key === '/' && !dialog?.open && !isTyping(event.target)) {
+      event.preventDefault();
+      open();
+      return;
+    }
+    if (!dialog?.open) return;
+    const links = options();
+    if (event.key === 'ArrowDown' && links.length > 0) {
+      event.preventDefault();
+      active = (active + 1) % links.length;
+      markActive();
+    } else if (event.key === 'ArrowUp' && links.length > 0) {
+      event.preventDefault();
+      active = (active - 1 + links.length) % links.length;
+      markActive();
+    } else if (event.key === 'Enter') {
+      const chosen = links[active];
+      if (!chosen) return;
+      event.preventDefault();
+      window.location.assign(chosen.href);
+    }
+  });
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const chosen = options()[active];
+    if (chosen) window.location.assign(chosen.href);
+  });
+
+  input?.addEventListener('input', () => {
+    if (records) render();
+    else void load();
+  });
+
+  list?.addEventListener('mousemove', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const link = target.closest('a[role="option"]');
+    if (!(link instanceof HTMLAnchorElement)) return;
+    const index = options().indexOf(link);
+    if (index >= 0 && index !== active) {
+      active = index;
+      markActive();
+    }
+  });
+
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) close();
+  });
+
+  showHome();
+</script>

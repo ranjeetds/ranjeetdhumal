@@ -23,6 +23,7 @@ const query = Astro.url.searchParams.get('q') ?? '';
         </button>
       </div>
     </form>
+    <p class="rise mt-3 text-sm text-ink-faint" style="--i:4">From any page, ⌘K or Ctrl K opens this search.</p>
   </PageHeader>
 
   <div class="mx-auto max-w-page px-gutter pb-section">
@@ -46,6 +47,8 @@ const query = Astro.url.searchParams.get('q') ?? '';
 </BaseLayout>
 
 <script>
+  import { foldSearch } from '@/lib/search';
+
   interface RecordItem {
     title: string;
     href: string;
@@ -64,10 +67,10 @@ const query = Astro.url.searchParams.get('q') ?? '';
 
   const render = () => {
     if (!input || !list || !status) return;
-    const terms = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+    const terms = foldSearch(input.value).split(/\s+/).filter(Boolean);
     const matched = records.filter((record) => {
       if (kind !== 'all' && record.kind !== kind) return false;
-      const haystack = `${record.title} ${record.description} ${record.kind}`.toLowerCase();
+      const haystack = foldSearch(`${record.title} ${record.description} ${record.kind}`);
       return terms.every((term) => haystack.includes(term));
     });
     active = 0;

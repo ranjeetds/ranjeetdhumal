@@ -5,6 +5,8 @@
  */
 import GuideDiagram from '@/components/content/GuideDiagram.astro';
 import Icon from '@/components/ui/Icon.astro';
+import OnThisPage from '@/components/ui/OnThisPage.astro';
+import ReadingProgress from '@/components/ui/ReadingProgress.astro';
 import Viz from '@/components/visualizations/Viz.astro';
 import { getSection } from '@/config/site';
 import { getGuideField } from '@/data/guides';
@@ -12,13 +14,20 @@ import { type Guide, formatDate, guideHref } from '@/lib/content';
 import { articleSchema, breadcrumbSchema } from '@/lib/seo';
 import BaseLayout from './BaseLayout.astro';
 
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
 interface Props {
   guide: Guide;
+  headings: Heading[];
   previous?: Guide;
   next?: Guide;
 }
 
-const { guide, previous, next } = Astro.props;
+const { guide, headings, previous, next } = Astro.props;
 const { title, description, publishedAt, useWhen, avoidWhen, check, figure, diagram } =
   guide.data;
 const field = getGuideField(guide.data.field);
@@ -55,7 +64,8 @@ const path = guideHref(guide);
     <div class="border-t border-line">
       <div class="mx-auto grid max-w-page gap-x-8 gap-y-10 px-gutter py-12 lg:grid-cols-12 lg:py-16">
         <aside aria-label="How to use this guide" class="lg:col-span-3" data-pagefind-ignore>
-          <dl class="grid gap-y-5 text-sm lg:sticky lg:top-24">
+          <div class="lg:sticky lg:top-24 lg:max-h-[calc(100dvh-8rem)] lg:overflow-y-auto">
+          <dl class="grid gap-y-5 text-sm">
             <div>
               <dt class="mono-label text-ink-faint">Use when</dt>
               <dd class="mt-1.5 text-ink-muted">{useWhen}</dd>
@@ -75,6 +85,8 @@ const path = guideHref(guide);
               </dd>
             </div>
           </dl>
+          <OnThisPage headings={headings} />
+          </div>
         </aside>
         <div class="min-w-0 lg:col-span-9">
           {
@@ -112,4 +124,5 @@ const path = guideHref(guide);
       </div>
     </div>
   </article>
+  <ReadingProgress />
 </BaseLayout>

@@ -205,6 +205,13 @@
 
 /* ------------------------------------------------------------------ 4. Utilities */
 
+/* Live numerals. Digits keep a constant width so a readout does not jitter. */
+@utility num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+}
+
 /* Small-caps monospace label: eyebrows, figure numbers, metadata. */
 @utility mono-label {
   font-family: var(--font-mono);
@@ -322,6 +329,7 @@
   font-family: var(--font-serif);
   font-weight: 500;
   letter-spacing: -0.018em;
+  scroll-margin-top: 6rem;
 }
 
 .prose :where(a):not(:where(.not-prose, .not-prose *)) {
