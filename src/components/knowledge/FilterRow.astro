@@ -1,0 +1,73 @@
+---
+/** Type, level and progress controls for one field. Level appears only when a figure has one. */
+import type { HubField, HubKind } from '@/lib/hub';
+
+interface Props {
+  field: HubField;
+}
+
+const { field } = Astro.props;
+const count = (kind: HubKind) => field.items.filter((item) => item.kind === kind).length;
+const levels = ['Foundational', 'Intermediate', 'Advanced'].filter((level) =>
+  field.items.some((item) => item.level === level),
+);
+---
+
+<div class="flex flex-wrap items-center gap-2">
+  <div role="radiogroup" aria-label="Type" class="inline-flex rounded-md border border-line bg-canvas p-0.5">
+    {
+      [
+        ['all', `All ${field.items.length}`],
+        ['note', `Notes ${count('note')}`],
+        ['guide', `Guides ${count('guide')}`],
+        ['figure', `Figures ${count('figure')}`],
+      ].map(([value, label]) => (
+        <button
+          type="button"
+          role="radio"
+          data-filter="type"
+          data-value={value}
+          aria-checked={value === 'all' ? 'true' : 'false'}
+          class="h-8 rounded-[4px] px-2.5 text-[0.8125rem] text-ink-faint aria-checked:bg-raised aria-checked:text-ink"
+        >
+          {label}
+        </button>
+      ))
+    }
+  </div>
+  {
+    field.hasLevels && (
+      <div role="radiogroup" aria-label="Level" class="inline-flex rounded-md border border-line bg-canvas p-0.5">
+        <button type="button" role="radio" data-filter="level" data-value="any" aria-checked="true" class="h-8 rounded-[4px] px-2.5 text-[0.8125rem] text-ink-faint aria-checked:bg-raised aria-checked:text-ink">
+          Any level
+        </button>
+        {levels.map((level) => (
+          <button type="button" role="radio" data-filter="level" data-value={level} aria-checked="false" class="h-8 rounded-[4px] px-2.5 text-[0.8125rem] text-ink-faint aria-checked:bg-raised aria-checked:text-ink">
+            {level}
+          </button>
+        ))}
+      </div>
+    )
+  }
+  <p class="sr-only">Levels are set on studio lessons only.</p>
+  <div role="radiogroup" aria-label="Progress" class="inline-flex rounded-md border border-line bg-canvas p-0.5">
+    {
+      [
+        ['all', 'All'],
+        ['unread', 'Unread'],
+        ['read', 'Read'],
+      ].map(([value, label]) => (
+        <button
+          type="button"
+          role="radio"
+          data-filter="status"
+          data-value={value}
+          aria-checked={value === 'all' ? 'true' : 'false'}
+          class="h-8 rounded-[4px] px-2.5 text-[0.8125rem] text-ink-faint aria-checked:bg-raised aria-checked:text-ink"
+        >
+          {label}
+        </button>
+      ))
+    }
+  </div>
+</div>

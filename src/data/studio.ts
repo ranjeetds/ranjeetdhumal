@@ -67,6 +67,8 @@ export interface StudioReading {
 
 export interface StudioDomain {
   id: StudioDomainId;
+  /** Knowledge Hub field this domain is listed under. */
+  topic: 'mathematics' | 'machine-learning' | 'deep-learning' | 'generative-ai' | 'agentic-ai';
   title: string;
   description: string;
   /** Why the domain is worth a learner's time. */
@@ -243,6 +245,7 @@ export type StudioModuleId = (typeof studioModules)[number]['id'];
 export const studioDomains = [
   {
     id: 'mathematics',
+    topic: 'mathematics',
     title: 'Mathematics & Statistics',
     description: 'The quantities later lessons treat as given: a sample, a mean, a score between two vectors, and a matrix acting as a map.',
     why: 'A loss is an average of mistakes. A similarity is a dot product. A layer\'s linear part is a map, and a direction it sends to zero is gone.',
@@ -278,6 +281,7 @@ export const studioDomains = [
   },
   {
     id: 'machine-learning',
+    topic: 'machine-learning',
     title: 'Machine Learning',
     description: 'A model is a function with adjustable numbers. Training is how those numbers move.',
     why: 'Almost every trained system is a search for parameters that make a loss smaller. The search is the thing worth seeing.',
@@ -305,6 +309,7 @@ export const studioDomains = [
   },
   {
     id: 'deep-learning',
+    topic: 'deep-learning',
     title: 'Deep Learning',
     description: 'A stack of weighted sums and a bend, trained by the same kind of step as a single surface.',
     why: 'Depth is composition. The update is still a step along a gradient. Seeing the step first makes the stack legible.',
@@ -334,6 +339,7 @@ export const studioDomains = [
   },
   {
     id: 'transformers',
+    topic: 'generative-ai',
     title: 'Transformers & LLMs',
     description: 'How a sequence is cut into pieces, mixed, and continued. These figures use designed numbers, not a trained model.',
     why: 'The public object is a chatbot. The mechanism is a distribution over pieces, conditioned on other pieces.',
@@ -374,6 +380,7 @@ export const studioDomains = [
   },
   {
     id: 'generative',
+    topic: 'generative-ai',
     title: 'Generative AI & RAG',
     description: 'A model continues a sequence. Retrieval puts source text in front of that continuation.',
     why: 'Generation without a source invents. Retrieval does not make the model honest, but it changes what the model is allowed to see.',
@@ -394,6 +401,7 @@ export const studioDomains = [
   },
   {
     id: 'agents',
+    topic: 'agentic-ai',
     title: 'Agentic AI',
     description: 'A loop that looks at a state, chooses an action, and has to survive a tool that fails.',
     why: 'An agent is not a smarter chat window. It is a policy with side effects, and the failure that matters is a bad action, not a bad sentence.',

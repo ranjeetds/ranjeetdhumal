@@ -29,7 +29,7 @@ const query = Astro.url.searchParams.get('q') ?? '';
   <div class="mx-auto max-w-page px-gutter pb-section">
     <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by kind">
       {
-        ['all', 'guide', 'lesson', 'domain', 'path', 'figure', 'video', 'project', 'research'].map((kind) => (
+        ['all', 'guide', 'lesson', 'domain', 'path', 'path-step', 'field-map', 'figure', 'video', 'project', 'research'].map((kind) => (
           <button
             type="button"
             data-kind={kind}

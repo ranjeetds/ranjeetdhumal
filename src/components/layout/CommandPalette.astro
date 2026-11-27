@@ -240,6 +240,10 @@ import { primaryNav } from '@/config/site';
 
   document.addEventListener('keydown', (event) => {
     const meta = event.metaKey || event.ctrlKey;
+    const hub = document.querySelector('[data-hub-root]');
+    if (hub && ((meta && event.key.toLowerCase() === 'k') || (event.key === '/' && !dialog?.open && !isTyping(event.target)))) {
+      return;
+    }
     if (meta && event.key.toLowerCase() === 'k') {
       event.preventDefault();
       if (dialog?.open) close();

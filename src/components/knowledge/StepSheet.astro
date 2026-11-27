@@ -1,0 +1,81 @@
+---
+/** One learning-path step: outcome, concepts, the article, the figure, and the experiment. */
+import type { HubField, HubStep } from '@/lib/hub';
+
+interface Props {
+  field: HubField;
+  step: HubStep;
+}
+
+const { field, step } = Astro.props;
+const total = field.path?.steps.length ?? step.n;
+const doneKey = step.article?.key ?? step.figure?.key ?? '';
+---
+
+<div class="grid max-h-[100dvh] grid-rows-[auto_minmax(0,1fr)]">
+  <div class="flex items-center justify-between border-b border-line px-5 py-3">
+    <p class="mono-label text-ink-faint">
+      Step {step.n} of {total}
+      {field.path ? ` · ${field.path.title}` : ''}
+    </p>
+    <button type="button" data-dialog-close class="text-sm text-ink-muted hover:text-ink">Close</button>
+  </div>
+  <div class="grid gap-5 overflow-y-auto px-5 py-6">
+    <h2 id="hub-sheet-title" class="font-serif text-headline text-ink">{step.title}</h2>
+    <p class="text-ink-muted">{step.outcome}</p>
+    <ul class="flex flex-wrap gap-2">
+      {step.concepts.map((concept) => <li class="rounded-full border border-line px-3 py-1 text-xs text-ink-muted">{concept}</li>)}
+    </ul>
+    <div class="flex flex-wrap gap-2">
+      {
+        step.article ? (
+          <a href={step.article.href} class="inline-flex h-10 items-center rounded-md bg-ink px-4 text-sm text-canvas">
+            {step.article.kind === 'guide' ? 'Read the guide' : 'Read the note'}
+          </a>
+        ) : (
+          <p class="text-sm text-ink-muted">Article not written yet.</p>
+        )
+      }
+      {
+        step.figure && (
+          <a href={step.figure.href} class="inline-flex h-10 items-center rounded-md border border-accent px-4 text-sm text-accent">
+            Open the figure
+          </a>
+        )
+      }
+    </div>
+    <section class="grid gap-2">
+      <h3 class="mono-label text-ink-faint">Why</h3>
+      <p class="text-sm leading-relaxed text-ink-muted">{step.why}</p>
+    </section>
+    {
+      step.experiment && (
+        <section class="grid gap-2 rounded-lg border border-signal/40 bg-surface p-4">
+          <h3 class="mono-label text-signal">Try this</h3>
+          <p class="text-sm leading-relaxed text-ink-muted">{step.experiment}</p>
+        </section>
+      )
+    }
+    {
+      doneKey && (
+        <button type="button" data-read={doneKey} aria-pressed="false" class="h-10 justify-self-start rounded-md border border-line px-4 text-sm text-ink aria-pressed:border-ok aria-pressed:text-ok">
+          Mark step done
+        </button>
+      )
+    }
+    <div class="flex justify-between gap-3 border-t border-line pt-4">
+      {
+        step.n > 1 ? (
+          <button type="button" data-open-step={step.n - 1} class="text-sm text-ink-muted hover:text-ink">Previous</button>
+        ) : (
+          <span></span>
+        )
+      }
+      {
+        step.n < total && (
+          <button type="button" data-open-step={step.n + 1} class="text-sm text-accent">Next</button>
+        )
+      }
+    </div>
+  </div>
+</div>

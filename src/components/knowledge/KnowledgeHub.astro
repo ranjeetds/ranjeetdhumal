@@ -1,0 +1,514 @@
+---
+/**
+ * Knowledge Hub. Every field is in the HTML so the page works without JavaScript.
+ * The client script shows one field, filters it, and remembers what was opened.
+ */
+import Equation from '@/components/studio/Equation.astro';
+import Icon from '@/components/ui/Icon.astro';
+import FilterRow from '@/components/knowledge/FilterRow.astro';
+import ItemSheet from '@/components/knowledge/ItemSheet.astro';
+import StepSheet from '@/components/knowledge/StepSheet.astro';
+import { HUB_KIND_LABEL, type HubField, type HubKind, type HubModel } from '@/lib/hub';
+
+interface Props {
+  model: HubModel;
+  title: string;
+  description: string;
+  index: string;
+}
+
+const { model, title, description, index } = Astro.props;
+const fieldCount = String(model.fields.length).padStart(2, '0');
+
+const duration = (minutes: number) => {
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return rest === 0 ? `${hours} h` : `${hours} h ${rest} min`;
+};
+
+const kindCount = (field: HubField, kind: HubKind) => field.items.filter((item) => item.kind === kind).length;
+
+const summary = (field: HubField) => {
+  const parts = (['note', 'guide', 'figure'] as const).flatMap((kind) => {
+    const count = kindCount(field, kind);
+    if (count === 0) return [];
+    const label = kind === 'note' ? 'note' : kind === 'guide' ? 'guide' : 'live figure';
+    return [`${count} ${label}${count === 1 ? '' : 's'}`];
+  });
+  const head = parts.length > 0 ? parts.join(' · ') : 'No notes, guides or figures yet';
+  return field.minutes > 0 ? `${head} · about ${duration(field.minutes)} in all` : head;
+};
+
+const stepOf = (field: HubField, key: string) =>
+  field.path?.steps.find((step) => step.article?.key === key || step.figure?.key === key)?.n;
+
+const ordered = (field: HubField) =>
+  [...field.items].sort((a, b) => (field.order.get(a.key) ?? 999) - (field.order.get(b.key) ?? 999));
+
+---
+
+<div data-hub-root>
+  <header class="relative isolate overflow-hidden">
+    <div
+      aria-hidden="true"
+      class="absolute inset-0 -z-10 bg-dotgrid opacity-50 [mask-image:radial-gradient(ellipse_60%_100%_at_85%_0%,black,transparent)]"
+    >
+    </div>
+    <div class="mx-auto grid max-w-[90rem] gap-8 px-gutter pt-12 pb-10 sm:pt-16 lg:grid-cols-[1fr_minmax(22rem,30rem)] lg:items-end lg:pt-20 lg:pb-12">
+      <div>
+        <p class="mono-label flex items-center gap-3 text-ink-faint">
+          <span class="text-accent">{index}</span>
+          <span class="h-px w-6 bg-line-strong" aria-hidden="true"></span>
+          <span>Notebook</span>
+        </p>
+        <h1
+          class="mt-5 max-w-4xl font-serif text-ink"
+          style="font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4.25rem); line-height: 0.98; letter-spacing: -0.03em;"
+        >
+          {title}
+        </h1>
+        <p class="mt-5 max-w-2xl text-lede text-ink-muted">{description}</p>
+      </div>
+      <div class="grid gap-3">
+        <button
+          type="button"
+          data-hub-search
+          class="flex h-12 items-center gap-3 rounded-lg border border-line bg-surface px-4 text-left text-ink-muted hover:border-line-strong hover:text-ink"
+        >
+          <Icon name="search" />
+          <span class="flex-1 text-sm">Search this hub</span>
+          <kbd class="hidden font-mono text-[0.65rem] text-ink-faint sm:inline">⌘K</kbd>
+        </button>
+        <p class="num text-xs text-ink-faint">
+          {model.counts.notes} notes · {model.counts.guides} guides · {model.counts.figures} live figures · {model.counts.paths} paths
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="mx-auto grid max-w-[90rem] gap-10 px-gutter pb-28">
+    <section aria-label="Where to start" class="grid gap-3" data-hub-continue>
+      <div data-hub-start class="grid gap-3 lg:grid-cols-4">
+        <p class="mono-label text-ink-faint lg:col-span-4">Start here</p>
+        {
+          model.primaryPath?.steps[0] && (
+            <a href={model.primaryPath.steps[0].article?.href ?? model.primaryPath.href} class="rounded-lg border border-accent/40 bg-surface p-4">
+              <p class="mono-label text-accent">Up next · step 1</p>
+              <p class="mt-2 font-serif text-lg text-ink">{model.primaryPath.steps[0].title}</p>
+              <p class="mt-1 text-sm text-ink-muted">{model.primaryPath.title}</p>
+            </a>
+          )
+        }
+        {
+          model.metaNote && (
+            <a href={model.metaNote.href} class="rounded-lg border border-line bg-surface p-4">
+              <p class="mono-label text-ink-faint">Note</p>
+              <p class="mt-2 font-serif text-lg text-ink">{model.metaNote.title}</p>
+              <p class="mt-1 text-sm text-ink-muted">{model.metaNote.minutes} min</p>
+            </a>
+          )
+        }
+        {
+          model.primaryPath && (
+            <a href={model.primaryPath.href} class="rounded-lg border border-line bg-surface p-4">
+              <p class="mono-label text-ink-faint">Path</p>
+              <p class="mt-2 font-serif text-lg text-ink">{model.primaryPath.title}</p>
+              <p class="mt-1 text-sm text-ink-muted">{model.primaryPath.description}</p>
+            </a>
+          )
+        }
+      </div>
+      <div data-hub-resume hidden class="grid gap-3 lg:grid-cols-4"></div>
+    </section>
+
+    <div class="lg:grid lg:grid-cols-[15.5rem_minmax(0,1fr)] lg:gap-12">
+      <nav aria-label="Fields" class="sticky top-20 hidden self-start lg:block">
+        <ol class="grid gap-1">
+          {
+            model.fields.map((field) => (
+              <li>
+                <a
+                  href={`#${field.id}`}
+                  data-hub-jump={field.id}
+                  class="group grid grid-cols-[1.5rem_1fr_auto] items-baseline gap-2 rounded-md px-2 py-2 text-ink-muted hover:bg-raised hover:text-ink aria-[current=page]:text-ink"
+                >
+                  <span class="num text-[0.6875rem] text-ink-faint group-aria-[current=page]:text-accent">
+                    {String(field.n).padStart(2, '0')}
+                  </span>
+                  <span class="text-sm">{field.title}</span>
+                  <span class="num text-[0.6875rem] text-ink-faint">{field.items.length}</span>
+                  <span class="col-span-3 mt-1 h-px bg-line">
+                    <span data-hub-bar={field.id} class="block h-px w-0 bg-ok"></span>
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+        <p class="mono-label mt-4 px-2 text-ink-faint">[ ] to switch fields</p>
+        <button type="button" data-hub-reset class="mono-label mt-2 px-2 text-ink-faint hover:text-ink">Reset progress</button>
+      </nav>
+
+      <div
+        class="sticky top-14 z-20 -mx-gutter mb-6 bg-canvas/90 px-gutter py-2 backdrop-blur-md lg:hidden"
+      >
+        <div class="fade-x scrollbar-none flex gap-2 overflow-x-auto" role="navigation" aria-label="Fields">
+          {
+            model.fields.map((field) => (
+              <a
+                href={`#${field.id}`}
+                data-hub-jump={field.id}
+                class="shrink-0 rounded-full border border-line px-3 py-1.5 text-sm text-ink-muted aria-[current=page]:border-accent aria-[current=page]:text-ink"
+              >
+                {field.title}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="grid gap-16">
+        {
+          model.fields.map((field) => (
+            <section id={field.id} data-hub-field={field.id} class="scroll-mt-28 grid gap-10" aria-labelledby={`${field.id}-title`}>
+              <header class="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
+                <div>
+                  <p class="mono-label text-ink-faint">
+                    <span class="text-accent">{String(field.n).padStart(2, '0')}</span> / {fieldCount} · Field
+                  </p>
+                  <h2 id={`${field.id}-title`} class="mt-2 font-serif text-headline text-ink" tabindex="-1">
+                    {field.title}
+                  </h2>
+                  <p class="mt-3 max-w-[60ch] text-lede text-ink-muted">{field.description}</p>
+                  <p class="num mt-3 text-xs text-ink-faint">{summary(field)}</p>
+                </div>
+                {
+                  field.items.length > 0 && (
+                    <div class="flex items-center gap-3 rounded-lg border border-line bg-surface px-4 py-3">
+                      <svg data-hub-ring viewBox="0 0 36 36" class="size-10 text-ok" aria-hidden="true">
+                        <circle cx="18" cy="18" r="15" fill="none" stroke="var(--line)" stroke-width="3" />
+                        <circle
+                          data-ring-arc
+                          cx="18"
+                          cy="18"
+                          r="15"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-dasharray="94.2"
+                          stroke-dashoffset="94.2"
+                          stroke-linecap="round"
+                          transform="rotate(-90 18 18)"
+                        />
+                      </svg>
+                      <span>
+                        <span data-read-label class="block text-sm font-medium text-ink">{field.items.length} items</span>
+                        <span class="text-xs text-ink-faint">Saved in this browser</span>
+                      </span>
+                    </div>
+                  )
+                }
+              </header>
+
+              <section aria-label={`${field.title} learning path`} class="grid gap-4">
+                {
+                  field.path ? (
+                    <>
+                      <div class="flex flex-wrap items-end justify-between gap-3">
+                        <div>
+                          <p class="mono-label text-ink-faint">Learning path</p>
+                          <h3 class="mt-1 font-serif text-title text-ink">{field.path.title}</h3>
+                        </div>
+                        <a href={field.path.href} data-path-continue class="text-sm text-accent hover:underline">
+                          Open the path
+                        </a>
+                      </div>
+                      <ol class="grid gap-3 lg:grid-cols-5">
+                        {field.path.steps.map((step) => (
+                          <li>
+                            <button
+                              type="button"
+                              data-open-step={step.n}
+                              data-done-key={step.article?.key ?? step.figure?.key ?? ''}
+                              class="flex h-full w-full flex-col gap-2 rounded-lg border border-line bg-surface p-4 text-left hover:border-line-strong"
+                            >
+                              <span class="num text-xs text-ink-faint" data-step-mark>
+                                {String(step.n).padStart(2, '0')}
+                              </span>
+                              <span class="font-serif text-base leading-snug text-ink">{step.title}</span>
+                              <span class="mt-auto text-xs text-ink-faint">
+                                {step.article ? 'Article' : 'Article not written yet'}
+                                {step.figure ? ' · Figure' : ''}
+                              </span>
+                            </button>
+                            <template data-sheet-step={step.n}>
+                              <StepSheet field={field} step={step} />
+                            </template>
+                          </li>
+                        ))}
+                      </ol>
+                    </>
+                  ) : (
+                    <p class="text-sm text-ink-muted">This field has no learning path yet.</p>
+                  )
+                }
+              </section>
+
+              <div class="grid gap-4" data-hub-filters>
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <p class="mono-label text-ink-faint">Notes, guides and figures</p>
+                  <button type="button" data-open-filters class="text-sm text-ink-muted hover:text-ink lg:hidden">
+                    Filter & sort
+                  </button>
+                </div>
+                <div data-filter-bar class="grid gap-3">
+                  <FilterRow field={field} />
+                  <div class="flex flex-wrap items-center gap-2">
+                    <label class="sr-only" for={`${field.id}-q`}>Filter this field</label>
+                    <input
+                      id={`${field.id}-q`}
+                      data-filter-q
+                      type="search"
+                      placeholder="Filter this field"
+                      class="h-9 min-w-0 flex-1 rounded-md border border-line bg-canvas px-3 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-line-strong sm:max-w-xs"
+                    />
+                    <label class="sr-only" for={`${field.id}-sort`}>Sort</label>
+                    <select
+                      id={`${field.id}-sort`}
+                      data-filter-sort
+                      class="h-9 rounded-md border border-line bg-canvas px-2 text-sm text-ink"
+                    >
+                      <option value="path">Path order</option>
+                      <option value="short">Shortest</option>
+                      <option value="new">Newest</option>
+                    </select>
+                    <p data-filter-count class="num text-xs text-ink-faint">{field.items.length} of {field.items.length}</p>
+                    <button type="button" data-filter-clear hidden class="text-xs text-ink-muted hover:text-ink">
+                      Clear
+                    </button>
+                  </div>
+                  {
+                    field.tags.length > 0 && (
+                      <div class="flex flex-wrap gap-1.5" role="group" aria-label="Tags">
+                        {field.tags.map((tag) => (
+                          <button
+                            type="button"
+                            data-filter-tag={tag}
+                            aria-pressed="false"
+                            class="num h-8 rounded-full border border-line px-3 text-xs text-ink-muted aria-pressed:border-accent aria-pressed:text-ink"
+                          >
+                            #{tag}
+                          </button>
+                        ))}
+                      </div>
+                    )
+                  }
+                </div>
+              </div>
+
+              <p data-hub-live class="sr-only" aria-live="polite"></p>
+
+              {
+                field.items.length === 0 ? (
+                  <p class="text-sm text-ink-muted">Nothing in this field is published as a note, guide or figure yet.</p>
+                ) : (
+                  <ul data-hub-grid class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {ordered(field).map((item) => (
+                      <li
+                        data-hub-card
+                        data-key={item.key}
+                        data-kind={item.kind}
+                        data-level={item.level ?? ''}
+                        data-tags={item.tags.join('|')}
+                        data-minutes={item.minutes}
+                        data-published={item.publishedAt ?? ''}
+                        data-order={field.order.get(item.key) ?? 999}
+                        data-text={`${item.title} ${item.description} ${item.tags.join(' ')}`}
+                        data-read-state="unread"
+                      >
+                        <article class="group relative flex h-full flex-col gap-3 rounded-lg border border-line bg-surface p-5 transition-[border-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-sheet">
+                          <div class="flex items-center justify-between gap-3">
+                            <span class="flex items-center gap-2">
+                              <span class:list={['mono-label', item.kind === 'guide' ? 'text-signal' : item.kind === 'figure' ? 'text-accent' : 'text-ink-faint']}>
+                                {HUB_KIND_LABEL[item.kind]}
+                              </span>
+                              {stepOf(field, item.key) && (
+                                <span class="mono-label rounded-xs border border-accent/40 px-1.5 text-accent">
+                                  Path · {stepOf(field, item.key)}
+                                </span>
+                              )}
+                            </span>
+                            <button
+                              type="button"
+                              data-read={item.key}
+                              aria-pressed="false"
+                              class="relative z-10 size-7 rounded-full border border-line text-transparent hover:border-line-strong aria-pressed:border-ok aria-pressed:bg-ok aria-pressed:text-canvas"
+                            >
+                              <span class="sr-only">Mark “{item.title}” as read</span>
+                              <span aria-hidden="true" class="grid size-full place-items-center text-xs">✓</span>
+                            </button>
+                          </div>
+                          <h3 class="font-serif text-[1.375rem] leading-[1.15] tracking-[-0.015em] text-ink">
+                            <a href={item.href} data-open-item={item.key} class="after:absolute after:inset-0 after:rounded-lg">
+                              {item.title}
+                            </a>
+                          </h3>
+                          <p class="line-clamp-3 text-sm leading-relaxed text-ink-muted">{item.description}</p>
+                          {
+                            item.equation && (
+                              <div class="overflow-hidden rounded-md border border-line bg-canvas/60 px-3 py-2 text-ink" aria-hidden="true">
+                                <Equation tex={item.equation} />
+                              </div>
+                            )
+                          }
+                          <p class="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-xs text-ink-faint">
+                            <span class="num">{item.minutes} min</span>
+                            {item.level && <span>{item.level}</span>}
+                            {item.maturity && <span class="capitalize">{item.maturity}</span>}
+                            {item.kind !== 'figure' && item.figureId && <span class="text-accent">Live figure inside</span>}
+                          </p>
+                        </article>
+                        <template data-sheet-item={item.key}>
+                          <ItemSheet item={item} field={field} />
+                        </template>
+                      </li>
+                    ))}
+                  </ul>
+                )
+              }
+              <p data-filter-empty hidden class="text-sm text-ink-muted">
+                Nothing matches these filters.
+                <button type="button" data-filter-clear class="ml-2 text-accent">Clear filters</button>
+              </p>
+
+              <section class="grid gap-5" aria-labelledby={`${field.id}-map`}>
+                <div>
+                  <p class="mono-label text-ink-faint">The field, in essays</p>
+                  <h3 id={`${field.id}-map`} class="mt-1 font-serif text-title text-ink">Why this field</h3>
+                </div>
+                <div class="grid max-w-[68ch] gap-3 text-[1.0625rem] leading-[1.7] text-ink-muted">
+                  {field.introduction.map((paragraph) => <p>{paragraph}</p>)}
+                </div>
+                <div class="divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface">
+                  {
+                    field.entries.map((entry) => (
+                      <details class="group">
+                        <summary class="cursor-pointer list-none px-5 py-4 font-serif text-lg text-ink marker:content-none [&::-webkit-details-marker]:hidden">
+                          <span class="flex items-center justify-between gap-4">
+                            {entry.title}
+                            <span class="text-ink-faint transition-transform group-open:rotate-180" aria-hidden="true">⌄</span>
+                          </span>
+                        </summary>
+                        <div class="grid max-w-[68ch] gap-3 px-5 pb-5 text-sm leading-relaxed text-ink-muted">
+                          {entry.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+                          {
+                            entry.links.length > 0 && (
+                              <p class="flex flex-wrap gap-2 pt-1">
+                                <span class="mono-label text-ink-faint">Go deeper</span>
+                                {entry.links.map((link) => (
+                                  <a href={link.href} class="text-accent hover:underline">
+                                    {link.title}
+                                  </a>
+                                ))}
+                              </p>
+                            )
+                          }
+                        </div>
+                      </details>
+                    ))
+                  }
+                </div>
+              </section>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <div
+    data-hub-bottom
+    class="fixed inset-x-0 bottom-0 z-30 hidden items-center justify-between gap-3 border-t border-line bg-canvas/95 px-gutter py-3 backdrop-blur-md lg:!hidden"
+  >
+    <button type="button" data-hub-search class="text-sm text-ink">Search the hub</button>
+    <a data-hub-next href="#main" class="text-sm text-accent">Next step</a>
+  </div>
+
+  <dialog id="hub-sheet" aria-labelledby="hub-sheet-title" class="hub-dialog bg-canvas text-ink shadow-sheet">
+    <div data-sheet-body></div>
+  </dialog>
+  <dialog id="hub-filters" aria-label="Filter and sort" class="hub-dialog hub-dialog-bottom bg-canvas text-ink shadow-sheet">
+    <div class="flex items-center justify-between border-b border-line px-4 py-3">
+      <p class="mono-label text-ink-faint">Filter & sort</p>
+      <button type="button" data-dialog-close class="text-sm text-ink-muted">Close</button>
+    </div>
+    <div data-filter-slot class="overflow-y-auto px-4 py-4"></div>
+    <div class="border-t border-line px-4 py-3">
+      <button type="button" data-filter-apply class="h-10 w-full rounded-md bg-ink text-sm text-canvas">Show items</button>
+    </div>
+  </dialog>
+  <dialog id="hub-palette" aria-labelledby="hub-palette-label" class="hub-dialog hub-palette bg-canvas text-ink shadow-sheet">
+    <form class="flex items-center gap-2 border-b border-line px-4" data-palette-form>
+      <label id="hub-palette-label" for="hub-q" class="sr-only">Search the hub</label>
+      <input
+        id="hub-q"
+        data-palette-q
+        type="search"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-controls="hub-palette-list"
+        aria-expanded="true"
+        placeholder="Search notes, guides, figures, paths"
+        class="h-14 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink-faint"
+      />
+      <button type="button" data-dialog-close class="mono-label text-ink-faint">Close</button>
+    </form>
+    <div data-palette-scopes class="flex gap-1 overflow-x-auto border-b border-line px-3 py-2" role="tablist" aria-label="Search scope"></div>
+    <p data-palette-status class="mono-label px-4 pt-3 text-ink-faint" aria-live="polite"></p>
+    <ul id="hub-palette-list" role="listbox" class="max-h-[min(24rem,50vh)] overflow-y-auto px-2 py-2"></ul>
+    <p class="border-t border-line px-4 py-3 text-xs text-ink-faint">
+      <a data-palette-site class="text-accent" href="/search">Search the whole notebook</a>
+    </p>
+  </dialog>
+  <script type="application/json" id="hub-index" set:html={JSON.stringify(model.search).replaceAll('<', '\\u003c')} />
+</div>
+
+<style>
+  .hub-dialog {
+    width: min(34rem, 100vw);
+    max-height: 100dvh;
+    margin: 0 0 0 auto;
+    border: 0;
+    border-left: 1px solid var(--line);
+    padding: 0;
+  }
+  .hub-dialog::backdrop {
+    background: color-mix(in oklab, var(--ink) 35%, transparent);
+  }
+  .hub-dialog-bottom {
+    width: 100%;
+    max-height: 86dvh;
+    margin: auto 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .hub-palette {
+    width: min(36rem, calc(100vw - 2rem));
+    max-height: min(36rem, 80vh);
+    margin: 12vh auto auto;
+    border: 1px solid var(--line-strong);
+  }
+  @media (min-width: 1024px) {
+    .hub-dialog-bottom {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { mountHub } from '@/lib/hub-client';
+
+  const root = document.querySelector('[data-hub-root]');
+  if (root instanceof HTMLElement) mountHub(root);
+</script>

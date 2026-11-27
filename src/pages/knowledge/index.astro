@@ -1,88 +1,27 @@
 ---
-import CardGrid from '@/components/ui/CardGrid.astro';
-import NoteList from '@/components/content/NoteList.astro';
-import EmptyState from '@/components/ui/EmptyState.astro';
-import Section from '@/components/ui/Section.astro';
-import { topics } from '@/data/topics';
-import PageLayout from '@/layouts/PageLayout.astro';
-import { getPublishedNotes, noteHref } from '@/lib/content';
+/**
+ * The hub is one field at a time once JavaScript runs. Without it, every field
+ * stays in the page and the anchors still land.
+ */
+import KnowledgeHub from '@/components/knowledge/KnowledgeHub.astro';
+import { getSection, sectionIndex } from '@/config/site';
+import { getHub } from '@/lib/hub';
+import { breadcrumbSchema } from '@/lib/seo';
+import BaseLayout from '@/layouts/BaseLayout.astro';
 
-const notes = await getPublishedNotes();
-
-const fields = topics.map((topic) => ({
-  ...topic,
-  notes: notes.filter((note) => note.data.topic === topic.id),
-}));
-
-const countLabel = (count: number) =>
-  count === 0 ? 'No notes yet' : `${count} ${count === 1 ? 'note' : 'notes'}`;
+const section = getSection('knowledge');
+const model = await getHub();
 ---
 
-<PageLayout section="knowledge">
-  <Section id="latest" label="Latest" title="Recently published">
-    {
-      notes.length > 0 ? (
-        <NoteList notes={notes.slice(0, 8)} />
-      ) : (
-        <EmptyState title="The first notes are being written.">
-          Notes appear here as soon as they are published.
-        </EmptyState>
-      )
-    }
-  </Section>
-
-  <Section id="fields" label="Fields" title="Eight fields.">
-    <CardGrid
-      items={fields.map((field, index) => ({
-        href: `#${field.id}`,
-        label: `${String(index + 1).padStart(2, '0')} / ${countLabel(field.notes.length)}`,
-        title: field.title,
-        description: field.entries.map((entry) => entry.title).join(' · '),
-      }))}
-    />
-
-    <ul class="mt-16 grid gap-16">
-      {
-        fields.map((field) => (
-          <li id={field.id} class="scroll-mt-28">
-            <h3 class="font-serif text-headline text-ink">{field.title}</h3>
-            {
-              field.notes.length > 0 && (
-                <div class="mt-8">
-                  <CardGrid
-                    heading="h4"
-                    items={field.notes.map((note) => ({
-                      href: noteHref(note),
-                      title: note.data.title,
-                      description: note.data.description,
-                    }))}
-                  />
-                </div>
-              )
-            }
-            <ul class="mt-8 grid gap-px border border-line bg-line sm:grid-cols-2">
-              <li class="bg-canvas p-6 sm:col-span-2">
-                <p class="mono-label text-ink-faint">Why this field</p>
-                <div class="mt-3 max-w-2xl space-y-3 text-sm leading-relaxed text-ink-muted">
-                  {field.introduction.map((paragraph) => (
-                    <p>{paragraph}</p>
-                  ))}
-                </div>
-              </li>
-              {field.entries.map((entry) => (
-                <li class="bg-canvas p-6">
-                  <h4 class="font-serif text-title text-ink">{entry.title}</h4>
-                  <div class="mt-3 space-y-3 text-sm leading-relaxed text-ink-muted">
-                    {entry.paragraphs.map((paragraph) => (
-                      <p>{paragraph}</p>
-                    ))}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))
-      }
-    </ul>
-  </Section>
-</PageLayout>
+<BaseLayout
+  title={section.title}
+  description={section.description}
+  structuredData={[breadcrumbSchema([{ name: section.title, path: section.href }])]}
+>
+  <KnowledgeHub
+    model={model}
+    title={section.title}
+    description={section.description}
+    index={sectionIndex(section.id)}
+  />
+</BaseLayout>

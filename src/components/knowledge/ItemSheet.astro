@@ -1,0 +1,124 @@
+---
+/** Detail for one note, guide or figure. Opened from the card; the page itself is the link. */
+import Equation from '@/components/studio/Equation.astro';
+import { HUB_KIND_LABEL, moduleTitle, type HubField, type HubItem } from '@/lib/hub';
+
+interface Props {
+  item: HubItem;
+  field: HubField;
+}
+
+const { item, field } = Astro.props;
+const steps = (field.path?.steps ?? []).filter((step) => step.article?.key === item.key || step.figure?.key === item.key);
+const openLabel = item.kind === 'note' ? 'Read the note' : item.kind === 'guide' ? 'Read the guide' : 'Open the live figure';
+---
+
+<div class="grid max-h-[100dvh] grid-rows-[auto_minmax(0,1fr)]">
+  <div class="flex items-center justify-between border-b border-line px-5 py-3">
+    <p class="mono-label text-ink-faint">{HUB_KIND_LABEL[item.kind]} · {field.title}</p>
+    <button type="button" data-dialog-close class="text-sm text-ink-muted hover:text-ink">Close</button>
+  </div>
+  <div class="grid gap-5 overflow-y-auto px-5 py-6">
+    <h2 id="hub-sheet-title" class="font-serif text-headline text-ink">{item.title}</h2>
+    <p class="text-lede text-ink-muted">{item.description}</p>
+    <p class="num text-xs text-ink-faint">
+      {item.minutes} min
+      {item.level && ` · ${item.level}`}
+      {item.maturity && ` · ${item.maturity}`}
+    </p>
+    <div class="flex flex-wrap gap-2">
+      <a href={item.href} class="inline-flex h-10 items-center rounded-md bg-accent px-4 text-sm font-medium text-accent-ink">
+        {openLabel}
+      </a>
+      <button type="button" data-read={item.key} aria-pressed="false" class="h-10 rounded-md border border-line px-4 text-sm text-ink aria-pressed:border-ok aria-pressed:text-ok">
+        Mark as read
+      </button>
+    </div>
+    {
+      item.equation && (
+        <section class="grid gap-2">
+          <h3 class="mono-label text-ink-faint">The equation it turns on</h3>
+          <div class="rounded-md border border-line bg-surface px-4 py-3 text-ink">
+            <Equation tex={item.equation} />
+          </div>
+        </section>
+      )
+    }
+    {
+      item.prerequisites.length > 0 && (
+        <section class="grid gap-2">
+          <h3 class="mono-label text-ink-faint">Before you start</h3>
+          <ul class="grid gap-1 text-sm text-ink-muted">
+            {item.prerequisites.map((prerequisite) =>
+              item.kind === 'figure' ? (
+                <li>
+                  <a href={`/studio/${prerequisite}`} class="hover:text-ink">{moduleTitle(prerequisite)}</a>
+                </li>
+              ) : (
+                <li>{prerequisite}</li>
+              ),
+            )}
+          </ul>
+        </section>
+      )
+    }
+    {
+      item.objectives.length > 0 && (
+        <section class="grid gap-2">
+          <h3 class="mono-label text-ink-faint">Afterwards you can</h3>
+          <ul class="list-disc pl-5 text-sm text-ink-muted">
+            {item.objectives.map((objective) => <li>{objective}</li>)}
+          </ul>
+        </section>
+      )
+    }
+    {
+      item.useWhen && (
+        <section class="grid gap-2 text-sm">
+          <h3 class="mono-label text-signal">Use when</h3>
+          <p class="text-ink-muted">{item.useWhen}</p>
+          {item.avoidWhen && (
+            <>
+              <h3 class="mono-label text-danger">Avoid when</h3>
+              <p class="text-ink-muted">{item.avoidWhen}</p>
+            </>
+          )}
+          {item.check && (
+            <>
+              <h3 class="mono-label text-ink-faint">Check</h3>
+              <p class="text-ink-muted">{item.check}</p>
+            </>
+          )}
+        </section>
+      )
+    }
+    {
+      item.kind !== 'figure' && item.figureId && (
+        <p>
+          <a href={`/studio/${item.figureId}`} class="text-sm text-accent hover:underline">Live figure inside</a>
+        </p>
+      )
+    }
+    {
+      item.next && (
+        <p class="text-sm text-ink-muted">
+          Next lesson: <a href={`/studio/${item.next}`} class="text-ink hover:underline">{moduleTitle(item.next)}</a>
+        </p>
+      )
+    }
+    {
+      steps.length > 0 && field.path && (
+        <p class="text-sm text-ink-muted">
+          On a learning path: {field.path.title}, step {steps.map((step) => step.n).join(', ')}.
+        </p>
+      )
+    }
+    {
+      item.tags.length > 0 && (
+        <p class="num flex flex-wrap gap-2 text-xs text-ink-faint">
+          {item.tags.map((tag) => <span>#{tag}</span>)}
+        </p>
+      )
+    }
+  </div>
+</div>

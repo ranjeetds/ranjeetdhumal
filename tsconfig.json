@@ -8,5 +8,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "exclude": ["portal", "dist", "node_modules"]
+  "exclude": ["portal", "dist", "node_modules", "ref"]
 }

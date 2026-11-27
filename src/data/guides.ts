@@ -53,6 +53,23 @@ export const guideFields = [
 
 export type GuideFieldId = (typeof guideFields)[number]['id'];
 
+/**
+ * Which Knowledge Hub field a guide field is listed under.
+ * Statistics sits with mathematics; retrieval with generative AI; weight space and
+ * recursive improvement with research. Confirm if a guide should move.
+ */
+export const guideFieldToTopic = {
+  mathematics: 'mathematics',
+  statistics: 'mathematics',
+  'machine-learning': 'machine-learning',
+  'deep-learning': 'deep-learning',
+  generative: 'generative-ai',
+  rag: 'generative-ai',
+  agents: 'agentic-ai',
+  'weight-space': 'emerging-tech',
+  improvement: 'emerging-tech',
+} as const satisfies Record<GuideFieldId, string>;
+
 export const guideFieldIds = guideFields.map((field) => field.id) as [GuideFieldId, ...GuideFieldId[]];
 
 export function getGuideField(id: GuideFieldId) {

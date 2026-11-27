@@ -57,7 +57,20 @@ function isLast(value: unknown): value is LastVisit {
 }
 
 function saveProgress(progress: Progress): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  let existing: Record<string, unknown> = {};
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed: unknown = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') existing = { ...(parsed as Record<string, unknown>) };
+    }
+  } catch {
+    existing = {};
+  }
+  const next: Record<string, unknown> = { ...existing, completed: progress.completed };
+  if (progress.last) next.last = progress.last;
+  else delete next.last;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
 }
 
 function resumeHref(last: LastVisit): string {
