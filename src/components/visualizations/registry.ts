@@ -178,6 +178,22 @@ export const visualizations = [
     status: 'live',
   },
   {
+    id: 'linear-map',
+    title: 'A matrix as a map',
+    summary: 'A 2×2 matrix sending the basis, the unit circle, and one chosen vector to new places.',
+    caption:
+      'Five designed maps of the plane. The ink arrows are the columns. The amber curve is the unit circle after the map. A dashed line is a direction that stays on itself.',
+    objective: 'Say which directions a matrix stretches, and which it sends to zero.',
+    interactions: [
+      'Switch among stretch, rotation, shear, and the two rank-1 maps',
+      'Move the input vector and read where it goes',
+      'Compare the columns with the rank',
+    ],
+    engine: 'svg',
+    topic: 'mathematics',
+    status: 'live',
+  },
+  {
     id: 'loss-functions',
     title: 'Loss functions',
     summary: 'Squared error and binary cross-entropy for one prediction.',

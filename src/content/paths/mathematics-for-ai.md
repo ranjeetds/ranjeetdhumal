@@ -55,6 +55,12 @@ modules:
     next: >
       The map is the forward pass. Changing a weight to reduce a loss requires
       a slope. That is the next module.
+    article: /guides/a-matrix-is-a-map
+    figure: linear-map
+    experiment: >
+      Open Stretch. The unit circle becomes an ellipse, and the two ink arrows
+      are the columns. Then choose Drop the vertical. One arrow lands on the
+      origin and the rank reads 1.
   - title: Derivatives and the chain rule
     outcome: >
       You can compute a gradient for a small composed function and explain why
@@ -72,6 +78,11 @@ modules:
     next: >
       Many of those functions are probabilities. The next module says what has
       to be true of a number before it deserves the name.
+    article: /guides/a-derivative-is-a-local-slope
+    figure: gradient-descent
+    experiment: >
+      Keep the start and raise the learning rate until the status reads Left
+      the frame. The slope at the start did not describe that step.
   - title: Probability as a commitment
     outcome: >
       You can update a belief with Bayes' rule on a small example, and you can
@@ -89,6 +100,7 @@ modules:
     next: >
       Training is the search for parameters that make a loss small. The last
       module is that search, including the constraints hiding inside it.
+    article: /guides/calibration
   - title: Walking downhill, with constraints
     outcome: >
       You can contrast a convex problem with a non-convex one, and you can name
@@ -106,4 +118,8 @@ modules:
     next: >
       The path ends when the symbols in a methods section refer to pictures.
       The machine-learning path uses those pictures on data.
+    figure: gradient-descent
+    experiment: >
+      Run Across the ridge, then Deeper valley. The update is the same kind of
+      step. The start chooses the well.
 ---

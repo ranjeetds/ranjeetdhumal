@@ -20,6 +20,7 @@ export type StudioDomainId = (typeof studioDomainIds)[number];
 export const liveVisualizationIds = [
   'sample-mean',
   'dot-product',
+  'linear-map',
   'loss-functions',
   'gradient-descent',
   'neuron',
@@ -99,6 +100,13 @@ export const studioModules = [
     id: 'dot-product',
     title: 'Dot product',
     subtitle: 'Two arrows, their product, and the angle between them.',
+    domainId: 'mathematics',
+    status: 'live',
+  },
+  {
+    id: 'linear-map',
+    title: 'A matrix as a map',
+    subtitle: 'Where a 2×2 matrix sends the basis, the unit circle, and one vector you choose.',
     domainId: 'mathematics',
     status: 'live',
   },
@@ -236,11 +244,11 @@ export const studioDomains = [
   {
     id: 'mathematics',
     title: 'Mathematics & Statistics',
-    description: 'The quantities later lessons treat as given: a sample, a mean, and a score between two vectors.',
-    why: 'A loss is an average of mistakes. A similarity is a dot product. Both are pictures before they are slogans.',
+    description: 'The quantities later lessons treat as given: a sample, a mean, a score between two vectors, and a matrix acting as a map.',
+    why: 'A loss is an average of mistakes. A similarity is a dot product. A layer\'s linear part is a map, and a direction it sends to zero is gone.',
     prerequisites: 'None. This is a starting point. The derivative a descent needs is taught inside the gradient descent lesson.',
     related: ['machine-learning'],
-    sequence: ['sample-mean', 'entropy', 'normalization', 'dot-product', 'gradient-descent'],
+    sequence: ['sample-mean', 'entropy', 'normalization', 'dot-product', 'linear-map', 'gradient-descent'],
     groups: [
       {
         title: 'Estimation',
@@ -257,8 +265,16 @@ export const studioDomains = [
         lede: 'The product of two vectors, which is the score attention will use later.',
         modules: ['dot-product'],
       },
+      {
+        title: 'Linear algebra',
+        lede: 'A matrix as a map of the plane: the directions it stretches, and the direction it sends to zero.',
+        modules: ['linear-map'],
+      },
     ],
-    reading: [{ href: '/knowledge/a-sample-and-its-mean', title: 'A sample and its mean' }],
+    reading: [
+      { href: '/knowledge/a-sample-and-its-mean', title: 'A sample and its mean' },
+      { href: '/guides/a-matrix-is-a-map', title: 'A matrix is a map' },
+    ],
   },
   {
     id: 'machine-learning',

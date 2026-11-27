@@ -16,6 +16,7 @@ import Convolution from './svg/Convolution';
 import DotProduct from './svg/DotProduct';
 import Entropy from './svg/Entropy';
 import GradientDescent from './svg/GradientDescent';
+import LinearMap from './svg/LinearMap';
 import Losses from './svg/Losses';
 import Neighbors from './svg/Neighbors';
 import Neuron from './svg/Neuron';
@@ -47,6 +48,7 @@ const visualization = getVisualization(id);
   {/* Hydrate only once scrolled into view; the server-rendered figure is already complete. */}
   {id === 'sample-mean' && <SampleMean client:visible />}
   {id === 'dot-product' && <DotProduct client:visible />}
+  {id === 'linear-map' && <LinearMap client:visible />}
   {id === 'loss-functions' && <Losses client:visible />}
   {id === 'gradient-descent' && <GradientDescent client:visible />}
   {id === 'neuron' && <Neuron client:visible />}

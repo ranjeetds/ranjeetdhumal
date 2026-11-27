@@ -1,0 +1,110 @@
+---
+title: A matrix as a map
+description: A 2×2 matrix sends the basis, the unit circle, and one vector you choose to new places in the plane.
+summary: Five maps, each a 2×2 matrix. The ink arrows are the columns, which are where (1, 0) and (0, 1) go. The amber curve is the unit circle after the map. The signal arrow is an input you move. Rank 2 means both columns survive. Rank 1 means they lie on one line, and something was sent to zero. A dashed line is a direction the map does not rotate, only scale.
+domain: mathematics
+difficulty: Foundational
+estimatedTime: 18
+visualization: linear-map
+status: published
+prerequisites:
+  - dot-product
+next: gradient-descent
+experiments:
+  - Leave Stretch on. The input (1.00, 0.50) goes to (2.00, 0.25). The columns are (2.00, 0.00) and (0.00, 0.50).
+  - Choose Rotate 90°. e1 goes to (0.00, 1.00) and e2 goes to (−1.00, 0.00). The caption says no real direction stays on its own line.
+  - Choose Shear. One direction stays on its line, with scale 1.00. The vertical basis arrow moves sideways and is not sent to zero.
+  - Choose Drop the vertical. e2 goes to (0.00, 0.00) and the rank reads 1.
+  - Choose Onto the diagonal. Both columns are (0.50, 0.50). The input (1.00, 0.50) goes to (0.75, 0.75).
+tags:
+  - matrix
+  - linear map
+  - rank
+  - eigenvector
+---
+
+<Chapter id="intuition" title="The columns are the whole map" objective="Say what the two ink arrows are, before any word for an eigenvalue.">
+
+A matrix of this size takes a pair of numbers and returns a pair. That is all a linear layer does in two dimensions. The figure draws three consequences of one matrix.
+
+The ink arrows start at the origin. One is where <Equation tex="(1, 0)" display={false} /> went. The other is where <Equation tex="(0, 1)" display={false} /> went. Those two images are the columns. Every other input is a mixture of them, so once you can see the columns you can see the map.
+
+The amber curve is the unit circle after the same map. A circle that becomes a stretched oval was scaled differently along two directions. A circle that becomes a line segment was flattened. The signal arrow is an input you choose with the sliders, and its tip is where that input went.
+
+Nothing here is learned. The five buttons are five matrices written by hand.
+
+</Chapter>
+
+<Chapter id="action" title="Where one vector goes" objective="Compute the image the caption prints for Stretch.">
+
+Write the matrix by rows, so
+
+<Equation tex="\begin{pmatrix} a & b \\ c & d \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} ax + by \\ cx + dy \end{pmatrix}." />
+
+Stretch is <Equation tex="a = 2" display={false} />, <Equation tex="b = 0" display={false} />, <Equation tex="c = 0" display={false} />, <Equation tex="d = 0.5" display={false} />. The default input is <Equation tex="(1, 0.5)" display={false} />. The image is <Equation tex="(2 \times 1 + 0 \times 0.5,\; 0 \times 1 + 0.5 \times 0.5) = (2, 0.25)" display={false} />, which is the pair the caption prints as (2.00, 0.25).
+
+The first column is the image of <Equation tex="(1, 0)" display={false} />, so it is <Equation tex="(a, c) = (2, 0)" display={false} />. The second column is the image of <Equation tex="(0, 1)" display={false} />, so it is <Equation tex="(b, d) = (0, 0.5)" display={false} />. Move the sliders and the signal tip moves. The ink arrows do not, because the matrix has not changed.
+
+</Chapter>
+
+<Chapter id="rank" title="Rank is how many directions survive" objective="Use Drop the vertical and Onto the diagonal, and say what rank 1 means on each.">
+
+The determinant of <Equation tex="\begin{pmatrix} a & b \\ c & d \end{pmatrix}" display={false} /> is <Equation tex="ad - bc" display={false} />. For a 2×2 matrix that number is zero exactly when the columns are parallel, including the case where one of them is zero. The figure calls the rank 2 when the determinant is not zero, and 1 when it is zero but a column is still there.
+
+Drop the vertical is <Equation tex="\begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}" display={false} />. The determinant is 0. The second column is <Equation tex="(0, 0)" display={false} />, so the vertical basis arrow lands on the origin and the caption says e2 goes to (0.00, 0.00). The rank reads 1. Horizontal inputs keep their first coordinate. Vertical inputs disappear. A later layer cannot tell them apart, because they have become the same point.
+
+Onto the diagonal is <Equation tex="\tfrac12 \begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}" display={false} />. Both columns are <Equation tex="(0.5, 0.5)" display={false} />, so the two ink arrows lie on top of each other. The rank is again 1, and the determinant is 0. The input <Equation tex="(1, 0.5)" display={false} /> goes to <Equation tex="(0.75, 0.75)" display={false} />, which sits on that same line. The direction <Equation tex="(1, -1)" display={false} /> is the one this map deletes. Set the sliders to 1 and −1. The image is (0.00, 0.00).
+
+Rotate 90° sends the unit circle onto itself, so the amber curve sits on the grey circle. The arrows are what turned: e1 points up and e2 points left. The determinant is 1.00 and the rank is 2. Shear keeps that area too, and the circle does not land on itself. Rank 2 means nothing was sent to zero.
+
+</Chapter>
+
+<Chapter id="lines" title="A direction that stays on its line" objective="Match the dashed lines to the scales the caption prints.">
+
+A direction stays on its line when the map scales it and does not rotate it. The scale is the eigenvalue, and the direction is an eigenvector. The dashed lines are those directions. The caption prints the scales.
+
+Stretch has two. The horizontal arrow is doubled, scale 2.00. The vertical arrow is halved, scale 0.50. They already lie on the axes, which is why the dashed lines are the axes.
+
+Shear is <Equation tex="\begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}" display={false} />. One direction stays on its line, with scale 1.00. That direction is horizontal: <Equation tex="(1, 0)" display={false} /> is sent to itself. The vertical basis arrow goes to <Equation tex="(1, 1)" display={false} />, so it is moved, not deleted. Rank stays 2. One fixed line is not the same fact as a collapse.
+
+Rotate 90° sends <Equation tex="(1, 0)" display={false} /> to <Equation tex="(0, 1)" display={false} /> and <Equation tex="(0, 1)" display={false} /> to <Equation tex="(-1, 0)" display={false} />. Every real direction is turned. The caption says no real direction stays on its own line, and there is no dashed line. The determinant is still 1.00. Turning a plane is not the same as flattening it.
+
+Drop the vertical has scales 1.00 and 0.00. The scale 0 is the collapsed direction. Onto the diagonal has the same two scales, along the diagonal and along <Equation tex="(1, -1)" display={false} />.
+
+</Chapter>
+
+<Chapter id="checks" title="Check this" objective="Use the figure, then answer.">
+
+<Check
+  id="column"
+  prompt="On Drop the vertical, where does e2 go?"
+  choices={[
+    'It goes to (0.00, 0.00).',
+    'It goes to (0.00, 1.00).',
+    'It goes to (1.00, 0.00).',
+  ]}
+  answer="It goes to (0.00, 0.00)."
+  why="e2 is (0, 1), and the second column is its image. That column is zeros, so the arrow lands on the origin and the rank reads 1."
+/>
+
+<Check
+  id="rotate"
+  prompt="On Rotate 90°, what does the caption say about directions that stay on their own line?"
+  choices={[
+    'Both axes stay, with scale 1.00.',
+    'The horizontal axis stays, with scale 1.00.',
+    'No real direction stays on its own line.',
+  ]}
+  answer="No real direction stays on its own line."
+  why="A quarter turn moves every real direction onto a different line. The determinant is still 1.00, so the map has not collapsed anything."
+/>
+
+</Chapter>
+
+<Chapter id="continue" title="What to open next" objective="Take the map into the place that changes it.">
+
+[A matrix is a map](/guides/a-matrix-is-a-map) is the same claim without the sliders: a weight matrix is this object, and a direction it sends to zero cannot be recovered downstream.
+
+[Gradient descent](/studio/gradient-descent) is what happens when the numbers inside the matrix are the things you step. The map on this page is fixed. A training step changes it. The slope that chooses the step is local, which is why a large learning rate can leave the region the slope described.
+
+</Chapter>

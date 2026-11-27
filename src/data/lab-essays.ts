@@ -53,6 +53,15 @@ export const labEssays: Record<VisualizationId, LabEssay> = {
       'The product of the components is also the product of the lengths and the cosine of the angle. Agreement is a positive number, a right angle is zero, and opposition is negative. A zero-length vector has no direction, so the figure does not invent an angle for it. A later attention score is this kind of number.',
     concepts: ['Component-wise product', 'Cosine of the angle', 'A zero vector has no direction'],
   },
+  'linear-map': {
+    scene:
+      'A plane with the unit circle, two ink arrows from the origin, and one signal arrow. Stretch is selected. The ink arrows are the columns: (1, 0) goes to (2.00, 0.00) and (0, 1) goes to (0.00, 0.50). The signal arrow is the input (1.00, 0.50), and its tip is (2.00, 0.25). The amber curve is the unit circle after the map. Dashed lines mark the directions that stay on themselves, with scales 2.00 and 0.50. The caption prints the rank, the determinant, and those images.',
+    interaction:
+      'Switch to Rotate 90°, Shear, Drop the vertical, or Onto the diagonal. The columns, the curve, and the dashed lines change with the matrix. Move x and y and only the signal arrow moves. Drop the vertical puts one ink arrow on the origin and the rank reads 1. Rotate 90° leaves the rank at 2 and says that no real direction stays on its own line.',
+    insight:
+      'A matrix is the place its columns send the basis. Rank 2 means both directions survive. Rank 1 means the columns lie on one line and some direction was sent to zero, which a later layer cannot recover. A direction that stays on its line was scaled, not turned. A rotation can preserve area and still have no such real direction.',
+    concepts: ['Columns as images of the basis', 'Rank', 'A direction that stays on its line'],
+  },
   'loss-functions': {
     scene:
       'A curve of loss against a prediction from 0 to 1. A vertical line and a marker sit on the prediction you chose. Squared error is the default, with prediction 0.20 and target 1, so the loss reads 0.64. Cross-entropy replaces the target slider with a label of 0 or 1.',
